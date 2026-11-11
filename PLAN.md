@@ -18,15 +18,15 @@ The dataset's transfer fees are in euros. Prompts say so and name the source, fo
 
 Rank a question's valid answers from most popular to least, then hand out tiers by fixed shares, all set in `src/config/tiers.ts`:
 
-| Tier | Share of a question's valid answers |
-|---|---|
-| Galacticat | the rarest 2%, at least 1, at most 3 |
-| Big Cat | next 5% |
-| Pick of the Litter | next 8% |
-| Tomcat | next 15% |
-| Squad Moggy | next 20% |
-| Alley Cat | next 25% |
-| Copycat | the rest, the most popular answers |
+| Tier               | Share of a question's valid answers  |
+| ------------------ | ------------------------------------ |
+| Galacticat         | the rarest 2%, at least 1, at most 3 |
+| Big Cat            | next 5%                              |
+| Pick of the Litter | next 8%                              |
+| Tomcat             | next 15%                             |
+| Squad Moggy        | next 20%                             |
+| Alley Cat          | next 25%                             |
+| Copycat            | the rest, the most popular answers   |
 
 Before a question has real answers, "popular" means the player's fame score from the data. After 200 answers, it means how often players gave that answer, with fame breaking ties.
 
@@ -62,13 +62,13 @@ Packs are built from question tags, priced at £1.99 each as in the brief. Three
 
 The Transfermarkt dataset only covers players active from 2012/13 onwards (details in section 7). I looked for older data and tested the options on 10 November 2026.
 
-| Source | What it has | Licence | Verdict |
-|---|---|---|---|
-| **Wikidata** | Club histories for footballers of every era, with years and appearance counts on most entries. World Cup squads. | CC0, free for any use including commercial | **Use it** |
-| Fjelstul World Cup Database | Every men's World Cup squad from 1930 to 2022, match appearances from 1970 | CC-BY-SA 4.0: commercial use allowed, but needs credit, and anything built from it must be shared under the same licence | Keep as a fallback |
-| openfootball/worldcup | World Cup results from 1930, some lineups | CC0 | Not enough player detail |
-| ewenme/transfers | Transfers in nine leagues from 1992/93 | No licence stated | Do not use |
-| salimt/football-datasets | 92,000 player profiles and season stats | Licence file missing | Do not use |
+| Source                      | What it has                                                                                                      | Licence                                                                                                                  | Verdict                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------ |
+| **Wikidata**                | Club histories for footballers of every era, with years and appearance counts on most entries. World Cup squads. | CC0, free for any use including commercial                                                                               | **Use it**               |
+| Fjelstul World Cup Database | Every men's World Cup squad from 1930 to 2022, match appearances from 1970                                       | CC-BY-SA 4.0: commercial use allowed, but needs credit, and anything built from it must be shared under the same licence | Keep as a fallback       |
+| openfootball/worldcup       | World Cup results from 1930, some lineups                                                                        | CC0                                                                                                                      | Not enough player detail |
+| ewenme/transfers            | Transfers in nine leagues from 1992/93                                                                           | No licence stated                                                                                                        | Do not use               |
+| salimt/football-datasets    | 92,000 player profiles and season stats                                                                          | Licence file missing                                                                                                     | Do not use               |
 
 What I measured on Wikidata:
 
@@ -120,23 +120,23 @@ Git, GitHub CLI and Node.js were installed on 10 November 2026 with Tom's go-ahe
 
 Prices read from each company's pricing page on 10 November 2026. They can change.
 
-| Service | During the build | Once live with ads and payments |
-|---|---|---|
-| Vercel | Free Hobby plan | **Pro, $20 a month** plus VAT. Includes $20 of usage credit and 1 TB of data transfer a month. Hobby is not allowed once the site has ads or takes payments. |
-| Supabase | Free: 2 projects, 500 MB database, 50,000 monthly users. Free projects pause after a week with no activity. | **Pro, $25 a month** recommended at launch so the live database never pauses. Includes 8 GB and 100,000 monthly users. |
-| Stripe | Free in test mode | No monthly fee. **1.5% + 20p** per payment on a standard UK card, more on premium, European and international cards. |
-| GitHub | Free | Free |
+| Service  | During the build                                                                                            | Once live with ads and payments                                                                                                                              |
+| -------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Vercel   | Free Hobby plan                                                                                             | **Pro, $20 a month** plus VAT. Includes $20 of usage credit and 1 TB of data transfer a month. Hobby is not allowed once the site has ads or takes payments. |
+| Supabase | Free: 2 projects, 500 MB database, 50,000 monthly users. Free projects pause after a week with no activity. | **Pro, $25 a month** recommended at launch so the live database never pauses. Includes 8 GB and 100,000 monthly users.                                       |
+| Stripe   | Free in test mode                                                                                           | No monthly fee. **1.5% + 20p** per payment on a standard UK card, more on premium, European and international cards.                                         |
+| GitHub   | Free                                                                                                        | Free                                                                                                                                                         |
 
 So the fixed cost at launch is about **$45 a month** plus VAT, plus the yearly domain renewal. I cannot predict traffic, but the included allowances are large for a new site.
 
 What Stripe keeps on each price in the brief, standard UK card:
 
-| Price | Stripe keeps | You get |
-|---|---|---|
-| £0.99 | about 21p (22%) | about 78p |
+| Price | Stripe keeps    | You get     |
+| ----- | --------------- | ----------- |
+| £0.99 | about 21p (22%) | about 78p   |
 | £1.99 | about 23p (12%) | about £1.76 |
-| £3.99 | about 26p (7%) | about £3.73 |
-| £4.99 | about 27p (5%) | about £4.72 |
+| £3.99 | about 26p (7%)  | about £3.73 |
+| £4.99 | about 27p (5%)  | about £4.72 |
 
 The 20p fixed fee hits the £0.99 coin pack hardest. The prices stay as the brief says unless you change them.
 
@@ -148,30 +148,30 @@ The 20p fixed fee hits the £0.99 coin pack hardest. The prices stay as the brie
 
 I cannot create accounts, sign in, or handle passwords and secret keys for you. These steps are yours.
 
-| When | What |
-|---|---|
-| Now | Sign in to GitHub once with `gh auth login`. Decide whether to make the repo private (2.2). |
-| Stage 2 | Create two Supabase projects (development and live) and paste their keys into `.env.local`. I will give exact click-by-click steps. |
-| Stage 7 | Create a Google sign-in client and paste its ID and secret into Supabase. |
-| Stage 12 | Create Stripe and AdSense accounts and paste the keys into Vercel. Upgrade Vercel to Pro. Connect transferkitty.gg in Vercel. |
+| When     | What                                                                                                                                |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| Now      | Sign in to GitHub once with `gh auth login`. Decide whether to make the repo private (2.2).                                         |
+| Stage 2  | Create two Supabase projects (development and live) and paste their keys into `.env.local`. I will give exact click-by-click steps. |
+| Stage 7  | Create a Google sign-in client and paste its ID and secret into Supabase.                                                           |
+| Stage 12 | Create Stripe and AdSense accounts and paste the keys into Vercel. Upgrade Vercel to Pro. Connect transferkitty.gg in Vercel.       |
 
 ---
 
 ## 5. Tech choices
 
-| Area | Choice | Why |
-|---|---|---|
-| Framework | Next.js App Router, TypeScript strict, Tailwind | From the brief. Latest stable versions at setup. |
-| Package manager | npm | Nothing extra to install. |
-| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5. |
-| Validation | Zod on every API input | From the brief. |
-| Tests | Vitest | Fast, works with TypeScript without setup. |
-| Lint and format | ESLint and Prettier | From the brief. |
-| Dataset tooling | DuckDB, called from TypeScript scripts | Reads the dataset files directly and handles millions of rows on a laptop. |
-| Rate limiting | A small Postgres-backed limiter behind one `rateLimit()` function | No extra vendor. Can be swapped for Redis later without touching callers. |
-| Sprites | Pixel grids in code, drawn as SVG | Fur, breed and kit colours swap by changing a palette. |
-| Sound | Web Audio API tones made in code | Original, tiny, no audio files to license. |
-| Payments | Stripe Checkout and a webhook | From the brief. |
+| Area              | Choice                                                                 | Why                                                                        |
+| ----------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Framework         | Next.js App Router, TypeScript strict, Tailwind                        | From the brief. Latest stable versions at setup.                           |
+| Package manager   | npm                                                                    | Nothing extra to install.                                                  |
+| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5.                                         |
+| Validation        | Zod on every API input                                                 | From the brief.                                                            |
+| Tests             | Vitest                                                                 | Fast, works with TypeScript without setup.                                 |
+| Lint and format   | ESLint and Prettier                                                    | From the brief.                                                            |
+| Dataset tooling   | DuckDB, called from TypeScript scripts                                 | Reads the dataset files directly and handles millions of rows on a laptop. |
+| Rate limiting     | A small Postgres-backed limiter behind one `rateLimit()` function      | No extra vendor. Can be swapped for Redis later without touching callers.  |
+| Sprites           | Pixel grids in code, drawn as SVG                                      | Fur, breed and kit colours swap by changing a palette.                     |
+| Sound             | Web Audio API tones made in code                                       | Original, tiny, no audio files to license.                                 |
+| Payments          | Stripe Checkout and a webhook                                          | From the brief.                                                            |
 
 ### How the main anti-cheat rules work
 
@@ -284,71 +284,71 @@ Row-level security is on for every table. "Server only" means no browser access 
 
 ### Reference data (imported)
 
-| Table | Key columns | Browser access |
-|---|---|---|
+| Table     | Key columns                                                                                                       | Browser access                                                  |
+| --------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
 | `players` | `id`, `transfermarkt_id`, `wikidata_id`, `name`, `search_name`, `country`, `birth_year`, `position`, `fame_score` | Server only. Autocomplete goes through a rate-limited endpoint. |
-| `clubs` | `id`, `transfermarkt_id`, `wikidata_id`, `name`, `search_name`, `country` | Server only |
+| `clubs`   | `id`, `transfermarkt_id`, `wikidata_id`, `name`, `search_name`, `country`                                         | Server only                                                     |
 
 `search_name` is lower-case with accents removed, with a trigram index for fast fuzzy search.
 
 ### Questions
 
-| Table | Key columns | Notes |
-|---|---|---|
-| `questions` | `id`, `prompt`, `answer_type` (player or club), `source` (generated or manual), `data_source`, `template_key`, `template_params`, `dedupe_key` unique, `status` (draft, active, retired), `answer_count`, `times_played`, `tiers_recalculated_at` | Server only |
-| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `fame_score`, `times_given`. Primary key on question and entity. | Server only. This is the table that must never leak. |
-| `question_tags` | `question_id`, `tag_type` (league, decade, competition, tournament, nationality, club, featured_player), `tag_value` | Server only |
-| `answer_reports` | `id`, `question_id`, `user_id`, `suggested_answer`, `status` | Players' "missing answer" reports, reviewed in Admin. |
+| Table              | Key columns                                                                                                                                                                                                                                       | Notes                                                 |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `questions`        | `id`, `prompt`, `answer_type` (player or club), `source` (generated or manual), `data_source`, `template_key`, `template_params`, `dedupe_key` unique, `status` (draft, active, retired), `answer_count`, `times_played`, `tiers_recalculated_at` | Server only                                           |
+| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `fame_score`, `times_given`. Primary key on question and entity.                                                                                              | Server only. This is the table that must never leak.  |
+| `question_tags`    | `question_id`, `tag_type` (league, decade, competition, tournament, nationality, club, featured_player), `tag_value`                                                                                                                              | Server only                                           |
+| `answer_reports`   | `id`, `question_id`, `user_id`, `suggested_answer`, `status`                                                                                                                                                                                      | Players' "missing answer" reports, reviewed in Admin. |
 
 Tiers are stored as a level number from 0 (Stray) to 7 (Galacticat). Names and fees come from config, so renaming a tier needs no database change.
 
 ### Daily puzzles
 
-| Table | Key columns | Notes |
-|---|---|---|
-| `daily_puzzles` | `puzzle_date` primary key, `puzzle_number` unique | |
+| Table                    | Key columns                                            | Notes                                                              |
+| ------------------------ | ------------------------------------------------------ | ------------------------------------------------------------------ |
+| `daily_puzzles`          | `puzzle_date` primary key, `puzzle_number` unique      |                                                                    |
 | `daily_puzzle_questions` | `puzzle_date`, `position` 1 to 7, `question_id` unique | A question appears in at most one daily. Server only until served. |
 
 ### Play
 
-| Table | Key columns | Notes |
-|---|---|---|
-| `game_sessions` | `id`, `user_id`, `mode` (daily, archive, unlimited, pack), `puzzle_date`, `pack_id`, `started_at`, `completed_at`, `total_fee`, `total_answer_ms` | **Unique index on `user_id` and `puzzle_date` where mode is daily.** That is the one-attempt rule. Players read their own rows. |
-| `session_questions` | `session_id`, `position`, `question_id`, `served_at`, `answered_at`, `entity_id`, `outcome` (correct, wrong, timeout), `tier`, `fee` | `served_at` is the server-side timer. Fee is locked here when answered. Players read their own rows. |
+| Table               | Key columns                                                                                                                                       | Notes                                                                                                                           |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `game_sessions`     | `id`, `user_id`, `mode` (daily, archive, unlimited, pack), `puzzle_date`, `pack_id`, `started_at`, `completed_at`, `total_fee`, `total_answer_ms` | **Unique index on `user_id` and `puzzle_date` where mode is daily.** That is the one-attempt rule. Players read their own rows. |
+| `session_questions` | `session_id`, `position`, `question_id`, `served_at`, `answered_at`, `entity_id`, `outcome` (correct, wrong, timeout), `tier`, `fee`              | `served_at` is the server-side timer. Fee is locked here when answered. Players read their own rows.                            |
 
 Fees are whole pounds stored as integers. Totals that can grow without limit use 64-bit integers.
 
 ### Players and social
 
-| Table | Key columns | Notes |
-|---|---|---|
-| `profiles` | `user_id`, `display_name`, `avatar` (JSON of chosen options), `is_guest`, `current_streak`, `best_streak`, `last_played_date`, `nine_lives_used_on` | Public read of name and avatar only. |
-| `leagues` | `id`, `name`, `invite_code` unique, `owner_id` | Members read their own leagues. |
-| `league_members` | `league_id`, `user_id` | |
+| Table            | Key columns                                                                                                                                         | Notes                                |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| `profiles`       | `user_id`, `display_name`, `avatar` (JSON of chosen options), `is_guest`, `current_streak`, `best_streak`, `last_played_date`, `nine_lives_used_on` | Public read of name and avatar only. |
+| `leagues`        | `id`, `name`, `invite_code` unique, `owner_id`                                                                                                      | Members read their own leagues.      |
+| `league_members` | `league_id`, `user_id`                                                                                                                              |                                      |
 
 Leaderboards (today, this week, all time, per league) are database functions over completed daily sessions. Ties are broken by lower total answer time. If they get slow at scale they become stored tables refreshed by the rollover job, with no change to the app code that calls them.
 
 ### Coins, shop and money
 
-| Table | Key columns | Notes |
-|---|---|---|
-| `coin_ledger` | `id`, `user_id`, `delta`, `reason`, `reference`, `idempotency_key` unique | Append-only. Balance is the sum. The unique key stops a reward or purchase being credited twice. Players read their own rows. |
-| `kits` | `id`, `name`, `primary_colour`, `secondary_colour`, `pattern`, `price_coins`, `active` | Seeded from `src/config/kits.ts`, then editable in Admin. |
-| `shop_items` | `id`, `kind`, `name`, `price_coins`, `active` | Avatar items, seeded from config. |
-| `user_items` | `user_id`, `item_type`, `item_id`, `ledger_id` | What a player owns. |
-| `packs` | `id`, `slug`, `name`, `kind` (era, tournament, special), `tag_filter`, `price_pence`, `active` | Themed packs built from tags. |
-| `entitlements` | `user_id`, `key` (`lifetime` or `pack:<slug>`), `source`, `stripe_ref` | Players read their own rows. Only the webhook writes. |
-| `purchases` | `id`, `user_id`, `stripe_session_id` unique, `product_key`, `amount_pence`, `status` | |
-| `stripe_events` | `event_id` primary key | Stops a repeated webhook being processed twice. |
+| Table           | Key columns                                                                                    | Notes                                                                                                                         |
+| --------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `coin_ledger`   | `id`, `user_id`, `delta`, `reason`, `reference`, `idempotency_key` unique                      | Append-only. Balance is the sum. The unique key stops a reward or purchase being credited twice. Players read their own rows. |
+| `kits`          | `id`, `name`, `primary_colour`, `secondary_colour`, `pattern`, `price_coins`, `active`         | Seeded from `src/config/kits.ts`, then editable in Admin.                                                                     |
+| `shop_items`    | `id`, `kind`, `name`, `price_coins`, `active`                                                  | Avatar items, seeded from config.                                                                                             |
+| `user_items`    | `user_id`, `item_type`, `item_id`, `ledger_id`                                                 | What a player owns.                                                                                                           |
+| `packs`         | `id`, `slug`, `name`, `kind` (era, tournament, special), `tag_filter`, `price_pence`, `active` | Themed packs built from tags.                                                                                                 |
+| `entitlements`  | `user_id`, `key` (`lifetime` or `pack:<slug>`), `source`, `stripe_ref`                         | Players read their own rows. Only the webhook writes.                                                                         |
+| `purchases`     | `id`, `user_id`, `stripe_session_id` unique, `product_key`, `amount_pence`, `status`           |                                                                                                                               |
+| `stripe_events` | `event_id` primary key                                                                         | Stops a repeated webhook being processed twice.                                                                               |
 
 The brief asks for kits in a config file and also for kits to be editable in Admin. The plan treats the config file as the starting catalogue and the database as the live copy.
 
 ### Housekeeping
 
-| Table | Purpose |
-|---|---|
-| `rate_limits` | Counters for the autocomplete, submission and purchase limits. |
-| `job_runs` | Records that the rollover job ran for a given UK date, so running twice is harmless. |
+| Table         | Purpose                                                                              |
+| ------------- | ------------------------------------------------------------------------------------ |
+| `rate_limits` | Counters for the autocomplete, submission and purchase limits.                       |
+| `job_runs`    | Records that the rollover job ran for a given UK date, so running twice is harmless. |
 
 ---
 
@@ -356,21 +356,21 @@ The brief asks for kits in a config file and also for kits to be editable in Adm
 
 Each stage is one branch and one pull request. A stage is done when CI is green and you have tried it.
 
-| # | Branch | What gets built | Done when |
-|---|---|---|---|
-| 1 | `stage/01-plan` | `BRIEF.md`, `CLAUDE.md`, this plan | You approve the plan |
-| 2 | `stage/02-setup` | Next.js, TypeScript strict, Tailwind, ESLint, Prettier, Vitest, CI, `.env.example`, Supabase connection, first migration | CI green, the app starts and reaches the database |
-| 3 | `stage/03-data` | Data download, import, source matching, fame score, generator, `QUESTIONS_TO_CHECK.md` | Thousands of questions loaded, quality report reviewed |
-| 4 | `stage/04-game-flow` | Daily puzzle, server timer, autocomplete, submission, one-attempt rule, rate limits, plain UI | You can play today's 7 end to end |
-| 5 | `stage/05-scoring` | Tier config, fees, kitty total, percentages, full answer list with search on Results, tier recalculation, rollover job | Fees and totals correct, tests pass |
-| 6 | `stage/06-top-kitties` | Today, week and all-time boards, rank, friends leagues with invite codes | Boards and leagues work with test users |
-| 7 | `stage/07-auth` | Guest mode, magic link, Google, account merge | Guest play carries over on sign-up |
-| 8 | `stage/08-visuals` | Pixel style, stadium, Kit, tier sprites, gauge, ticker, sounds, loader | All screens in final style on a phone |
-| 9 | `stage/09-profile` | Avatar builder, streaks, history calendar, share text | Avatar shows on Top Kitties |
-| 10 | `stage/10-admin` | Protected admin: questions, tiers, packs, kits, prices, answer reports | You can add a question and override a tier |
-| 11 | `stage/11-coins-shop` | Coin ledger, rewards, shop, kits, owned items | Earn and spend coins, balance from ledger only |
-| 12 | `stage/12-payments` | Stripe Checkout, webhook, lifetime unlock, Unlimited, Archive, packs, Nine Lives, AdSense | Test-mode purchases grant and restore correctly |
-| 13 | `stage/13-launch-extras` | Privacy policy, terms, cookie consent, display-name filter, report-an-answer link, `README.md` | Ready for the legal check and launch |
+| #   | Branch                   | What gets built                                                                                                          | Done when                                              |
+| --- | ------------------------ | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------ |
+| 1   | `stage/01-plan`          | `BRIEF.md`, `CLAUDE.md`, this plan                                                                                       | You approve the plan                                   |
+| 2   | `stage/02-setup`         | Next.js, TypeScript strict, Tailwind, ESLint, Prettier, Vitest, CI, `.env.example`, Supabase connection, first migration | CI green, the app starts and reaches the database      |
+| 3   | `stage/03-data`          | Data download, import, source matching, fame score, generator, `QUESTIONS_TO_CHECK.md`                                   | Thousands of questions loaded, quality report reviewed |
+| 4   | `stage/04-game-flow`     | Daily puzzle, server timer, autocomplete, submission, one-attempt rule, rate limits, plain UI                            | You can play today's 7 end to end                      |
+| 5   | `stage/05-scoring`       | Tier config, fees, kitty total, percentages, full answer list with search on Results, tier recalculation, rollover job   | Fees and totals correct, tests pass                    |
+| 6   | `stage/06-top-kitties`   | Today, week and all-time boards, rank, friends leagues with invite codes                                                 | Boards and leagues work with test users                |
+| 7   | `stage/07-auth`          | Guest mode, magic link, Google, account merge                                                                            | Guest play carries over on sign-up                     |
+| 8   | `stage/08-visuals`       | Pixel style, stadium, Kit, tier sprites, gauge, ticker, sounds, loader                                                   | All screens in final style on a phone                  |
+| 9   | `stage/09-profile`       | Avatar builder, streaks, history calendar, share text                                                                    | Avatar shows on Top Kitties                            |
+| 10  | `stage/10-admin`         | Protected admin: questions, tiers, packs, kits, prices, answer reports                                                   | You can add a question and override a tier             |
+| 11  | `stage/11-coins-shop`    | Coin ledger, rewards, shop, kits, owned items                                                                            | Earn and spend coins, balance from ledger only         |
+| 12  | `stage/12-payments`      | Stripe Checkout, webhook, lifetime unlock, Unlimited, Archive, packs, Nine Lives, AdSense                                | Test-mode purchases grant and restore correctly        |
+| 13  | `stage/13-launch-extras` | Privacy policy, terms, cookie consent, display-name filter, report-an-answer link, `README.md`                           | Ready for the legal check and launch                   |
 
 Stage 4 uses plain styling on purpose. The final look comes in stage 8, once the game works.
 

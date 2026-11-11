@@ -1,0 +1,2 @@
+# Keep line endings the same on Windows, macOS and CI so Prettier agrees everywhere.
+* text=auto eol=lf
