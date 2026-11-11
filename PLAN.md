@@ -159,19 +159,19 @@ I cannot create accounts, sign in, or handle passwords and secret keys for you. 
 
 ## 5. Tech choices
 
-| Area              | Choice                                                                 | Why                                                                        |
-| ----------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Framework         | Next.js App Router, TypeScript strict, Tailwind                        | From the brief. Latest stable versions at setup.                           |
-| Package manager   | npm                                                                    | Nothing extra to install.                                                  |
-| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5.                                         |
-| Validation        | Zod on every API input                                                 | From the brief.                                                            |
-| Tests             | Vitest                                                                 | Fast, works with TypeScript without setup.                                 |
-| Lint and format   | ESLint and Prettier                                                    | From the brief.                                                            |
-| Dataset tooling   | DuckDB, called from TypeScript scripts                                 | Reads the dataset files directly and handles millions of rows on a laptop. |
-| Rate limiting     | A small Postgres-backed limiter behind one `rateLimit()` function      | No extra vendor. Can be swapped for Redis later without touching callers.  |
-| Sprites           | Pixel grids in code, drawn as SVG                                      | Fur, breed and kit colours swap by changing a palette.                     |
-| Sound             | Web Audio API tones made in code                                       | Original, tiny, no audio files to license.                                 |
-| Payments          | Stripe Checkout and a webhook                                          | From the brief.                                                            |
+| Area              | Choice                                                                 | Why                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework         | Next.js App Router, TypeScript strict, Tailwind                        | From the brief. Latest stable versions at setup.                                                                                     |
+| Package manager   | npm                                                                    | Nothing extra to install.                                                                                                            |
+| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5.                                                                                                   |
+| Validation        | Zod on every API input                                                 | From the brief.                                                                                                                      |
+| Tests             | Vitest                                                                 | Fast, works with TypeScript without setup.                                                                                           |
+| Lint and format   | ESLint and Prettier                                                    | From the brief.                                                                                                                      |
+| Dataset tooling   | SQLite, built into Node, called from TypeScript scripts                | Handles millions of rows on a laptop with nothing extra to install. DuckDB was the first choice but crashed on load on the build PC. |
+| Rate limiting     | A small Postgres-backed limiter behind one `rateLimit()` function      | No extra vendor. Can be swapped for Redis later without touching callers.                                                            |
+| Sprites           | Pixel grids in code, drawn as SVG                                      | Fur, breed and kit colours swap by changing a palette.                                                                               |
+| Sound             | Web Audio API tones made in code                                       | Original, tiny, no audio files to license.                                                                                           |
+| Payments          | Stripe Checkout and a webhook                                          | From the brief.                                                                                                                      |
 
 ### How the main anti-cheat rules work
 
@@ -239,42 +239,56 @@ transfer-kitty/
 
 ### What the Transfermarkt dataset covers
 
-Checked on 10 November 2026 by downloading five of its twelve tables.
+Checked on 11 November 2026 by loading nine of its tables into the local warehouse.
 
-- Match and appearance data for the main European leagues and cups runs from 2012/13 to 2025/26. Leagues outside Europe's main ones (Brazil, Argentina, MLS, Saudi Arabia, Japan and others) only have 2024 and 2025.
-- World Cups from 2006 to 2026 and Euros from 2008 to 2024 are in the games table. Whether full player appearances exist for the older tournaments is not checked yet.
+- Match and appearance data (1,894,350 appearances) for the main European leagues and cups runs from 2012/13 to 2025/26. Leagues outside Europe's main ones (Brazil, Argentina, MLS, Saudi Arabia, Japan and others) only have 2024 and 2025.
 - 50,149 players, every one active in 2012/13 or later.
-- 175,165 transfers for those players, including their moves before 2012. Fees are in euros.
-- Updates are paused. Games stop at 6 July 2026 and appearances at 28 June 2026, so the 2026/27 season is missing and the 2026 World Cup is cut off before its final. A 2026 World Cup pack needs its knockout rounds from another source, or waits until the dataset resumes.
+- **Transfers before 2012 are too patchy to use.** Only 6,165 of the 175,165 transfers are from the 2000s, so careers before the match data are mostly missing. Asked for Liverpool and Real Madrid players, the dataset alone finds two (Fabinho and Alexander-Arnold) and misses Xabi Alonso. Transfers are used only for fees since summer 2012. Fees are in euros.
+- **Older tournaments have results but no players.** World Cups from 2006 and Euros from 2008 are in the games table, but player appearances exist only for the 2026 World Cup group stage. Earlier tournaments need Wikidata.
+- Cup finals have full line-ups up to 2025. The 2026 finals are missing.
+- Updates are paused. Games stop at 6 July 2026, so the 2026/27 season is missing and the 2026 World Cup is cut off before its knockout rounds.
+
+Because of this, every question built from Transfermarkt alone is built from match appearances and says which seasons it covers ("since 2012/13", or a named season or final).
 
 ### Generator steps
 
 Runs on a developer machine against the downloaded data, never on the live site.
 
-1. **Download** the data into `data/raw/` (not committed).
-2. **Import** players and clubs into Supabase, with a fame score for each player. If Wikidata is approved, players are matched across the two sources by Transfermarkt ID.
-3. **Generate.** Each template is one file that returns a prompt, tags and the list of valid answers with the evidence behind each. Starting templates:
-   - played for both Club A and Club B
-   - a [nationality] player who played in [league]
-   - joined [club] for €Xm or more
-   - played in a [competition] final
-   - played in [league] in the [decade]
-   - played for [club] in the [decade]
-   - scored in [competition] for [club]
-   - played for [club] under [manager]
-   - in the [country] squad at [tournament]
-   - played alongside [player] at [club]
-4. **Filter.** Keep questions with at least 15 valid answers (config). Drop near-duplicates and questions so broad that almost any player is right (upper limit in config).
-5. **Tier.** Rank each question's answers by fame score and apply the shares in decision 1.2.
-6. **Load** into Supabase. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated.
+1. **Download** the data into `data/raw/` (not committed): `npm run data:download`.
+2. **Build the warehouse**, a local SQLite file with the raw tables, a per-player-per-season summary and a fame score for each player: `npm run data:build`.
+3. **Generate**: `npm run questions:generate`. Each template is one file in `scripts/questions/templates` that returns a prompt, tags and the valid answers. The 16 templates built so far:
+   - played for [club] in [league] in [season]
+   - played a league match for [club] since 2012/13
+   - played for [club] in the 2020s
+   - played for [club] under [manager], with the seasons named
+   - played for [club] in [cup] since 2012/13
+   - scored for [club] in [competition] since 2012/13
+   - played for both [club] and [club] since 2012/13
+   - played in both [league] and [league] since 2012/13
+   - a player from [country] who played in [league] since 2012/13
+   - a player from [country] who played for [club] since 2012/13
+   - played in the [year] [cup] final, and in any [cup] final
+   - scored [10, 15 or 20] or more goals in a [league] season
+   - scored a hat-trick in [competition]
+   - joined [club] for €Xm or more since summer 2012
+   - played for [country] in the group stage of the 2026 World Cup
+4. **Filter.** Keep questions with 15 to 400 valid answers (config). Above 400, almost any guess is right.
+5. **Tier.** Rank each question's answers by starting popularity and apply the shares in decision 1.2.
+6. **Load** into Supabase: `npm run questions:load`. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated.
 
-**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals. Crowd recalculation and admin overrides fix what remains.
+**First run, 11 November 2026:** 6,581 questions and 296,780 answers, loaded into the development database.
 
-**"Played for" rule.** A player counts for a club if a source shows an appearance for it or a spell in its first team. Youth and reserve sides are separate clubs in the data and do not count.
+**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals. Known weakness: stars whose best years were before 2012 score too low, because their matches are not in the data. Wikidata can correct this. Crowd recalculation and admin overrides fix what remains.
 
-**Tags.** Every question is tagged by league, decade, competition, tournament, nationality, club and featured player where they apply. Packs are just saved tag filters.
+**Starting popularity.** Within one question, fame is scaled down for a player who barely featured in what is being asked. Salah is a rarer answer for "played for Chelsea" than for "played for Liverpool". The strength of this is set in `src/config/fame.ts`.
 
-The generator prints a report: questions per template, answer-count spread, source agreement, and a random sample to eyeball. The target is several thousand questions. I will report the real numbers at the end of stage 3 before going further.
+**"Played for" rule.** A player counts for a club only if the data shows a match appearance for it. Signing for a club without playing does not count.
+
+**Nationality** is the first citizenship the dataset lists for a player.
+
+**Tags.** Every question is tagged by league, decade, competition, tournament, nationality and club where they apply. Packs are just saved tag filters.
+
+The generator writes a report to `data/build/question-report.txt`: questions per template, the spread of answer counts, and one sample question per template with its most popular and rarest answers.
 
 ---
 
@@ -296,7 +310,7 @@ Row-level security is on for every table. "Server only" means no browser access 
 | Table              | Key columns                                                                                                                                                                                                                                       | Notes                                                 |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `questions`        | `id`, `prompt`, `answer_type` (player or club), `source` (generated or manual), `data_source`, `template_key`, `template_params`, `dedupe_key` unique, `status` (draft, active, retired), `answer_count`, `times_played`, `tiers_recalculated_at` | Server only                                           |
-| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `fame_score`, `times_given`. Primary key on question and entity.                                                                                              | Server only. This is the table that must never leak.  |
+| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `starting_popularity`, `times_given`. Primary key on question and entity.                                                                                     | Server only. This is the table that must never leak.  |
 | `question_tags`    | `question_id`, `tag_type` (league, decade, competition, tournament, nationality, club, featured_player), `tag_value`                                                                                                                              | Server only                                           |
 | `answer_reports`   | `id`, `question_id`, `user_id`, `suggested_answer`, `status`                                                                                                                                                                                      | Players' "missing answer" reports, reviewed in Admin. |
 

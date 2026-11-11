@@ -21,7 +21,28 @@ Other commands:
 | `npm run dev`                       | Start the app at http://localhost:3000              |
 | `npm run build`                     | Production build                                    |
 | `npx supabase migration new <name>` | Create a new migration file                         |
-| `npx supabase db push`              | Apply new migrations to the linked Supabase project |
+| `npx supabase db push --remote`     | Apply new migrations to the linked Supabase project |
+
+`db push` without `--remote` targets a local database that this project does not use. Add `--dry-run` first to see what would be applied.
+
+## Data and questions
+
+Questions are built offline from downloaded data, then loaded into the database. Nothing in `data/` is committed. Run these in order; each is safe to re-run.
+
+| Command                      | What it does                                                              |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                         |
+| `npm run data:build`         | Load them into the local SQLite warehouse and build fame scores           |
+| `npm run questions:generate` | Run every template and write the questions and a report to `data/build`   |
+| `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local` |
+| `npm run wikidata:download`  | Download club histories from Wikidata (about 100 slices, resumable)       |
+| `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
+| `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
+
+- Scripts live in `scripts/` and run with `tsx`. They may print to the console; app code may not.
+- A new kind of question is one new file in `scripts/questions/templates`, added to `index.ts` there.
+- The match data starts in 2012/13. A prompt built from it must say which seasons it covers, or valid older answers would be marked wrong.
+- The generator stops if a question lists the same player twice. Fix the template, not the check.
 
 ## Next.js version
 
