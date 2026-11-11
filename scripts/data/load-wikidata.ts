@@ -45,9 +45,11 @@ export async function loadWikidataCareers(warehouse: Warehouse): Promise<number>
     }
   });
 
+  // Player and team together, so checking one player's spell at one club is a single lookup.
   warehouse.run(`
-    create index wd_careers_by_player on wd_careers (player_tm_id);
+    create index wd_careers_by_player_team on wd_careers (player_tm_id, team_tm_id);
     create index wd_careers_by_team on wd_careers (team_tm_id);
+    analyze wd_careers;
   `);
   return spellCount;
 }

@@ -144,7 +144,74 @@ function buildReport(warehouse: Warehouse, spellCount: number): string {
     line("Club can be matched by Transfermarkt ID", withClubId, overlapSpells),
     line("Has a start year", withStartYear, overlapSpells),
     line("Has an appearance count", withAppearances, overlapSpells),
+    ...buildBreakdowns(warehouse),
   ].join("\n");
+}
+
+/** One line per group, from a query that returns `label`, `part` and `whole`. */
+function breakdown(warehouse: Warehouse, sql: string): string[] {
+  return warehouse
+    .query<{ label: string; part: number; whole: number }>(sql)
+    .map((row) => line(`  ${row.label}`, row.part, row.whole));
+}
+
+/** Where Wikidata is strong and weak, which decides how it should be used. */
+function buildBreakdowns(warehouse: Warehouse): string[] {
+  const found = `sum(exists (select 1 from wd_careers w
+                             where w.player_tm_id = t.player_id and w.team_tm_id = t.club_id))`;
+  const knownSpells = `from cmp_tm_spells t
+    join player_fame f on f.player_id = t.player_id
+    where t.appearances >= ${ESTABLISHED_LEAGUE_APPEARANCES}
+      and t.player_id in (select player_tm_id from wd_careers)`;
+  const confirmed = `sum(exists (select 1 from player_seasons s
+                                 where s.player_id = w.player_tm_id and s.club_id = w.team_tm_id))`;
+
+  return [
+    "",
+    "6. Spells found in Wikidata, by when the player first appeared for the club",
+    ...breakdown(
+      warehouse,
+      `select case when t.first_season = ${FIRST_SEASON} then '1. already there in ${FIRST_SEASON}'
+                   when t.first_season <= 2018 then '2. 2013 to 2018'
+                   when t.first_season <= 2022 then '3. 2019 to 2022'
+                   else '4. 2023 onwards' end as label,
+              ${found} as part, count(*) as whole
+       ${knownSpells} group by label order by label`,
+    ),
+    "",
+    "7. Spells found in Wikidata, by how famous the player is",
+    ...breakdown(
+      warehouse,
+      `select case when f.fame >= 300 then '1. famous (fame 300+)'
+                   when f.fame >= 100 then '2. known (fame 100 to 299)'
+                   else '3. obscure (fame under 100)' end as label,
+              ${found} as part, count(*) as whole
+       ${knownSpells} group by label order by label`,
+    ),
+    "",
+    "8. Wikidata spells confirmed by Transfermarkt, by the games Wikidata records for the spell",
+    ...breakdown(
+      warehouse,
+      `select case when w.appearances is null then '4. no count recorded'
+                   when w.appearances = 0 then '3. zero games'
+                   when w.appearances < ${MEANINGFUL_WIKIDATA_APPEARANCES} then '2. 1 to ${MEANINGFUL_WIKIDATA_APPEARANCES - 1} games'
+                   else '1. ${MEANINGFUL_WIKIDATA_APPEARANCES} or more games' end as label,
+              ${confirmed} as part, count(*) as whole
+       from wd_careers w
+       join tm_players p on p.player_id = w.player_tm_id
+       join cmp_ever_present_clubs c on c.club_id = w.team_tm_id
+       where w.start_year > ${FIRST_SEASON}
+       group by label order by label`,
+    ),
+    "",
+    "9. What Wikidata adds from before the match data",
+    ...breakdown(
+      warehouse,
+      `select 'spells before ${FIRST_SEASON} with a matched club and at least one game' as label,
+              sum(team_tm_id is not null and appearances >= 1) as part, count(*) as whole
+       from wd_careers where start_year < ${FIRST_SEASON}`,
+    ),
+  ];
 }
 
 const warehouse = openWarehouse();

@@ -91,6 +91,39 @@ The limits, honestly:
 
 If it passes, the player pool becomes "everyone in either source". If it fails, the game launches with 2012/13 onwards and says so on screen. The "report a missing answer" link and the admin page cover the gaps that remain either way.
 
+#### The accuracy numbers (measured 11 November 2026, waiting for Tom's go)
+
+867,149 club spells were downloaded from Wikidata and compared with Transfermarkt's match data for the players and seasons both cover. Reproduce with `npm run wikidata:compare`.
+
+**What Wikidata says is nearly always right, when it records games for the spell.** Share of Wikidata spells confirmed by a Transfermarkt appearance:
+
+| Games Wikidata records for the spell | Confirmed |
+| ------------------------------------ | --------- |
+| 5 or more                            | 98.6%     |
+| 1 to 4                               | 87.9%     |
+| No count recorded                    | 77.0%     |
+| Zero                                 | 26.4%     |
+
+**Wikidata is complete for older spells and patchy for recent ones.** Share of Transfermarkt spells (10 or more league games for a club) that Wikidata also has:
+
+| When the player first appeared for the club | Found in Wikidata |
+| ------------------------------------------- | ----------------- |
+| Already there in 2012                       | 97.5%             |
+| 2013 to 2018                                | 78.0%             |
+| 2019 to 2022                                | 46.7%             |
+| 2023 onwards                                | 43.0%             |
+
+It is also better for famous players (92.0% found) than obscure ones (60.6%). Where both have a start year, they agree within a year 91.6% of the time.
+
+**What this means.** The two sources are strong in opposite places. Transfermarkt is accurate from 2012/13 but blank before it. Wikidata is nearly complete before 2012 but volunteers have not kept up with recent transfers. Neither can be used alone for an all-time question.
+
+**Recommendation:** combine them. A player counts for a club if Transfermarkt shows a match appearance (2012/13 onwards), or Wikidata shows a spell. Wikidata spells with zero games are never used. That leaves one choice for Tom:
+
+- **Strict:** use only Wikidata spells with at least one game recorded. About 97% of accepted answers are right, but about 30% of real spells have no count and would be rejected as wrong answers.
+- **Inclusive (recommended):** also use spells with no count recorded. About 90% of accepted answers are right, and far fewer correct answers are rejected. A rejected correct answer is the worse mistake in this game, because it punishes exactly the deep knowledge the fees are meant to reward.
+
+**Limits of this test.** It can only check Wikidata against seasons Transfermarkt covers. The 97.5% figure is for spells that began before 2012 by players still active then. Players who retired long before 2012 could not be checked, though they are mostly the well-documented famous names. 316,659 pre-2012 spells have a matched club and at least one game.
+
 ### 2.2 Make the GitHub repo private (open, Tom's choice)
 
 **Recommendation:** make it private now. Nothing in this project needs it public, and Vercel and the automated checks work the same with a private repo. The valid answers will live in the database, not the repo, but the question generator and the artwork code will be in the repo. You can switch it under Settings, General, Danger Zone, Change visibility. Renaming it later is also easy and can wait.
