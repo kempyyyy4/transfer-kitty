@@ -1,0 +1,11 @@
+.next
+node_modules
+package-lock.json
+next-env.d.ts
+data
+supabase/.temp
+
+# The brief is kept word for word, so no tool may reformat it.
+BRIEF.md
+# Written and re-added by `next dev`.
+AGENTS.md
