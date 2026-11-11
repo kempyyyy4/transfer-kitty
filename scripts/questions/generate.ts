@@ -69,6 +69,15 @@ if (duplicateKeys > 0) {
   throw new Error(`${duplicateKeys} questions share a dedupe key. Each key must be unique.`);
 }
 
+// A repeated player means a template merged rows it should not have, which would also
+// give that player two tiers. Stop here so it is fixed in the template.
+const repeated = finished.find(
+  (q) => new Set(q.answers.map((answer) => answer.playerId)).size !== q.answers.length,
+);
+if (repeated) {
+  throw new Error(`"${repeated.prompt}" lists the same player more than once.`);
+}
+
 const playerNames = new Map(
   warehouse
     .query<{ player_id: number; name: string }>("select player_id, name from tm_players")
