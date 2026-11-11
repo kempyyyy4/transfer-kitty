@@ -6,15 +6,26 @@ Tom owns the product but does not touch the repo. Claude handles every file, com
 
 ## Before every commit
 
-All three must pass. Never commit with a failure, and never skip hooks.
+Every check must pass. Never commit with a failure, and never skip hooks.
 
 ```bash
-npm run lint
-npm run typecheck
-npm test
+npm run check
 ```
 
-`npm run format` applies Prettier. CI (`.github/workflows/ci.yml`) runs the same three checks on every push and pull request.
+That runs, in order, `npm run format:check` (Prettier), `npm run lint` (ESLint), `npm run typecheck` (Next.js route types, then `tsc`) and `npm test` (Vitest). `npm run format` fixes formatting. CI (`.github/workflows/ci.yml`) runs the same four on every push and pull request.
+
+Other commands:
+
+| Command                             | What it does                                        |
+| ----------------------------------- | --------------------------------------------------- |
+| `npm run dev`                       | Start the app at http://localhost:3000              |
+| `npm run build`                     | Production build                                    |
+| `npx supabase migration new <name>` | Create a new migration file                         |
+| `npx supabase db push`              | Apply new migrations to the linked Supabase project |
+
+## Next.js version
+
+This project is on Next.js 16 with Cache Components turned on, which differs from older Next.js in caching, route handlers and config. Follow `AGENTS.md`: read the matching guide in `node_modules/next/dist/docs/` before writing Next.js code. Code that touches the database or the clock at request time must not run during the build (see `src/app/api/health/route.ts` for the pattern).
 
 ## Git workflow
 
@@ -38,20 +49,21 @@ Ask Tom before any decision that is hard to change later: database schema change
 
 ## Where things go
 
-| Path | What lives there |
-|---|---|
-| `src/app` | Routes only. Pages and route handlers stay thin and call into features. |
+| Path                  | What lives there                                                                                                                       |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/app`             | Routes only. Pages and route handlers stay thin and call into features.                                                                |
 | `src/features/<name>` | One folder per feature (`game`, `scoring`, `leaderboard`, `shop`, `avatar`, ...). Components, server logic and tests for that feature. |
-| `src/components` | Shared UI used by more than one feature. |
-| `src/lib` | Shared non-UI code. |
-| `src/lib/db` | The only place that talks to the database. |
-| `src/config` | Game rules: tiers, timer, coin rewards, prices, kits, packs. |
-| `supabase/migrations` | Every database change, as a migration file. |
-| `scripts` | Dataset download, import and the question generator. |
+| `src/components`      | Shared UI used by more than one feature.                                                                                               |
+| `src/lib`             | Shared non-UI code.                                                                                                                    |
+| `src/lib/db`          | The only place that talks to the database.                                                                                             |
+| `src/config`          | Game rules: tiers, timer, coin rewards, prices, kits, packs.                                                                           |
+| `supabase/migrations` | Every database change, as a migration file.                                                                                            |
+| `scripts`             | Dataset download, import and the question generator.                                                                                   |
 
 - Game rules are never hard-coded in components or logic. Read them from `src/config`.
 - Tier names, fees and sprite keys live in one file, `src/config/tiers.ts`. Game logic refers to tiers by level number, never by name.
-- No raw queries outside `src/lib/db`. Features call typed functions from that layer.
+- No raw queries outside `src/lib/db`. Features call typed functions from that layer. ESLint blocks importing the Supabase client anywhere else.
+- Read env variables only through `src/lib/env.ts`, which checks them. Add each new one there and to `.env.example`.
 - A feature may import from `src/lib`, `src/config` and `src/components`, and from another feature only through that feature's `index.ts`.
 - Tests sit next to the code they test as `*.test.ts`.
 
