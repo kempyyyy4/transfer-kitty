@@ -17,6 +17,8 @@
     "data:download": "tsx scripts/data/download-transfermarkt.ts",
     "data:build": "tsx scripts/data/build-warehouse.ts && tsx scripts/data/derive.ts",
     "data:sql": "tsx scripts/data/sql.ts",
+    "wikidata:download": "tsx scripts/data/download-wikidata.ts",
+    "wikidata:compare": "tsx scripts/data/compare-wikidata.ts",
     "questions:generate": "tsx scripts/questions/generate.ts",
     "questions:load": "tsx --conditions=react-server --env-file=.env.local scripts/questions/load.ts"
   },
