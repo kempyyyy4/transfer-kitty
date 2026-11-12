@@ -6,8 +6,12 @@
 export interface Tier {
   level: number;
   name: string;
+  /** Plural, for the share text: "2 Galacticats". */
+  plural: string;
   feeGbp: number;
   spriteKey: string;
+  /** One per answer in the spoiler-free share text. Rarer tiers are warmer colours. */
+  shareEmoji: string;
   meaning: string;
 }
 
@@ -15,39 +19,73 @@ export const TIERS: readonly Tier[] = [
   {
     level: 0,
     name: "Stray",
+    plural: "Strays",
     feeGbp: 0,
     spriteKey: "stray",
+    shareEmoji: "⬛",
     meaning: "Wrong answer or timed out",
   },
   {
     level: 1,
     name: "Copycat",
+    plural: "Copycats",
     feeGbp: 500_000,
     spriteKey: "copycat",
+    shareEmoji: "⬜",
     meaning: "The answer everyone gave",
   },
   {
     level: 2,
     name: "Alley Cat",
+    plural: "Alley Cats",
     feeGbp: 2_000_000,
     spriteKey: "alley-cat",
+    shareEmoji: "🟫",
     meaning: "Very common",
   },
-  { level: 3, name: "Squad Moggy", feeGbp: 8_000_000, spriteKey: "squad-moggy", meaning: "Common" },
-  { level: 4, name: "Tomcat", feeGbp: 20_000_000, spriteKey: "tomcat", meaning: "Decent" },
+  {
+    level: 3,
+    name: "Squad Moggy",
+    plural: "Squad Moggies",
+    feeGbp: 8_000_000,
+    spriteKey: "squad-moggy",
+    shareEmoji: "🟩",
+    meaning: "Common",
+  },
+  {
+    level: 4,
+    name: "Tomcat",
+    plural: "Tomcats",
+    feeGbp: 20_000_000,
+    spriteKey: "tomcat",
+    shareEmoji: "🟦",
+    meaning: "Decent",
+  },
   {
     level: 5,
     name: "Pick of the Litter",
+    plural: "Picks of the Litter",
     feeGbp: 40_000_000,
     spriteKey: "pick-of-the-litter",
+    shareEmoji: "🟪",
     meaning: "Rare",
   },
-  { level: 6, name: "Big Cat", feeGbp: 70_000_000, spriteKey: "big-cat", meaning: "Very rare" },
+  {
+    level: 6,
+    name: "Big Cat",
+    plural: "Big Cats",
+    feeGbp: 70_000_000,
+    spriteKey: "big-cat",
+    shareEmoji: "🟧",
+    meaning: "Very rare",
+  },
   {
     level: 7,
     name: "Galacticat",
+    plural: "Galacticats",
     feeGbp: 100_000_000,
     spriteKey: "galacticat",
+    shareEmoji: "🦁",
     meaning: "Hardly anyone said it",
   },
 ];
