@@ -140,6 +140,15 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Do not add a data source without a licence that allows commercial use, and not without Tom's approval.
 - Any fact that is not from an approved data source goes in `src/config/manual-facts.ts` and is listed in `QUESTIONS_TO_CHECK.md` for Tom to verify.
 
+## The look
+
+- Colours and fonts are theme tokens in `src/app/globals.css` (`night`, `chalk`, `floodlight`, `turf`, `claret`, `scoreboard`...; `font-pixel` for headings and labels, `font-mono` for body). Never use raw Tailwind palette colours such as `slate-` or `amber-` on a screen.
+- Buttons use the `pixel-button` utility, boxes `pixel-panel`, text boxes `pixel-input`. Pixel-font button labels are written in capitals.
+- Characters are drawn from pixel grids in `src/features/avatar`: `cat/base.ts` is the body, `cat/extras.ts` the markings and accessories, `cast.ts` the mascot and tier characters. Change colours through a `CatLook`, never by editing the body rows.
+- Animations respect `prefers-reduced-motion` (see the end of `globals.css`).
+- Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
+- Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top right for the sound button.
+
 ## Content rules
 
 - No real club crests, league logos, sponsor logos, player likenesses or photos.
