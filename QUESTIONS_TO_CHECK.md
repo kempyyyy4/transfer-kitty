@@ -50,14 +50,22 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 
 ## 4. Top Kitties and leagues (stage 6)
 
-- **Guests are on the boards for now.** You agreed only signed-in players should be named, because a guest can clear their browser and replay. Sign-up arrives in stage 7, so until then guests show as "Guest" plus four characters, so the boards can be tried. Stage 7 switches this off (`includeGuests` in `src/config/leaderboard.ts`). Guests will still see their own rank.
-- **Names are placeholders** ("Guest 8122", "Player 3F9A") until stage 7 adds chosen names.
+- **Guests are off the boards** (from stage 7), as agreed. They still see their own rank.
+- **A signed-in player who has not chosen a name** shows as "Player" plus four characters.
 - **The week runs Monday to Sunday**, UK time.
 - **Ties go to the faster player**: equal kitties are ranked by total time taken to answer.
 - **Guests can create and join leagues.** If they clear their browser they lose the league. Say if you want leagues to need sign-in instead.
 - **Limits**: 10 leagues per player, 500 members per league, names of 3 to 30 characters. League names are not yet checked for offensive words; that is the name filter in stage 13.
 
-## 5. Known weaknesses
+## 5. Accounts (stage 7)
+
+- **When a guest signs in, everything they played comes with them**: games, leagues and leagues they created. If the guest and the account both played the same day's puzzle, the account's game is kept and the guest's is dropped, so nobody holds two attempts at one puzzle.
+- **The emailed link must be opened on the same device and browser** that asked for it, within an hour. Otherwise it fails with a message asking for a new link. This is how Supabase keeps the link safe.
+- **Display names**: 3 to 20 characters, letters (any alphabet), numbers, spaces and . _ ' -. Unique regardless of capitals. Names beginning "Guest" or "Player" are refused so nobody can pose as a placeholder. Offensive words are not checked until the launch extras.
+- **Names can be changed at any time.** Say if you want a limit.
+- **Signing out** makes the next game in that browser a fresh guest.
+
+## 6. Known weaknesses
 
 - **About one in ten older answers may be wrong.** That is the measured cost of the inclusive rule. The mistakes are mostly youth players who never made the first team, and the odd player Wikidata has attached to the wrong club. In "played for Arsenal in the 1990s", Gustavo Costas looks like one: Wikidata links him to Arsenal for 1996 to 1997 with no games recorded. Tiers are unaffected for the well-known answers; the mistakes sit among the rare ones.
 - **Some real older answers will be missing**, where Wikidata has no record of the spell. The "report a missing answer" link planned for stage 13 is how players flag these.
@@ -65,6 +73,6 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 - **Players only in Wikidata have no nationality or position** in the database yet, so nationality questions still cover 2012/13 onwards only.
 - **The Transfermarkt dataset stopped updating on 6 July 2026.** The 2026 cup finals and the 2026/27 season are not in it.
 
-## 6. Not yet written
+## 7. Not yet written
 
 Transfer-record milestones for the kitty gauge will go in `src/config/manual-facts.ts` and be listed here when the gauge is built in stage 8.

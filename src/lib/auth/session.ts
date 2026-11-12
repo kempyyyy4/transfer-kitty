@@ -7,7 +7,7 @@ import { getServerEnv } from "@/lib/env";
  * A Supabase client that reads and writes the visitor's session in cookies.
  * It uses the publishable key, so it can only do what the visitor is allowed to.
  */
-async function createSessionClient() {
+export async function createSessionClient() {
   const cookieStore = await cookies();
   const env = getServerEnv();
 
@@ -35,6 +35,26 @@ export async function getUserId(): Promise<string | null> {
   const client = await createSessionClient();
   const { data } = await client.auth.getClaims();
   return data?.claims.sub ?? null;
+}
+
+export interface Visitor {
+  userId: string;
+  isGuest: boolean;
+  email: string | null;
+}
+
+/** Who the visitor is, from their checked session token. Null if they have no session. */
+export async function getVisitor(): Promise<Visitor | null> {
+  const client = await createSessionClient();
+  const { data } = await client.auth.getClaims();
+  const claims = data?.claims;
+  if (!claims?.sub) return null;
+
+  return {
+    userId: claims.sub,
+    isGuest: claims.is_anonymous === true,
+    email: typeof claims.email === "string" && claims.email !== "" ? claims.email : null,
+  };
 }
 
 /**

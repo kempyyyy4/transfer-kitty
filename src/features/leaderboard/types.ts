@@ -17,6 +17,8 @@ export interface Board {
   entries: BoardEntry[];
   /** Your own place, shown even when you are outside the rows on the board. */
   you: { rank: number; total: number; days: number } | null;
+  /** You have a rank but, as a guest, are left off the board until you sign in. */
+  signInToAppear: boolean;
 }
 
 export interface League {

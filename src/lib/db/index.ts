@@ -1,4 +1,13 @@
 export {
+  deleteUser,
+  getDisplayName,
+  mergeGuestIntoAccount,
+  saveDisplayName,
+  savePendingMerge,
+  takePendingMerge,
+  type MergeResult,
+} from "./accounts";
+export {
   getIdsByTransfermarktId,
   upsertClubs,
   upsertPlayers,
