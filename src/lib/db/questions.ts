@@ -1,9 +1,14 @@
 import "server-only";
+import { z } from "zod";
 import { getServiceClient } from "@/lib/supabase/server";
 import { inBatches } from "./batches";
 
 /** Small enough that one request stays quick even when every question has hundreds of answers. */
 const QUESTIONS_PER_REQUEST = 20;
+/** Supabase returns at most this many rows per request. */
+const READ_PAGE_SIZE = 1000;
+/** IDs travel in the request address, so a batch has to stay short. */
+const RETIRE_BATCH_SIZE = 100;
 
 export interface QuestionImport {
   prompt: string;
@@ -55,14 +60,51 @@ function toPayload(question: QuestionImport) {
 }
 
 /** How many questions and answers the database holds, for checking an import. */
-export async function countQuestions(): Promise<{ questions: number; answers: number }> {
+export async function countQuestions(): Promise<{ activeQuestions: number; answers: number }> {
   const client = getServiceClient();
   const [questions, answers] = await Promise.all([
-    client.from("questions").select("id", { count: "exact", head: true }),
+    client.from("questions").select("id", { count: "exact", head: true }).eq("status", "active"),
     client.from("question_answers").select("entity_id", { count: "exact", head: true }),
   ]);
   const error = questions.error ?? answers.error;
   if (error) throw new Error(`Counting questions failed: ${error.message}`);
 
-  return { questions: questions.count ?? 0, answers: answers.count ?? 0 };
+  return { activeQuestions: questions.count ?? 0, answers: answers.count ?? 0 };
+}
+
+const keyedQuestionSchema = z.array(z.object({ id: z.string(), dedupe_key: z.string() }));
+
+/**
+ * Retires every active generated question whose key is not in `currentKeys`: the ones a
+ * new generator run no longer produces. Hand-written questions are never touched.
+ * Returns how many were retired.
+ */
+export async function retireGeneratedQuestionsExcept(
+  currentKeys: ReadonlySet<string>,
+): Promise<number> {
+  const client = getServiceClient();
+  const staleIds: string[] = [];
+
+  for (let from = 0; ; from += READ_PAGE_SIZE) {
+    const { data, error } = await client
+      .from("questions")
+      .select("id, dedupe_key")
+      .eq("source", "generated")
+      .eq("status", "active")
+      .order("id")
+      .range(from, from + READ_PAGE_SIZE - 1);
+    if (error) throw new Error(`Reading questions failed: ${error.message}`);
+
+    const page = keyedQuestionSchema.parse(data);
+    for (const row of page) {
+      if (!currentKeys.has(row.dedupe_key)) staleIds.push(row.id);
+    }
+    if (page.length < READ_PAGE_SIZE) break;
+  }
+
+  for (const batch of inBatches(staleIds, RETIRE_BATCH_SIZE)) {
+    const { error } = await client.from("questions").update({ status: "retired" }).in("id", batch);
+    if (error) throw new Error(`Retiring questions failed: ${error.message}`);
+  }
+  return staleIds.length;
 }

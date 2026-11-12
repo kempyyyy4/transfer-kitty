@@ -6,4 +6,9 @@ export {
   type PlayerImport,
 } from "./entities";
 export { isDatabaseReachable } from "./health";
-export { countQuestions, importQuestions, type QuestionImport } from "./questions";
+export {
+  countQuestions,
+  importQuestions,
+  retireGeneratedQuestionsExcept,
+  type QuestionImport,
+} from "./questions";

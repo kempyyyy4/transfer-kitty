@@ -12,6 +12,7 @@ type EntityTable = "players" | "clubs";
 
 export interface PlayerImport {
   transfermarktId: number;
+  wikidataId: string | null;
   name: string;
   country: string | null;
   birthYear: number | null;
@@ -31,6 +32,7 @@ export async function upsertPlayers(players: readonly PlayerImport[]): Promise<v
     "players",
     players.map((player) => ({
       transfermarkt_id: player.transfermarktId,
+      wikidata_id: player.wikidataId,
       name: player.name,
       search_name: toSearchName(player.name),
       country: player.country,
