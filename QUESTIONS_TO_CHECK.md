@@ -79,7 +79,7 @@ Nothing outstanding.
 
 ## 8. Profile, avatars and sharing (stage 9)
 
-- **Coin prices on avatar items and kits are placeholders**, needing your approval before the shop opens in stage 11. They are in `src/config/avatar-items.ts` and `src/config/kits.ts`. Free for everyone now: 5 furs, 3 breeds, 4 eye colours, 3 boot colours, headband, sweatbands, and 3 kits (Kitty Teal, Plain White, Midnight Navy). Priced: 100 to 500 coins.
+- **Coin prices on avatar items and kits**: you approved these on 12 November 2026 (stage 11). They can now be changed any time in Admin, Shop Prices. They are in `src/config/avatar-items.ts` and `src/config/kits.ts`. Free for everyone now: 5 furs, 3 breeds, 4 eye colours, 3 boot colours, headband, sweatbands, and 3 kits (Kitty Teal, Plain White, Midnight Navy). Priced: 100 to 500 coins.
 - **Kit names**: Merseyside Red, Sky Blue Mancs, Claret & Blue, Black & White Stripes, Green & White Hoops, Gold Sash. Made-up names in club-like colours, with no crests, badges or real club names.
 - **Avatars need sign-in and a chosen name**, because only signed-in players appear on Top Kitties. Guests see the default cat and a sign-in prompt.
 - **Up to 2 accessories** can be worn at once.
@@ -112,3 +112,11 @@ Real names appear only as text labels on the gauge. No likenesses, crests or log
 - Pack kinds are Era, World Cup, Player and Other. Player packs (for example a Messi Pack) still need the legal check before any goes live.
 - A pack's web name (like `messi-pack`) should not change once the pack is on sale. Pick it with care.
 - Admin can override tiers and add or remove answers, but not for a question in today's puzzle: those are frozen until midnight so nobody's fee changes mid-day.
+
+## 12. Coins and the shop (stage 11)
+
+- **Rewards you approved**: 10 coins for finishing the daily, 5 per Galacticat, and 50 on every 7th day of a streak (day 7, 14, 21...). Only the daily earns coins.
+- **Real-money figures** in the shop use the 500 coins for £0.99 rate, rounded up to the penny, so a 300-coin kit shows as "about 60p".
+- **Guests earn coins** and keep them when they sign in. If a guest and their account both played the same day, the account's game is kept and the guest's coins for that day are dropped with it.
+- **Buying needs sign-in.** Coin packs are shown with their prices but marked SOON until payments arrive in stage 12.
+- **The streak bonus is paid when a round is finished.** Nine Lives, which protects a streak, comes in stage 12.

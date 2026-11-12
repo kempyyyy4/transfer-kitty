@@ -1,5 +1,5 @@
 import "server-only";
-import { computeStats } from "@/features/profile";
+import { computeStats } from "@/features/profile/server";
 import { getCoinBalance, getCoinsForSession, getPlayerHistory, grantCoins } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
 import { roundRewards } from "./rewards";

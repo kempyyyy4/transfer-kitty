@@ -31,21 +31,22 @@ If the dev server shows an old version of a page or stylesheet after a restart, 
 
 Questions are built offline from downloaded data, then loaded into the database. Nothing in `data/` is committed. Run these in order; each is safe to re-run.
 
-| Command                      | What it does                                                              |
-| ---------------------------- | ------------------------------------------------------------------------- |
-| `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                         |
-| `npm run wikidata:download`  | Download club histories and player profiles from Wikidata (resumable)     |
-| `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables     |
-| `npm run questions:generate` | Run every template and write the questions and a report to `data/build`   |
-| `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local` |
-| `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                |
-| `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules     |
-| `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does          |
-| `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database               |
-| `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database   |
-| `npm run smoke:admin`        | Check the admin tools and missing-answer reports against that database    |
-| `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
-| `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
+| Command                      | What it does                                                                |
+| ---------------------------- | --------------------------------------------------------------------------- |
+| `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                           |
+| `npm run wikidata:download`  | Download club histories and player profiles from Wikidata (resumable)       |
+| `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables       |
+| `npm run questions:generate` | Run every template and write the questions and a report to `data/build`     |
+| `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local`   |
+| `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                  |
+| `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules       |
+| `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does            |
+| `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database                 |
+| `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database     |
+| `npm run smoke:admin`        | Check the admin tools and missing-answer reports against that database      |
+| `npm run smoke:coins`        | Check coin rewards, spending and the guest carry-over against that database |
+| `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                         |
+| `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                      |
 
 - Scripts live in `scripts/` and run with `tsx`. They may print to the console; app code may not.
 - A new kind of question is one new file in `scripts/questions/templates`, added to `index.ts` there. Each template names its `dataSource`.
@@ -144,6 +145,16 @@ A feature's `service.ts` is server-only. Its client components import from their
 - A question in today's puzzle is frozen: tier overrides and answer changes are refused until midnight, so a fee never changes during its day.
 - Hand-written questions get starting tiers from fame, the same way as generated ones. They follow the question rules below: only checked facts.
 - Players report missing answers by picking a player, never by free text. Reports are only accepted for a round they finished.
+
+## Coins and the shop
+
+- A balance is never stored. It is the sum of the player's rows in `coin_ledger`. Every row has a unique `idempotency_key`, so a reward or purchase is never counted twice.
+- Coins are paid when a finished daily round's summary is read (`payRoundCoins`), with keys tied to the round. Amounts live in `src/config/coins.ts`.
+- Buying goes through `buy_item`, which locks per player, so a balance can never go below zero. The price always comes from the server's catalogue, never the browser.
+- Item prices start in `src/config`. Admin changes are stored in `shop_prices` and win. A price of 0 makes an item free for everyone. Wearing is checked with `wearableKeys` from the shop feature.
+- Owned items are keyed by slot and ID (`kit:gold-sash`), because IDs are only unique within a slot.
+- Shop prices show a real-money equivalent at the smallest coin pack's rate, rounded up (`moneyEquivalent`).
+- Direct purchase only. No random packs, loot boxes or mystery items.
 
 ## Question rules
 
