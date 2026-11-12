@@ -1,1 +1,196 @@
 @import "tailwindcss";
+
+/*
+ * The retro football game look. Colours are named for what they are in the stadium, so
+ * screens read as "chalk on night sky" rather than raw hex values.
+ */
+@theme {
+  --font-pixel: var(--font-press-start), ui-monospace, monospace;
+  --font-mono: var(--font-vt323), ui-monospace, monospace;
+
+  --color-night: #0b1026;
+  --color-night-deep: #060914;
+  --color-stand: #1a2140;
+  --color-chalk: #f2f4ff;
+  --color-chalk-dim: #a9b0d6;
+  --color-floodlight: #ffd23f;
+  --color-turf: #1f8a3a;
+  --color-turf-light: #29a646;
+  --color-claret: #e23d3d;
+  --color-sky: #4fc3f7;
+  --color-scoreboard: #ffb000;
+}
+
+html {
+  /* VT323 is drawn small for its size, so the base is larger than usual. */
+  font-size: 20px;
+}
+
+body {
+  background-color: var(--color-night);
+  color: var(--color-chalk);
+}
+
+/* Pixel art and the pixel fonts must never be smoothed. */
+svg[shape-rendering="crispEdges"],
+.pixelated {
+  image-rendering: pixelated;
+}
+
+/* An old console menu button: thick bright outline and a hard, offset shadow. */
+@utility pixel-button {
+  display: inline-block;
+  border: 4px solid var(--color-chalk);
+  background-color: var(--color-night-deep);
+  color: var(--color-chalk);
+  box-shadow: 6px 6px 0 0 #000;
+  font-family: var(--font-pixel);
+  text-align: center;
+  transition: transform 80ms steps(2);
+
+  &:hover {
+    border-color: var(--color-floodlight);
+    color: var(--color-floodlight);
+  }
+
+  &:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0 0 #000;
+  }
+
+  &:focus-visible {
+    outline: 4px dashed var(--color-sky);
+    outline-offset: 4px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+@utility pixel-panel {
+  border: 4px solid var(--color-chalk-dim);
+  background-color: color-mix(in srgb, var(--color-night-deep) 88%, transparent);
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+@utility pixel-input {
+  border: 4px solid var(--color-chalk);
+  background-color: var(--color-night-deep);
+  color: var(--color-chalk);
+  font-size: 1.2rem;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-floodlight);
+  }
+}
+
+/* Old television lines across the logo. */
+@utility crt {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgb(0 0 0 / 0.28) 0,
+      rgb(0 0 0 / 0.28) 2px,
+      transparent 2px,
+      transparent 4px
+    );
+  }
+}
+
+@keyframes crt-flicker {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 0.82;
+  }
+  96% {
+    opacity: 0.95;
+  }
+}
+
+@keyframes paw-step {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes tier-flash {
+  0%,
+  40%,
+  80% {
+    color: var(--color-floodlight);
+    transform: scale(1.08);
+  }
+  20%,
+  60%,
+  100% {
+    color: var(--color-chalk);
+    transform: scale(1);
+  }
+}
+
+@keyframes sprite-pop {
+  0% {
+    transform: translateY(24px) scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: translateY(-6px) scale(1.05);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes floodlight-glow {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.animate-crt-flicker {
+  animation: crt-flicker 6s infinite steps(1);
+}
+.animate-paw-step {
+  animation: paw-step 1.2s infinite steps(4);
+}
+.animate-tier-flash {
+  animation: tier-flash 900ms steps(2) 1;
+}
+.animate-sprite-pop {
+  animation: sprite-pop 450ms steps(6) 1;
+}
+.animate-floodlight {
+  animation: floodlight-glow 3s infinite steps(3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-crt-flicker,
+  .animate-paw-step,
+  .animate-tier-flash,
+  .animate-sprite-pop,
+  .animate-floodlight {
+    animation: none;
+  }
+}
