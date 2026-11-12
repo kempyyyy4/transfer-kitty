@@ -3,12 +3,11 @@ export const LEADERBOARD = {
   /** How many rows a board shows. Your own rank is always shown as well. */
   entriesShown: 50,
   /**
-   * Whether guests appear by name on the boards. PLAN.md decision 1.5 says only signed-in
-   * players are named, because a guest can clear their browser and play again. Sign-up
-   * arrives in stage 7; until then guests are shown so the boards can be tried out.
-   * Guests always see their own rank either way.
+   * Whether guests appear on the boards. PLAN.md decision 1.5: only signed-in players are
+   * named, because a guest can clear their browser and play again. Guests always see
+   * their own rank either way.
    */
-  includeGuests: true,
+  includeGuests: false,
 } as const;
 
 export const LEAGUES = {
