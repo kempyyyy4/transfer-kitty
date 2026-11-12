@@ -43,6 +43,7 @@ Questions are built offline from downloaded data, then loaded into the database.
 | `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does          |
 | `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database               |
 | `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database   |
+| `npm run smoke:admin`        | Check the admin tools and missing-answer reports against that database    |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
@@ -135,6 +136,14 @@ Sign-in goes through `src/lib/auth` only, the same way database access goes thro
 - Redirect with `NextResponse.redirect`, not `Response.redirect`, from any route that sets cookies.
 
 A feature's `service.ts` is server-only. Its client components import from their neighbouring files (`../types`, `../api-client`), never from the feature's `index.ts`, which would pull server code into the browser.
+
+## Admin
+
+- The admin area is `/admin`. Getting in needs both: signed in as `ADMIN_USER_ID`, and `ADMIN_PASSWORD` typed within the last 8 hours (an httpOnly cookie signed with the password, `src/lib/auth/admin.ts`). If either variable is blank, admin is switched off.
+- Every admin route starts with `adminGate()` from `src/features/admin/server.ts`. Anyone else gets a plain 404.
+- A question in today's puzzle is frozen: tier overrides and answer changes are refused until midnight, so a fee never changes during its day.
+- Hand-written questions get starting tiers from fame, the same way as generated ones. They follow the question rules below: only checked facts.
+- Players report missing answers by picking a player, never by free text. Reports are only accepted for a round they finished.
 
 ## Question rules
 
