@@ -26,6 +26,8 @@ export const DAILY_PUZZLE = {
    * Daily questions must reach this, so even a casual fan can name someone.
    */
   minProminence: 400,
+  /** Which answer prominence is read from, counting from 0 for the most popular. */
+  prominenceAnswerRank: 2,
   /** At most this many of a day's questions may come from the same template. */
   maxQuestionsPerTemplate: 2,
   /** How many random candidates are drawn to choose a day's questions from. */

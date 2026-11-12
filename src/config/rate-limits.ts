@@ -21,6 +21,12 @@ export const RATE_LIMITS = {
   accountChange: { name: "account-change", limit: 20, windowSeconds: 600 },
   /** Creating, joining and leaving leagues. Low, because a script could spam invite codes. */
   leagueChange: { name: "league-change", limit: 10, windowSeconds: 600 },
+  /** Reporting a missing answer after a round. */
+  answerReport: { name: "answer-report", limit: 20, windowSeconds: 600 },
+  /** Typing the admin password. Counted per IP address, and kept very low. */
+  adminUnlock: { name: "admin-unlock", limit: 5, windowSeconds: 900 },
+  /** Everything else in the admin area, once in. */
+  admin: { name: "admin", limit: 120, windowSeconds: 60 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export const PLAYER_SEARCH = {
