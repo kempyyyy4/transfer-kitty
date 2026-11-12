@@ -15,6 +15,7 @@ export const RATE_LIMITS = {
   gameStart: { name: "game-start", limit: 10, windowSeconds: 60 },
   gamePlay: { name: "game-play", limit: 60, windowSeconds: 60 },
   leaderboard: { name: "leaderboard", limit: 60, windowSeconds: 60 },
+  profile: { name: "profile", limit: 60, windowSeconds: 60 },
   /** Each try sends an email, so this stays low. Counted per IP address. */
   signIn: { name: "sign-in", limit: 5, windowSeconds: 600 },
   accountChange: { name: "account-change", limit: 20, windowSeconds: 600 },
