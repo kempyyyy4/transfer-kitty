@@ -36,7 +36,9 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 ## 3. Judgement calls in the questions
 
 - **Which leagues get questions.** The ten leagues in the table above. The dataset also covers Russia, Greece, Ukraine and Denmark from 2012/13, left out as too obscure for a UK audience. Easy to add.
-- **"Played for" means appeared in a match.** A player who signed but never played does not count.
+- **"Played for" means appeared in a match**, from 2012/13 onwards. A player who signed but never played does not count. Before 2012/13 it means Wikidata records a spell at the club, under the inclusive rule you chose.
+- **Decade questions cover the 1990s, 2000s, 2010s and 2020s.** Wikidata goes back further, so the 1980s and earlier could be added.
+- **The minimum of 15 answers rules out the brief's own example.** "Played for both Liverpool and Real Madrid" has 11 correct answers, so it is not generated. Say if you want the minimum lowered for "both clubs" questions.
 - **Nationality is one country per player**, the first citizenship the dataset lists. A dual national is only a valid answer for that one country.
 - **Managers need 20 matches in charge** of a club to get a question, to leave out caretakers.
 - **Manager questions name the seasons**, for example "under José Mourinho between 2013/14 and 2015/16", because the data starts in 2012/13 and would miss an earlier spell.
@@ -46,8 +48,11 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 
 ## 4. Known weaknesses
 
-- **Older stars are ranked as more obscure than they are.** Fame comes mainly from matches since 2012/13, so Steven Gerrard and Michael Owen score low and may be given high-fee tiers they do not deserve. Wikidata can correct this once approved. Tiers also correct themselves from real answers after 200 plays, and Admin can override any tier.
-- **The dataset stopped updating on 6 July 2026.** The 2026 cup finals and the 2026/27 season are not in it.
+- **About one in ten older answers may be wrong.** That is the measured cost of the inclusive rule. The mistakes are mostly youth players who never made the first team, and the odd player Wikidata has attached to the wrong club. In "played for Arsenal in the 1990s", Gustavo Costas looks like one: Wikidata links him to Arsenal for 1996 to 1997 with no games recorded. Tiers are unaffected for the well-known answers; the mistakes sit among the rare ones.
+- **Some real older answers will be missing**, where Wikidata has no record of the spell. The "report a missing answer" link planned for stage 13 is how players flag these.
+- **Fame for older players is an estimate.** For players born before 1990 it uses how many language editions of Wikipedia cover them. That measures fame worldwide, not fame among UK fans, so a player famous abroad can rank above a British cult hero. Tiers correct themselves from real answers after 200 plays, and Admin can override any tier.
+- **Players only in Wikidata have no nationality or position** in the database yet, so nationality questions still cover 2012/13 onwards only.
+- **The Transfermarkt dataset stopped updating on 6 July 2026.** The 2026 cup finals and the 2026/27 season are not in it.
 
 ## 5. Not yet written
 

@@ -32,16 +32,18 @@ Questions are built offline from downloaded data, then loaded into the database.
 | Command                      | What it does                                                              |
 | ---------------------------- | ------------------------------------------------------------------------- |
 | `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                         |
-| `npm run data:build`         | Load them into the local SQLite warehouse and build fame scores           |
+| `npm run wikidata:download`  | Download club histories and player profiles from Wikidata (resumable)     |
+| `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables     |
 | `npm run questions:generate` | Run every template and write the questions and a report to `data/build`   |
 | `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local` |
-| `npm run wikidata:download`  | Download club histories from Wikidata (about 100 slices, resumable)       |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
 - Scripts live in `scripts/` and run with `tsx`. They may print to the console; app code may not.
-- A new kind of question is one new file in `scripts/questions/templates`, added to `index.ts` there.
-- The match data starts in 2012/13. A prompt built from it must say which seasons it covers, or valid older answers would be marked wrong.
+- A new kind of question is one new file in `scripts/questions/templates`, added to `index.ts` there. Each template names its `dataSource`.
+- Transfermarkt's match data starts in 2012/13. A template built from it alone must say which seasons it covers in the prompt, or valid older answers would be marked wrong. Only templates that read the merged `club_spells` or `wd_club_spells` tables may ask all-time questions.
+- How Wikidata is used is a decision Tom made from measured accuracy (PLAN.md 2.1). The rule lives in `src/config/wikidata.ts`. Do not loosen it without asking.
+- A player is identified by Transfermarkt ID in both sources, in the warehouse and in the generator.
 - The generator stops if a question lists the same player twice. Fix the template, not the check.
 
 ## Next.js version

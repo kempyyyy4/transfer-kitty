@@ -91,7 +91,7 @@ The limits, honestly:
 
 If it passes, the player pool becomes "everyone in either source". If it fails, the game launches with 2012/13 onwards and says so on screen. The "report a missing answer" link and the admin page cover the gaps that remain either way.
 
-#### The accuracy numbers (measured 11 November 2026, waiting for Tom's go)
+#### The accuracy numbers (measured 11 November 2026)
 
 867,149 club spells were downloaded from Wikidata and compared with Transfermarkt's match data for the players and seasons both cover. Reproduce with `npm run wikidata:compare`.
 
@@ -117,12 +117,21 @@ It is also better for famous players (92.0% found) than obscure ones (60.6%). Wh
 
 **What this means.** The two sources are strong in opposite places. Transfermarkt is accurate from 2012/13 but blank before it. Wikidata is nearly complete before 2012 but volunteers have not kept up with recent transfers. Neither can be used alone for an all-time question.
 
-**Recommendation:** combine them. A player counts for a club if Transfermarkt shows a match appearance (2012/13 onwards), or Wikidata shows a spell. Wikidata spells with zero games are never used. That leaves one choice for Tom:
+**Decision: combine them, with the inclusive rule.** Tom agreed on 11 November 2026. The two options were:
 
 - **Strict:** use only Wikidata spells with at least one game recorded. About 97% of accepted answers are right, but about 30% of real spells have no count and would be rejected as wrong answers.
-- **Inclusive (recommended):** also use spells with no count recorded. About 90% of accepted answers are right, and far fewer correct answers are rejected. A rejected correct answer is the worse mistake in this game, because it punishes exactly the deep knowledge the fees are meant to reward.
+- **Inclusive (chosen):** also use spells with no count recorded. About 90% of accepted answers are right, and far fewer correct answers are rejected. A rejected correct answer is the worse mistake in this game, because it punishes exactly the deep knowledge the fees are meant to reward.
 
-**Limits of this test.** It can only check Wikidata against seasons Transfermarkt covers. The 97.5% figure is for spells that began before 2012 by players still active then. Players who retired long before 2012 could not be checked, though they are mostly the well-documented famous names. 316,659 pre-2012 spells have a matched club and at least one game.
+**The rule as built**, set in `src/config/wikidata.ts`:
+
+- From 2012/13 onwards, a player counts for a club only if Transfermarkt shows a match appearance.
+- Before that, a player counts if Wikidata shows a spell that began by 2012.
+- A Wikidata spell recorded with zero games is never used.
+- A Wikidata spell with no dates is used only when it must predate the match data: it ended by 2012, or the player is not in the match data at all.
+
+**What it produced.** 192,493 players in total, 142,344 of them only in Wikidata. "Played for both Liverpool and Real Madrid" now returns the right 11 players, including McManaman, Morientes, Dudek and Núñez. The expected mistakes show up too. "Played for Arsenal in the 1990s" has 88 answers, and a few look wrong on reading them: Gustavo Costas, whom Wikidata links to Arsenal for 1996 to 1997 with no games recorded, and one or two names that look like youth players. These have not been checked against another source. They are spells with no game count, the kind the inclusive rule knowingly lets in.
+
+**Limits of the test.** It can only check Wikidata against seasons Transfermarkt covers. The 97.5% figure is for spells that began before 2012 by players still active then. Players who retired long before 2012 could not be checked, though they are mostly the well-documented famous names. 316,659 pre-2012 spells have a matched club and at least one game.
 
 ### 2.2 Make the GitHub repo private (open, Tom's choice)
 
@@ -287,16 +296,16 @@ Because of this, every question built from Transfermarkt alone is built from mat
 
 Runs on a developer machine against the downloaded data, never on the live site.
 
-1. **Download** the data into `data/raw/` (not committed): `npm run data:download`.
-2. **Build the warehouse**, a local SQLite file with the raw tables, a per-player-per-season summary and a fame score for each player: `npm run data:build`.
-3. **Generate**: `npm run questions:generate`. Each template is one file in `scripts/questions/templates` that returns a prompt, tags and the valid answers. The 16 templates built so far:
+1. **Download** the data into `data/raw/` (not committed): `npm run data:download` for Transfermarkt and `npm run wikidata:download` for Wikidata.
+2. **Build the warehouse**, a local SQLite file with the raw tables from both sources, the merged player list, club spells and a fame score for each player: `npm run data:build`.
+3. **Generate**: `npm run questions:generate`. Each template is one file in `scripts/questions/templates` that returns a prompt, tags and the valid answers. The 16 templates built so far, the first two using both sources:
+   - played for both [club] and [club], all-time
+   - played for [club] in the [1990s, 2000s, 2010s or 2020s]
    - played for [club] in [league] in [season]
    - played a league match for [club] since 2012/13
-   - played for [club] in the 2020s
    - played for [club] under [manager], with the seasons named
    - played for [club] in [cup] since 2012/13
    - scored for [club] in [competition] since 2012/13
-   - played for both [club] and [club] since 2012/13
    - played in both [league] and [league] since 2012/13
    - a player from [country] who played in [league] since 2012/13
    - a player from [country] who played for [club] since 2012/13
@@ -307,15 +316,19 @@ Runs on a developer machine against the downloaded data, never on the live site.
    - played for [country] in the group stage of the 2026 World Cup
 4. **Filter.** Keep questions with 15 to 400 valid answers (config). Above 400, almost any guess is right.
 5. **Tier.** Rank each question's answers by starting popularity and apply the shares in decision 1.2.
-6. **Load** into Supabase: `npm run questions:load`. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated.
+6. **Load** into Supabase: `npm run questions:load`. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated. A question the new run no longer produces is retired.
 
-**First run, 11 November 2026:** 6,581 questions and 296,780 answers, loaded into the development database.
+**Runs so far.** 11 November 2026, Transfermarkt only: 6,581 questions. 12 November 2026, both sources: 10,271 questions and 468,058 answers in the development database, of which 2,872 are all-time "both clubs" questions (78 before) and 1,168 are decade questions (272 before).
 
-**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals. Known weakness: stars whose best years were before 2012 score too low, because their matches are not in the data. Wikidata can correct this. Crowd recalculation and admin overrides fix what remains.
+**The brief's own example does not make the cut.** "Played for both Liverpool and Real Madrid" has 11 correct answers, under the 15 the brief asks for, so it is not generated. Lowering the minimum is one number in `src/config/game.ts`. It is Tom's call.
+
+**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals.
+
+**Fame for older players.** Match data starts in 2012/13, so on its own it makes Gerrard and Owen look obscure. For players born before 1990, and for players with no match data at all, fame is the higher of their match fame and a Wikipedia fame: how many language editions of Wikipedia have an article on them, matched by rank against players whose whole peak is in the match data. That puts Zidane level with Salah, and Henry, Gerrard and Owen just behind. Players born from 1990 keep match fame alone. Settings are in `src/config/wikidata.ts`. Crowd recalculation and admin overrides fix what remains.
 
 **Starting popularity.** Within one question, fame is scaled down for a player who barely featured in what is being asked. Salah is a rarer answer for "played for Chelsea" than for "played for Liverpool". The strength of this is set in `src/config/fame.ts`.
 
-**"Played for" rule.** A player counts for a club only if the data shows a match appearance for it. Signing for a club without playing does not count.
+**"Played for" rule.** From 2012/13, a player counts for a club only if the data shows a match appearance for it. Signing without playing does not count. Before then, the Wikidata rule in decision 2.1 applies.
 
 **Nationality** is the first citizenship the dataset lists for a player.
 
