@@ -2,11 +2,10 @@
  * Measures how well Wikidata's club histories agree with Transfermarkt's match data,
  * for the players and seasons both cover. Tom decides from these numbers whether
  * Wikidata is accurate enough to build older-era questions on.
- * npm run wikidata:compare     Run after "npm run wikidata:download".
+ * npm run wikidata:compare     Run after "npm run data:build".
  */
 import { writeFileSync } from "node:fs";
 import { FEATURED_LEAGUES, FIRST_SEASON } from "@/config/competitions";
-import { loadWikidataCareers } from "./load-wikidata";
 import { WIKIDATA_REPORT_PATH } from "./sources";
 import { openWarehouse, type Warehouse } from "./warehouse";
 
@@ -215,7 +214,7 @@ function buildBreakdowns(warehouse: Warehouse): string[] {
 }
 
 const warehouse = openWarehouse();
-const spellCount = await loadWikidataCareers(warehouse);
+const spellCount = single(warehouse, "select count(*) as value from wd_careers");
 buildComparisonTables(warehouse);
 const report = buildReport(warehouse, spellCount);
 warehouse.close();
