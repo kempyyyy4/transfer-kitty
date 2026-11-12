@@ -7,3 +7,11 @@ export {
   signOut,
   type SignInProof,
 } from "./sign-in";
+export {
+  getAdminAccess,
+  getAdminUserId,
+  lockAdmin,
+  unlockAdmin,
+  type AdminAccess,
+  type UnlockOutcome,
+} from "./admin";

@@ -106,3 +106,9 @@ Real names appear only as text labels on the gauge. No likenesses, crests or log
 - Fonts are Press Start 2P for headings and VT323 for body text, both free Google Fonts.
 - Sounds are made in code (no sound files) and start muted.
 - The Archive, Themed Packs, Unlimited and Shop buttons on the home screen show as "SOON" until their stages are built.
+
+## 11. Admin (stage 10)
+
+- Pack kinds are Era, World Cup, Player and Other. Player packs (for example a Messi Pack) still need the legal check before any goes live.
+- A pack's web name (like `messi-pack`) should not change once the pack is on sale. Pick it with care.
+- Admin can override tiers and add or remove answers, but not for a question in today's puzzle: those are frozen until midnight so nobody's fee changes mid-day.

@@ -30,3 +30,21 @@ describe("parseServerEnv", () => {
     );
   });
 });
+
+describe("parseServerEnv admin settings", () => {
+  it("treats blank optional values as not set", () => {
+    const env = parseServerEnv({ ...validEnv, ADMIN_USER_ID: "", ADMIN_PASSWORD: "" });
+    expect(env.ADMIN_USER_ID).toBeUndefined();
+    expect(env.ADMIN_PASSWORD).toBeUndefined();
+  });
+
+  it("rejects a short admin password", () => {
+    expect(() => parseServerEnv({ ...validEnv, ADMIN_PASSWORD: "short" })).toThrow(
+      /ADMIN_PASSWORD/,
+    );
+  });
+
+  it("rejects an admin user ID that is not an account ID", () => {
+    expect(() => parseServerEnv({ ...validEnv, ADMIN_USER_ID: "tom" })).toThrow(/ADMIN_USER_ID/);
+  });
+});

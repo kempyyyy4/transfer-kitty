@@ -42,6 +42,8 @@ export const gameApi = {
     post<AnswerFeedback>("/api/game/answer", { sessionId, position, playerId }),
   answerLists: (sessionId: string) =>
     call<QuestionAnswers[]>(`/api/game/answers?sessionId=${encodeURIComponent(sessionId)}`),
+  reportMissing: (sessionId: string, position: number, playerId: number) =>
+    post<{ message: string }>("/api/game/report", { sessionId, position, playerId }),
   searchPlayers: (query: string, signal: AbortSignal) =>
     call<PlayerSuggestion[]>(`/api/players/search?q=${encodeURIComponent(query)}`, { signal }),
 };

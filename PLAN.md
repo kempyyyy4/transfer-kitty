@@ -437,10 +437,10 @@ Each stage is one branch and one pull request. A stage is done when CI is green 
 | 7   | `stage/07-auth`          | Guest mode, magic link, Google, account merge                                                                            | Guest play carries over on sign-up                     |
 | 8   | `stage/08-visuals`       | Pixel style, stadium, Kit, tier sprites, gauge, ticker, sounds, loader                                                   | All screens in final style on a phone                  |
 | 9   | `stage/09-profile`       | Avatar builder, streaks, history calendar, share text                                                                    | Avatar shows on Top Kitties                            |
-| 10  | `stage/10-admin`         | Protected admin: questions, tiers, packs, kits, prices, answer reports                                                   | You can add a question and override a tier             |
-| 11  | `stage/11-coins-shop`    | Coin ledger, rewards, shop, kits, owned items                                                                            | Earn and spend coins, balance from ledger only         |
+| 10  | `stage/10-admin`         | Protected admin: questions, tiers, packs, answer reports, schedule (kits and prices move to stage 11, with the shop)     | You can add a question and override a tier             |
+| 11  | `stage/11-coins-shop`    | Coin ledger, rewards, shop, kits, owned items, admin for kits and shop prices                                            | Earn and spend coins, balance from ledger only         |
 | 12  | `stage/12-payments`      | Stripe Checkout, webhook, lifetime unlock, Unlimited, Archive, packs, Nine Lives, AdSense                                | Test-mode purchases grant and restore correctly        |
-| 13  | `stage/13-launch-extras` | Privacy policy, terms, cookie consent, display-name filter, report-an-answer link, `README.md`                           | Ready for the legal check and launch                   |
+| 13  | `stage/13-launch-extras` | Privacy policy, terms, cookie consent, display-name filter, `README.md` (report-an-answer came early, in stage 10)       | Ready for the legal check and launch                   |
 
 Stage 4 uses plain styling on purpose. The final look comes in stage 8, once the game works.
 

@@ -61,3 +61,40 @@ export {
   getQuestionsDueForRecalculation,
   saveRecalculatedTiers,
 } from "./tiers";
+export {
+  deleteAnswer,
+  getPlayerFame,
+  getQuestionForAdmin,
+  getUpcomingPuzzles,
+  insertAnswer,
+  insertManualQuestion,
+  listQuestionsForAdmin,
+  saveQuestionStatus,
+  saveTierOverride,
+  type AdminQuestionDetail,
+  type AdminQuestionList,
+  type ManualQuestionInsert,
+  type QuestionSource,
+  type QuestionStatus,
+  type UpcomingPuzzle,
+} from "./admin-questions";
+export {
+  dismissReports,
+  getOpenReports,
+  saveAnswerReport,
+  type OpenReport,
+  type ReportOutcome,
+} from "./answer-reports";
+export {
+  addPackQuestion,
+  insertPack,
+  readPack,
+  readPacks,
+  removePackQuestion,
+  updatePack,
+  type PackDetail,
+  type PackFields,
+  type PackKind,
+  type PackRow,
+  type PackStatus,
+} from "./packs";
