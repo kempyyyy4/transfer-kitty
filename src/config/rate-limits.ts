@@ -14,6 +14,9 @@ export const RATE_LIMITS = {
   playerSearch: { name: "player-search", limit: 120, windowSeconds: 60 },
   gameStart: { name: "game-start", limit: 10, windowSeconds: 60 },
   gamePlay: { name: "game-play", limit: 60, windowSeconds: 60 },
+  leaderboard: { name: "leaderboard", limit: 60, windowSeconds: 60 },
+  /** Creating, joining and leaving leagues. Low, because a script could spam invite codes. */
+  leagueChange: { name: "league-change", limit: 10, windowSeconds: 600 },
 } as const satisfies Record<string, RateLimitRule>;
 
 export const PLAYER_SEARCH = {
