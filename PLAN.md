@@ -369,12 +369,16 @@ Tiers are stored as a level number from 0 (Stray) to 7 (Galacticat). Names and f
 | `daily_puzzles`          | `puzzle_date` primary key, `puzzle_number` unique      |                                                                    |
 | `daily_puzzle_questions` | `puzzle_date`, `position` 1 to 7, `question_id` unique | A question appears in at most one daily. Server only until served. |
 
+**How a day's puzzle is chosen** (stage 4, settings in `src/config/game.ts`). Each question stores a `prominence`: the starting popularity of its third most popular answer. Daily puzzles draw only from questions with prominence 400 or more (about 1,600 of 10,271), so even a casual fan can name someone. Seven are picked at random with no club asked about twice and at most two from one template. Puzzles are created 30 days ahead. At one puzzle a day the pool lasts over seven months; the rest of the questions are for Unlimited and packs.
+
 ### Play
 
 | Table               | Key columns                                                                                                                                       | Notes                                                                                                                           |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `game_sessions`     | `id`, `user_id`, `mode` (daily, archive, unlimited, pack), `puzzle_date`, `pack_id`, `started_at`, `completed_at`, `total_fee`, `total_answer_ms` | **Unique index on `user_id` and `puzzle_date` where mode is daily.** That is the one-attempt rule. Players read their own rows. |
 | `session_questions` | `session_id`, `position`, `question_id`, `served_at`, `answered_at`, `entity_id`, `outcome` (correct, wrong, timeout), `tier`, `fee`              | `served_at` is the server-side timer. Fee is locked here when answered. Players read their own rows.                            |
+
+**As built in stage 4**, these tables are server-only for now: the browser reaches them only through the game API. Each game step is one database function (`start_daily_session`, `serve_next_question`, `submit_answer`), so the timer is measured on the database clock and a step cannot half-happen. The server allows 25 seconds plus 1.5 seconds for the network. A question left open past the limit is forfeited as a timeout the next time the player asks for a question. `rate_limits` landed in this stage; `job_runs` was not needed, because creating a puzzle is safe to repeat.
 
 Fees are whole pounds stored as integers. Totals that can grow without limit use 64-bit integers.
 

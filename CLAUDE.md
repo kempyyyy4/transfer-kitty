@@ -36,6 +36,8 @@ Questions are built offline from downloaded data, then loaded into the database.
 | `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables     |
 | `npm run questions:generate` | Run every template and write the questions and a report to `data/build`   |
 | `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local` |
+| `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                |
+| `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules     |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
@@ -100,8 +102,23 @@ Ask Tom before any decision that is hard to change later: database schema change
 ## Game integrity rules
 
 - Valid answers and tiers are never sent to the browser until the server has that player's round of 7 marked as finished.
-- The 25-second timer is judged by the server clock, not the client.
+- The 25-second timer is judged by the database clock, not the client. `serve_next_question` stamps the time a question is handed out and `submit_answer` measures from it, both inside Postgres, so a game step is one atomic call.
 - One daily attempt per user is enforced by a database constraint, not just by code.
+- Types in `src/features/game/types.ts` are what the browser receives. Adding a field there is a decision about what players can see.
+- After changing game logic, run `npm run smoke:game` against the development database.
+
+## API routes
+
+Every route handler follows the same order, and stays thin:
+
+1. Identify the visitor with `getUserId()` from `@/lib/auth`. Only `/api/game/start` uses `getOrCreateUserId()`, which signs a new visitor in as a guest.
+2. Check the rate limit with `isWithinRateLimit()` and a rule from `src/config/rate-limits.ts`.
+3. Check the input against a Zod schema, with `readJsonBody()` for a JSON body.
+4. Call one function from a feature's `service.ts` and return what it gives.
+
+Sign-in goes through `src/lib/auth` only, the same way database access goes through `src/lib/db` only. ESLint enforces both.
+
+A feature's `service.ts` is server-only. Its client components import from their neighbouring files (`../types`, `../api-client`), never from the feature's `index.ts`, which would pull server code into the browser.
 
 ## Question rules
 

@@ -70,6 +70,7 @@ function toImport(question: FinishedQuestion, playerIds: Map<number, number>): Q
     templateKey: question.templateKey,
     templateParams: question.params,
     dedupeKey: question.dedupeKey,
+    prominence: question.prominence,
     tags: question.tags,
     answers: question.answers.map((answer) => {
       const entityId = playerIds.get(answer.playerId);

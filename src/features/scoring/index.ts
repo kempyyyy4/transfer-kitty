@@ -4,3 +4,4 @@ export {
   type RankableAnswer,
   type TieredAnswer,
 } from "./assign-tiers";
+export { formatFee, percentOfPlayers } from "./format";

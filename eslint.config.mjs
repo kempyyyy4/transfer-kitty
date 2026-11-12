@@ -4,7 +4,7 @@ import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
 
 const databaseLayerMessage =
-  "Only src/lib/db talks to the database. Call a function from @/lib/db instead.";
+  "Only src/lib/db talks to the database, and only src/lib/auth to sign-in. Call a function from @/lib/db or @/lib/auth instead.";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -21,12 +21,15 @@ const eslintConfig = defineConfig([
   },
   {
     files: ["src/**/*.{ts,tsx}"],
-    ignores: ["src/lib/db/**", "src/lib/supabase/**"],
+    ignores: ["src/lib/db/**", "src/lib/supabase/**", "src/lib/auth/**"],
     rules: {
       "no-restricted-imports": [
         "error",
         {
-          paths: [{ name: "@supabase/supabase-js", message: databaseLayerMessage }],
+          paths: [
+            { name: "@supabase/supabase-js", message: databaseLayerMessage },
+            { name: "@supabase/ssr", message: databaseLayerMessage },
+          ],
           patterns: [{ group: ["@/lib/supabase/*"], message: databaseLayerMessage }],
         },
       ],
