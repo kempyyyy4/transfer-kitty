@@ -98,3 +98,15 @@ export {
   type PackRow,
   type PackStatus,
 } from "./packs";
+export {
+  buyItem,
+  getCoinBalance,
+  getCoinsForSession,
+  getOwnedItemKeys,
+  getPriceChanges,
+  grantCoins,
+  savePriceChange,
+  type BuyOutcome,
+  type CoinGrant,
+  type StoredPriceChange,
+} from "./coins";
