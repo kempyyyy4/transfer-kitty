@@ -5,8 +5,8 @@ import { useEffect, useRef, useState } from "react";
 const TICK_MS = 100;
 
 interface Props {
-  /** Time left when the question arrived, by the server's clock. */
-  msRemaining: number;
+  /** When time runs out, on the browser's performance.now() clock. */
+  deadline: number;
   /** The full time for a question, which the bar is drawn against. */
   msTotal: number;
   onExpire: () => void;
@@ -17,8 +17,8 @@ interface Props {
  * itself, so stopping this bar gains a player nothing.
  * Give it a `key` per question so each question gets a fresh countdown.
  */
-export function TimerBar({ msRemaining, msTotal, onExpire }: Props) {
-  const [msLeft, setMsLeft] = useState(msRemaining);
+export function TimerBar({ deadline, msTotal, onExpire }: Props) {
+  const [msLeft, setMsLeft] = useState(msTotal);
   const onExpireRef = useRef(onExpire);
 
   useEffect(() => {
@@ -26,17 +26,17 @@ export function TimerBar({ msRemaining, msTotal, onExpire }: Props) {
   }, [onExpire]);
 
   useEffect(() => {
-    const deadline = performance.now() + msRemaining;
-    const timer = setInterval(() => {
+    const tick = () => {
       const left = Math.max(0, deadline - performance.now());
       setMsLeft(left);
       if (left === 0) {
         clearInterval(timer);
         onExpireRef.current();
       }
-    }, TICK_MS);
+    };
+    const timer = setInterval(tick, TICK_MS);
     return () => clearInterval(timer);
-  }, [msRemaining]);
+  }, [deadline]);
 
   const secondsLeft = Math.ceil(msLeft / 1000);
   return (
