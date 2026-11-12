@@ -25,6 +25,8 @@ Other commands:
 
 `db push` without `--remote` targets a local database that this project does not use. Add `--dry-run` first to see what would be applied.
 
+If the dev server shows an old version of a page or stylesheet after a restart, its build cache is stale: stop it, delete `.next`, and start it again.
+
 ## Data and questions
 
 Questions are built offline from downloaded data, then loaded into the database. Nothing in `data/` is committed. Run these in order; each is safe to re-run.
@@ -144,6 +146,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 
 - Colours and fonts are theme tokens in `src/app/globals.css` (`night`, `chalk`, `floodlight`, `turf`, `claret`, `scoreboard`...; `font-pixel` for headings and labels, `font-mono` for body). Never use raw Tailwind palette colours such as `slate-` or `amber-` on a screen.
 - Buttons use the `pixel-button` utility, boxes `pixel-panel`, text boxes `pixel-input`. Pixel-font button labels are written in capitals.
+- Avatar and kit options live in `src/config/avatar-items.ts` and `src/config/kits.ts`. A player's avatar is stored as item IDs, so never rename an ID once players can pick it. The server checks every item exists and is free or owned before saving (`checkChoice`).
 - Characters are drawn from pixel grids in `src/features/avatar`: `cat/base.ts` is the body, `cat/extras.ts` the markings and accessories, `cast.ts` the mascot and tier characters. Change colours through a `CatLook`, never by editing the body rows.
 - Animations respect `prefers-reduced-motion` (see the end of `globals.css`).
 - Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
