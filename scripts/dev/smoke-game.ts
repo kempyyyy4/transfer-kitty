@@ -13,10 +13,13 @@ import { TIERS } from "@/config/tiers";
 import {
   advanceGame,
   answerQuestion,
+  getAnswerLists,
   getTodayStatus,
   startDailyGame,
 } from "@/features/game/service";
 import type { OpenQuestion } from "@/features/game/types";
+import { recalculateDueTiers } from "@/features/scoring/recalculation-job";
+import { ukDayOf } from "@/lib/time/uk-day";
 import { getServiceClient } from "@/lib/supabase/server";
 
 const admin = getServiceClient();
@@ -92,6 +95,9 @@ async function play(userId: string): Promise<void> {
   assert.equal(await advanceGame(randomUUID(), game.sessionId), null);
   assert.equal(await answerQuestion(randomUUID(), game.sessionId, 1, NOBODY), null);
   passed("another user cannot see or answer this game");
+
+  assert.equal(await getAnswerLists(userId, game.sessionId), "not_completed");
+  passed("the full answer lists are refused while the round is being played");
 
   assert.equal(await answerQuestion(userId, game.sessionId, 2, NOBODY), "not_open");
   passed("a question that has not been served cannot be answered");
@@ -171,6 +177,22 @@ async function play(userId: string): Promise<void> {
   passed(
     `the game completes with all ${finished.summary.answers.length} answers and a kitty of £${total}`,
   );
+
+  const lists = await getAnswerLists(userId, game.sessionId);
+  assert.ok(Array.isArray(lists), "expected answer lists after the round");
+  assert.equal(lists.length, GAME_RULES.questionsPerRound);
+  for (const list of lists) {
+    assert.ok(list.answers.length >= GAME_RULES.minAnswersPerQuestion);
+    assert.ok(list.answers.every((answer) => answer.fee > 0));
+  }
+  const secondList = lists.find((list) => list.position === 2);
+  assert.ok(secondList?.answers.some((answer) => answer.id === secondList.yourAnswerId));
+  passed(
+    "after the round, every question's full answer list is shown, with the player's own answer",
+  );
+
+  assert.equal((await recalculateDueTiers(ukDayOf(now))) >= 0, true);
+  passed("the nightly tier recalculation runs");
 
   assert.equal((await getTodayStatus(userId, now)).played, "completed");
   passed("today now shows as played");

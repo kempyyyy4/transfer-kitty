@@ -4,6 +4,7 @@ export { answerSchema, nextQuestionSchema, playerSearchSchema } from "./schemas"
 export {
   advanceGame,
   answerQuestion,
+  getAnswerLists,
   getGameSummary,
   getTodayStatus,
   startDailyGame,
@@ -16,6 +17,7 @@ export type {
   OpenQuestion,
   PlayerSuggestion,
   PlayState,
+  QuestionAnswers,
   StartedGame,
   TodayStatus,
 } from "./types";

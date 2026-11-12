@@ -20,7 +20,7 @@ type View =
   | { kind: "loading" }
   | { kind: "question"; question: OpenQuestion; deadline: number }
   | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
-  | { kind: "completed"; summary: GameSummary }
+  | { kind: "completed"; sessionId: string; summary: GameSummary }
   | { kind: "error"; message: string };
 
 function errorView(error: unknown): View {
@@ -39,17 +39,18 @@ export function GameScreen() {
   const draft = useRef<AnswerDraft>(EMPTY_DRAFT);
 
   const showNext = useCallback(async () => {
-    if (!sessionId.current) return;
+    const id = sessionId.current;
+    if (!id) return;
     try {
       // The server starts its clock somewhere between asking and hearing back. Counting
       // from the moment of asking puts this deadline at or before the server's, never after.
       const askedAt = performance.now();
-      const state = await gameApi.next(sessionId.current);
+      const state = await gameApi.next(id);
       answering.current = false;
       draft.current = EMPTY_DRAFT;
       setView(
         state.status === "completed"
-          ? { kind: "completed", summary: state.summary }
+          ? { kind: "completed", sessionId: id, summary: state.summary }
           : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
       );
     } catch (error) {
@@ -113,7 +114,9 @@ export function GameScreen() {
   }
 
   if (view.kind === "loading") return <p>Scouting...</p>;
-  if (view.kind === "completed") return <SummaryPanel summary={view.summary} />;
+  if (view.kind === "completed") {
+    return <SummaryPanel sessionId={view.sessionId} summary={view.summary} />;
+  }
   if (view.kind === "error") {
     return (
       <section className="flex flex-col gap-4">

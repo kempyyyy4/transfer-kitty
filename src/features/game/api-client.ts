@@ -2,6 +2,7 @@ import type {
   AnswerFeedback,
   PlayerSuggestion,
   PlayState,
+  QuestionAnswers,
   StartedGame,
   TodayStatus,
 } from "./types";
@@ -39,6 +40,8 @@ export const gameApi = {
   next: (sessionId: string) => post<PlayState>("/api/game/next", { sessionId }),
   answer: (sessionId: string, position: number, playerId: number | null) =>
     post<AnswerFeedback>("/api/game/answer", { sessionId, position, playerId }),
+  answerLists: (sessionId: string) =>
+    call<QuestionAnswers[]>(`/api/game/answers?sessionId=${encodeURIComponent(sessionId)}`),
   searchPlayers: (query: string, signal: AbortSignal) =>
     call<PlayerSuggestion[]>(`/api/players/search?q=${encodeURIComponent(query)}`, { signal }),
 };

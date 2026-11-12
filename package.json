@@ -22,6 +22,7 @@
     "questions:generate": "tsx scripts/questions/generate.ts",
     "questions:load": "tsx --conditions=react-server --env-file=.env.local scripts/questions/load.ts",
     "puzzles:schedule": "tsx --conditions=react-server --env-file=.env.local scripts/questions/schedule-puzzles.ts",
+    "tiers:recalculate": "tsx --conditions=react-server --env-file=.env.local scripts/questions/recalculate-tiers.ts",
     "smoke:game": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-game.ts"
   },
   "dependencies": {
