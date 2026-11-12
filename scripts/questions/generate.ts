@@ -5,7 +5,7 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { GAME_RULES } from "@/config/game";
+import { DAILY_PUZZLE, GAME_RULES } from "@/config/game";
 import { assignTiers } from "@/features/scoring";
 import { openWarehouse } from "../data/warehouse";
 import { QUESTIONS_PATH, REPORT_PATH } from "./paths";
@@ -13,9 +13,6 @@ import { startingPopularity } from "./popularity";
 import { buildReport, type TemplateOutcome } from "./report";
 import { TEMPLATES } from "./templates";
 import type { DataSource, DraftQuestion, FinishedQuestion } from "./types";
-
-/** A question's prominence is read from its third most popular answer (counting from 0). */
-const PROMINENCE_RANK = 2;
 
 const warehouse = openWarehouse();
 
@@ -35,7 +32,7 @@ function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion 
   return {
     ...draft,
     dataSource,
-    prominence: tiered[PROMINENCE_RANK]?.popularity ?? 0,
+    prominence: tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0,
     answers: tiered.map(({ entityId, popularity, tier }) => ({
       playerId: entityId,
       popularity,
