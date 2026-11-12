@@ -45,6 +45,8 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 - **Transfer fee questions use euros** and Transfermarkt's own fee figures, which are estimates for undisclosed deals. Each club gets one question, at the highest of €50m, €40m, €30m, €20m or €10m that still has 15 answers.
 - **World Cup 2026 questions cover the group stage only**, because the dataset stops before the knockout rounds. Five of the 48 nations are missing because the dataset has no team entry for them.
 - **Questions with more than 400 valid answers are dropped** as too easy.
+- **When time runs out, whatever is typed is sent**, as you asked. If it clearly fits one name in the list (the full name, or every word typed), that player is sent. If not, the best-known player matching the text is sent. So typing just "gomez" sends Mario Gómez, even when Papu Gómez was the answer you meant. Picking from the list avoids this.
+- **Daily puzzles only use well-known questions**: those whose third most popular answer is famous enough (prominence 400 or more in `src/config/game.ts`). About 1,600 of the 10,271 questions qualify.
 
 ## 4. Known weaknesses
 
