@@ -4,10 +4,17 @@ import { useState } from "react";
 import { formatFee } from "@/features/scoring";
 import { toSearchName } from "@/lib/search-name";
 import type { QuestionAnswers } from "../types";
+import { ReportMissing } from "./ReportMissing";
 import { tierName } from "./tier-label";
 
 /** Every valid answer to one question, with a search box. Shown only after the round. */
-export function AnswerList({ question }: { question: QuestionAnswers }) {
+export function AnswerList({
+  sessionId,
+  question,
+}: {
+  sessionId: string;
+  question: QuestionAnswers;
+}) {
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState("");
   const query = toSearchName(filter);
@@ -54,6 +61,11 @@ export function AnswerList({ question }: { question: QuestionAnswers }) {
         ))}
         {shown.length === 0 ? <li className="py-1">No answer matches that name.</li> : null}
       </ul>
+      <ReportMissing
+        sessionId={sessionId}
+        position={question.position}
+        answerIds={new Set(question.answers.map((answer) => answer.id))}
+      />
     </div>
   );
 }

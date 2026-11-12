@@ -80,7 +80,7 @@ export function SummaryPanel({ sessionId, summary }: Props) {
                   </p>
                 </div>
               </div>
-              {list ? <AnswerList question={list} /> : null}
+              {list ? <AnswerList sessionId={sessionId} question={list} /> : null}
             </li>
           );
         })}
