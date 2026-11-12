@@ -1,7 +1,7 @@
-import { TIERS } from "@/config/tiers";
+import { TIERS, TOP_LEVEL } from "@/config/tiers";
 import { formatFee } from "@/features/scoring";
 
-const TOP_TIER = TIERS.reduce((top, tier) => (tier.level > top.level ? tier : top));
+const TOP_TIER = TIERS.find((tier) => tier.level === TOP_LEVEL);
 
 export interface ShareInput {
   puzzleNumber: number;
@@ -18,9 +18,9 @@ export interface ShareInput {
  * The top-tier count is left out when there are none.
  */
 export function shareText({ puzzleNumber, totalFee, tierLevels }: ShareInput): string {
-  const topCount = tierLevels.filter((level) => level === TOP_TIER.level).length;
+  const topCount = tierLevels.filter((level) => level === TOP_LEVEL).length;
   const parts = [`🐱 ${formatFee(totalFee)}`];
-  if (topCount > 0) parts.push(`${topCount} ${topCount === 1 ? TOP_TIER.name : TOP_TIER.plural}`);
+  if (topCount > 0) parts.push(`${topCount} ${topCount === 1 ? TOP_TIER?.name : TOP_TIER?.plural}`);
   parts.push(`Transfer Kitty #${puzzleNumber}`);
 
   const row = tierLevels
