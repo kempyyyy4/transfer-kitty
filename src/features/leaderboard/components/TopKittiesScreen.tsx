@@ -57,14 +57,14 @@ export function TopKittiesScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Top Kitties</h1>
+      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">TOP KITTIES</h1>
 
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-lg text-chalk-dim">
         Showing
         <select
           value={leagueId ?? ""}
           onChange={(event) => setLeagueId(event.target.value || null)}
-          className="border-2 border-slate-100 bg-slate-900 p-2 text-base"
+          className="pixel-input p-2 text-base"
         >
           <option value="">Everyone</option>
           {leagues.map((league) => (
@@ -83,11 +83,11 @@ export function TopKittiesScreen() {
             role="tab"
             aria-selected={period === option.id}
             onClick={() => setPeriod(option.id)}
-            className={`flex-1 border-2 p-2 ${
-              period === option.id ? "border-amber-400 font-bold" : "border-slate-600"
+            className={`pixel-button flex-1 px-1 py-2 text-[9px] ${
+              period === option.id ? "border-floodlight text-floodlight" : ""
             }`}
           >
-            {option.label}
+            {option.label.toUpperCase()}
           </button>
         ))}
       </div>
@@ -103,8 +103,8 @@ export function TopKittiesScreen() {
         }}
       />
 
-      <Link href="/" className="border-2 border-slate-100 p-3 text-center font-bold">
-        Back to home
+      <Link href="/" className="pixel-button px-4 py-3 text-xs">
+        BACK TO HOME
       </Link>
     </section>
   );

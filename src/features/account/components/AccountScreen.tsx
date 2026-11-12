@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Loader } from "@/components/Loader";
 import { useEffect, useState } from "react";
 import { accountApi } from "../api-client";
 import type { AccountStatus } from "../types";
@@ -32,14 +33,14 @@ export function AccountScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">Your account</h1>
+      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">YOUR ACCOUNT</h1>
       {notice ? (
-        <p role="status" className="border-2 border-amber-400 p-3">
+        <p role="status" className="pixel-panel border-floodlight p-3">
           {notice}
         </p>
       ) : null}
 
-      {account === null ? <p>Scouting...</p> : null}
+      {account === null ? <Loader /> : null}
       {account && account.status !== "signed_in" ? (
         <SignInPanel isGuest={account.status === "guest"} />
       ) : null}
@@ -53,15 +54,15 @@ export function AccountScreen() {
           <button
             type="button"
             onClick={() => void signOut()}
-            className="self-start border-2 border-slate-600 px-3 py-2 hover:border-red-400"
+            className="pixel-button self-start px-3 py-2 text-[10px] hover:border-claret hover:text-claret"
           >
             Sign out
           </button>
         </>
       ) : null}
 
-      <Link href="/" className="border-2 border-slate-100 p-3 text-center font-bold">
-        Back to home
+      <Link href="/" className="pixel-button px-4 py-3 text-xs">
+        BACK TO HOME
       </Link>
     </section>
   );

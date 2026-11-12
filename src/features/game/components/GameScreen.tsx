@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader } from "@/components/Loader";
 import { GAME_RULES } from "@/config/game";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { formatFee } from "@/features/scoring";
@@ -8,8 +9,9 @@ import { gameApi, GameApiError } from "../api-client";
 import { bestMatch, confidentMatch } from "../best-match";
 import type { AnswerFeedback, GameSummary, OpenQuestion, PlayerSuggestion } from "../types";
 import { AnswerInput, type AnswerDraft } from "./AnswerInput";
+import { FeedbackPanel } from "./FeedbackPanel";
+import { KittyGauge } from "./KittyGauge";
 import { SummaryPanel } from "./SummaryPanel";
-import { outcomeLine, tierName } from "./tier-label";
 import { TimerBar } from "./TimerBar";
 
 /** The last-moment name lookup must leave time inside the server's grace period. */
@@ -113,59 +115,65 @@ export function GameScreen() {
     }
   }
 
-  if (view.kind === "loading") return <p>Scouting...</p>;
+  if (view.kind === "loading") return <Loader />;
   if (view.kind === "completed") {
     return <SummaryPanel sessionId={view.sessionId} summary={view.summary} />;
   }
   if (view.kind === "error") {
     return (
-      <section className="flex flex-col gap-4">
-        <p role="alert">{view.message}</p>
+      <section className="pixel-panel flex flex-col gap-4 p-4">
+        <p role="alert" className="text-xl">
+          {view.message}
+        </p>
         <button
           type="button"
-          className="border-2 border-slate-100 p-3 font-bold"
+          className="pixel-button px-4 py-3 text-xs"
           onClick={() => window.location.reload()}
         >
-          Try again
+          TRY AGAIN
         </button>
       </section>
     );
   }
 
   const { question } = view;
+  const kitty = kittyShown(view);
   return (
-    <section className="flex flex-col gap-4">
-      <p className="flex justify-between text-sm">
-        <span>
-          Question {question.position}/{question.total}
-        </span>
-        <span>Kitty: {formatFee(kittyShown(view))}</span>
-      </p>
-      <h1 className="text-xl font-bold">{question.prompt}</h1>
+    <section className="flex gap-3">
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
+          <span>
+            {question.position}/{question.total}
+          </span>
+          <span className="text-floodlight">KITTY {formatFee(kitty)}</span>
+        </p>
+        <h1 className="text-2xl leading-tight">{question.prompt}</h1>
 
-      {view.kind === "question" ? (
-        <>
-          <TimerBar
-            key={`timer-${question.position}`}
-            deadline={view.deadline}
-            msTotal={GAME_RULES.answerSeconds * 1000}
-            onExpire={() => void submitTyped(question)}
+        {view.kind === "question" ? (
+          <>
+            <TimerBar
+              key={`timer-${question.position}`}
+              deadline={view.deadline}
+              msTotal={GAME_RULES.answerSeconds * 1000}
+              onExpire={() => void submitTyped(question)}
+            />
+            <AnswerInput
+              key={`answer-${question.position}`}
+              disabled={false}
+              onPick={(player) => void submit(question, player)}
+              onDraftChange={rememberDraft}
+            />
+          </>
+        ) : (
+          <FeedbackPanel
+            answer={view.answer}
+            feedback={view.feedback}
+            isLast={question.position === question.total}
+            onContinue={() => void showNext()}
           />
-          <AnswerInput
-            key={`answer-${question.position}`}
-            disabled={false}
-            onPick={(player) => void submit(question, player)}
-            onDraftChange={rememberDraft}
-          />
-        </>
-      ) : (
-        <FeedbackPanel
-          answer={view.answer}
-          feedback={view.feedback}
-          isLast={question.position === question.total}
-          onContinue={() => void showNext()}
-        />
-      )}
+        )}
+      </div>
+      <KittyGauge kitty={kitty} />
     </section>
   );
 }
@@ -174,30 +182,4 @@ export function GameScreen() {
 function kittyShown(view: Extract<View, { kind: "question" | "feedback" }>): number {
   const earnedNow = view.kind === "feedback" ? view.feedback.fee : 0;
   return view.question.kittySoFar + earnedNow;
-}
-
-interface FeedbackProps {
-  answer: string | null;
-  feedback: AnswerFeedback;
-  isLast: boolean;
-  onContinue: () => void;
-}
-
-function FeedbackPanel({ answer, feedback, isLast, onContinue }: FeedbackProps) {
-  return (
-    <div className="flex flex-col gap-3 border-2 border-slate-100 p-4" role="status">
-      <p>{outcomeLine(feedback.outcome, answer)}</p>
-      <p className="text-2xl font-bold">{tierName(feedback.tier)}</p>
-      <p className="text-xl">{formatFee(feedback.fee)}</p>
-      {feedback.outcome === "correct" ? <p>{feedback.percent}% of players said this</p> : null}
-      <button
-        type="button"
-        autoFocus
-        className="border-2 border-amber-400 p-3 font-bold"
-        onClick={onContinue}
-      >
-        {isLast ? "See your kitty" : "Next question"}
-      </button>
-    </div>
-  );
 }

@@ -25,23 +25,44 @@ export function HomePanel() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      {today ? <p>Today&apos;s puzzle: #{today.puzzleNumber}</p> : null}
-      <Link href="/play" className="border-4 border-amber-400 px-8 py-4 text-2xl font-bold">
+    <div className="flex w-full max-w-sm flex-col items-center gap-5">
+      <p className="font-pixel text-xs text-chalk-dim">
+        {today ? `PUZZLE #${today.puzzleNumber}` : " "}
+      </p>
+      <Link
+        href="/play"
+        className="pixel-button w-full border-floodlight px-6 py-5 text-xl text-floodlight"
+      >
         {BUTTON_LABELS[today?.played ?? "not_started"]}
       </Link>
-      <p>
+      <p className="text-xl">
         Next puzzle in <Countdown />
       </p>
-      <div className="flex gap-3">
-        <Link href="/top-kitties" className="border-2 border-slate-100 px-6 py-2 font-bold">
-          Top Kitties
+
+      <nav aria-label="More" className="grid w-full grid-cols-2 gap-4">
+        <Link href="/top-kitties" className="pixel-button px-2 py-3 text-[10px]">
+          TOP KITTIES
         </Link>
-        <Link href="/account" className="border-2 border-slate-100 px-6 py-2 font-bold">
-          Account
+        <Link href="/account" className="pixel-button px-2 py-3 text-[10px]">
+          ACCOUNT
         </Link>
-      </div>
+        {COMING_LATER.map((label) => (
+          <ComingLater key={label} label={label} />
+        ))}
+      </nav>
     </div>
+  );
+}
+
+/** Buttons for modes that later stages build. Shown now so the menu is complete. */
+const COMING_LATER = ["ARCHIVE", "THEMED PACKS", "UNLIMITED", "SHOP"];
+
+function ComingLater({ label }: { label: string }) {
+  return (
+    <button type="button" disabled className="pixel-button relative px-2 py-3 text-[10px]">
+      {label}
+      <span className="absolute -top-3 -right-2 bg-claret px-1 text-[8px] text-chalk">SOON</span>
+    </button>
   );
 }
 

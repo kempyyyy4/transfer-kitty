@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const TICK_MS = 100;
+const HURRY_SECONDS = 5;
 
 interface Props {
   /** When time runs out, on the browser's performance.now() clock. */
@@ -39,16 +40,26 @@ export function TimerBar({ deadline, msTotal, onExpire }: Props) {
   }, [deadline]);
 
   const secondsLeft = Math.ceil(msLeft / 1000);
+  // The bar turns red for the last few seconds.
+  const hurry = secondsLeft <= HURRY_SECONDS;
   return (
-    <div
-      role="timer"
-      aria-label={`${secondsLeft} seconds left`}
-      className="h-4 w-full border-2 border-slate-100 bg-slate-800"
-    >
+    <div className="flex items-center gap-2">
       <div
-        className="h-full bg-amber-400"
-        style={{ width: `${Math.min(100, (100 * msLeft) / msTotal)}%` }}
-      />
+        role="timer"
+        aria-label={`${secondsLeft} seconds left`}
+        className="h-6 flex-1 border-4 border-chalk bg-night-deep"
+      >
+        <div
+          className={`h-full ${hurry ? "bg-claret" : "bg-turf-light"}`}
+          style={{ width: `${Math.min(100, (100 * msLeft) / msTotal)}%` }}
+        />
+      </div>
+      <span
+        aria-hidden
+        className={`w-8 text-right font-pixel text-xs ${hurry ? "text-claret" : ""}`}
+      >
+        {secondsLeft}
+      </span>
     </div>
   );
 }

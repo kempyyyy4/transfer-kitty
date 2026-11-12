@@ -20,7 +20,7 @@ export function AnswerList({ question }: { question: QuestionAnswers }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="self-start border-2 border-slate-600 px-3 py-1 text-sm hover:border-amber-400"
+        className="pixel-button self-start px-3 py-2 text-[10px]"
       >
         Show all {question.answers.length} answers
       </button>
@@ -29,21 +29,21 @@ export function AnswerList({ question }: { question: QuestionAnswers }) {
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="flex flex-col gap-1 text-sm">
+      <label className="flex flex-col gap-1 text-lg text-chalk-dim">
         Search the answers
         <input
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           autoComplete="off"
-          className="border-2 border-slate-100 bg-slate-900 p-2"
+          className="pixel-input p-2"
         />
       </label>
-      <ul className="flex max-h-80 flex-col overflow-y-auto text-sm">
+      <ul className="flex max-h-80 flex-col overflow-y-auto text-lg">
         {shown.map((answer) => (
           <li
             key={answer.id}
-            className={`flex justify-between gap-2 border-b border-slate-700 py-1 ${
-              answer.id === question.yourAnswerId ? "text-amber-400" : ""
+            className={`flex justify-between gap-2 border-b-2 border-stand py-1 ${
+              answer.id === question.yourAnswerId ? "text-floodlight" : ""
             }`}
           >
             <span>{answer.name}</span>

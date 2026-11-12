@@ -75,4 +75,25 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 
 ## 7. Not yet written
 
-Transfer-record milestones for the kitty gauge will go in `src/config/manual-facts.ts` and be listed here when the gauge is built in stage 8.
+Nothing outstanding.
+
+## 8. Transfer records on the kitty gauge (stage 8)
+
+These are written from memory, not taken from a data source, so they need checking. They live in `src/config/manual-facts.ts`. Fees are as commonly reported in the UK, in pounds.
+
+| Gauge label | Fact to check                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------- |
+| SHEARER '96 | Alan Shearer, Blackburn Rovers to Newcastle United, 1996, £15m: a world record at the time  |
+| RONALDO '09 | Cristiano Ronaldo, Manchester United to Real Madrid, 2009, £80m: a world record at the time |
+| ISAK '25    | Alexander Isak, Newcastle United to Liverpool, 2025, £125m: the British record              |
+| NEYMAR '17  | Neymar, Barcelona to Paris Saint-Germain, 2017, £198m (€222m): the world record             |
+
+Real names appear only as text labels on the gauge. No likenesses, crests or logos are used.
+
+## 9. The look and characters (stage 8)
+
+- All characters are cat-headed footballers drawn in code from pixel grids in `src/features/avatar`. Kit the mascot is a smoky blue cat in a teal kit with a yellow sash. Please confirm none of them reminds you of an existing character.
+- Kits on the tier characters use made-up colour schemes. The Big Cat's claret and sky-blue stripes and the Tomcat's red and white stripes echo common real club colours, with no names or badges.
+- Fonts are Press Start 2P for headings and VT323 for body text, both free Google Fonts.
+- Sounds are made in code (no sound files) and start muted.
+- The Archive, Themed Packs, Unlimited and Shop buttons on the home screen show as "SOON" until their stages are built.

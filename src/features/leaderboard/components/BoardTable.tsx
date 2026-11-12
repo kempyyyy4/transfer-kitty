@@ -20,7 +20,7 @@ export function BoardTable({ board }: { board: Board }) {
   const youAreShown = board.entries.some((entry) => entry.isYou);
   return (
     <div className="flex flex-col gap-2">
-      <p className="text-sm text-slate-400">
+      <p className="text-sm text-chalk-dim">
         {board.players.toLocaleString("en-GB")} {board.players === 1 ? "player" : "players"}
       </p>
       <ol className="flex flex-col">
@@ -37,7 +37,7 @@ export function BoardTable({ board }: { board: Board }) {
       </ol>
       {board.signInToAppear ? <SignInToAppear /> : null}
       {board.you && !youAreShown ? (
-        <ol className="flex flex-col border-t-2 border-slate-600 pt-2">
+        <ol className="flex flex-col border-t-4 border-stand pt-2">
           <Row
             rank={board.you.rank}
             name="You"
@@ -63,8 +63,8 @@ interface RowProps {
 function Row({ rank, name, total, days, highlight }: RowProps) {
   return (
     <li
-      className={`flex justify-between gap-2 border-b border-slate-700 py-2 ${
-        highlight ? "text-amber-400" : ""
+      className={`flex justify-between gap-2 border-b-2 border-stand py-2 ${
+        highlight ? "text-floodlight" : ""
       }`}
     >
       <span>

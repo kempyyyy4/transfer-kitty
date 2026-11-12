@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { TIERS } from "@/config/tiers";
+import { TierSprite } from "@/features/avatar";
 import { YourRank } from "@/features/leaderboard";
 import { formatFee } from "@/features/scoring";
 import { gameApi } from "../api-client";
@@ -32,36 +34,55 @@ export function SummaryPanel({ sessionId, summary }: Props) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold">
-        Transfer Kitty{summary.puzzleNumber ? ` #${summary.puzzleNumber}` : ""}
+      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">
+        TRANSFER KITTY{summary.puzzleNumber ? ` #${summary.puzzleNumber}` : ""}
       </h1>
-      <p className="text-xl">
-        Your kitty: <strong>{formatFee(summary.totalFee)}</strong>
-      </p>
+      <div className="flex flex-col items-center gap-2">
+        <p className="font-pixel text-[10px] text-chalk-dim">YOUR KITTY</p>
+        <p
+          className="border-4 border-stand bg-black px-6 py-3 font-pixel text-3xl text-scoreboard"
+          style={{ textShadow: "0 0 6px #ffb000" }}
+        >
+          {formatFee(summary.totalFee)}
+        </p>
+      </div>
       <YourRank />
 
-      <ol className="flex flex-col gap-3">
+      <ol className="flex flex-col gap-4">
         {summary.answers.map((answer) => {
           const list = lists?.find((question) => question.position === answer.position);
+          const spriteKey = TIERS.find((tier) => tier.level === answer.tier)?.spriteKey;
           return (
-            <li key={answer.position} className="flex flex-col gap-2 border-2 border-slate-600 p-3">
-              <p className="text-sm text-slate-400">
+            <li key={answer.position} className="pixel-panel flex flex-col gap-2 p-3">
+              <p className="text-lg text-chalk-dim">
                 {answer.position}. {answer.prompt}
               </p>
-              <p>{outcomeLine(answer.outcome, answer.answer)}</p>
-              <p>
-                <strong>{tierName(answer.tier)}</strong> · {formatFee(answer.fee)}
-                {answer.outcome === "correct" ? ` · ${answer.percent}% of players said this` : ""}
-              </p>
+              <div className="flex items-center gap-3">
+                {spriteKey ? (
+                  <TierSprite spriteKey={spriteKey} label={tierName(answer.tier)} scale={2} />
+                ) : null}
+                <div>
+                  <p className="text-xl">{outcomeLine(answer.outcome, answer.answer)}</p>
+                  <p className="text-lg">
+                    <span className="font-pixel text-[10px] text-floodlight">
+                      {tierName(answer.tier).toUpperCase()}
+                    </span>{" "}
+                    · {formatFee(answer.fee)}
+                    {answer.outcome === "correct" ? ` · ${answer.percent}% said this` : ""}
+                  </p>
+                </div>
+              </div>
               {list ? <AnswerList question={list} /> : null}
             </li>
           );
         })}
       </ol>
 
-      <p>That is today&apos;s game done. A new one starts at midnight UK time.</p>
-      <Link href="/" className="border-2 border-slate-100 p-3 text-center font-bold">
-        Back to home
+      <p className="text-xl">
+        That is today&apos;s game done. A new one starts at midnight UK time.
+      </p>
+      <Link href="/" className="pixel-button px-4 py-3 text-xs">
+        BACK TO HOME
       </Link>
     </section>
   );

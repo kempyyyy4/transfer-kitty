@@ -3,7 +3,7 @@ import Link from "next/link";
 /** Shown to a guest who has a rank but is left off the board until they sign in. */
 export function SignInToAppear() {
   return (
-    <p className="border-2 border-amber-400 p-3 text-sm">
+    <p className="pixel-panel border-floodlight p-3 text-lg">
       Guests are not shown on Top Kitties.{" "}
       <Link href="/account" className="font-bold underline">
         Sign in

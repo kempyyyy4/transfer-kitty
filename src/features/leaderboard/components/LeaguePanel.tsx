@@ -48,20 +48,20 @@ export function LeaguePanel({ selected, onChanged }: Props) {
   }
 
   return (
-    <section className="flex flex-col gap-4 border-2 border-slate-600 p-3">
+    <section className="pixel-panel flex flex-col gap-4 p-3">
       {selected ? (
         <div className="flex flex-col gap-2">
           <p>
             Invite code for {selected.name}:{" "}
             <strong className="tracking-widest">{selected.inviteCode}</strong>
           </p>
-          <p className="text-sm text-slate-400">
+          <p className="text-sm text-chalk-dim">
             Share it with friends so they can join. {selected.members}{" "}
             {selected.members === 1 ? "member" : "members"}.
           </p>
           <button
             type="button"
-            className="self-start border-2 border-slate-600 px-3 py-1 text-sm hover:border-red-400"
+            className="pixel-button self-start px-3 py-2 text-[10px] hover:border-claret hover:text-claret"
             onClick={() =>
               void run(async () => {
                 await leaderboardApi.leaveLeague(selected.id);
@@ -75,7 +75,7 @@ export function LeaguePanel({ selected, onChanged }: Props) {
       ) : null}
 
       <form onSubmit={join} className="flex flex-col gap-1">
-        <label htmlFor="join-code" className="text-sm">
+        <label htmlFor="join-code" className="text-lg text-chalk-dim">
           Join a league with an invite code
         </label>
         <div className="flex gap-2">
@@ -85,16 +85,19 @@ export function LeaguePanel({ selected, onChanged }: Props) {
             onChange={(event) => setCode(event.target.value)}
             maxLength={12}
             autoComplete="off"
-            className="min-w-0 flex-1 border-2 border-slate-100 bg-slate-900 p-2 uppercase"
+            className="min-w-0 flex-1 pixel-input p-2 uppercase"
           />
-          <button type="submit" className="border-2 border-amber-400 px-3 font-bold">
+          <button
+            type="submit"
+            className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
+          >
             Join
           </button>
         </div>
       </form>
 
       <form onSubmit={create} className="flex flex-col gap-1">
-        <label htmlFor="league-name" className="text-sm">
+        <label htmlFor="league-name" className="text-lg text-chalk-dim">
           Start a new league
         </label>
         <div className="flex gap-2">
@@ -105,9 +108,12 @@ export function LeaguePanel({ selected, onChanged }: Props) {
             minLength={LEAGUES.nameMinLength}
             maxLength={LEAGUES.nameMaxLength}
             autoComplete="off"
-            className="min-w-0 flex-1 border-2 border-slate-100 bg-slate-900 p-2"
+            className="min-w-0 flex-1 pixel-input p-2"
           />
-          <button type="submit" className="border-2 border-amber-400 px-3 font-bold">
+          <button
+            type="submit"
+            className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
+          >
             Create
           </button>
         </div>
