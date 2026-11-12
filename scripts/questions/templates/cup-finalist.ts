@@ -10,6 +10,7 @@ interface Row extends AnswerRow {
 /** "Name a player who has played in the FA Cup final since 2013." */
 export const cupFinalist: Template = {
   key: "cup-finalist",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       with finals as (

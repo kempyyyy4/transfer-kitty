@@ -13,6 +13,7 @@ interface Row extends AnswerRow {
 /** "Name a player who played in the 2019 Champions League final (Tottenham Hotspur v Liverpool FC)." */
 export const cupFinal: Template = {
   key: "cup-final",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select g.game_id, g.competition_id, cast(substr(g.date, 1, 4) as integer) as year,

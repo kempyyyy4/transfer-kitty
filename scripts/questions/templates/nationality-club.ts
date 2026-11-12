@@ -12,6 +12,7 @@ interface Row extends AnswerRow {
 /** "Name a player from Brazil who has played for Real Madrid since 2012/13." */
 export const nationalityClub: Template = {
   key: "nationality-club",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select s.club_id, c.name as club_name, p.country_of_citizenship as country,

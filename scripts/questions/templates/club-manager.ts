@@ -23,6 +23,7 @@ interface Row extends AnswerRow {
  */
 export const clubManager: Template = {
   key: "club-manager",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       with spells as (

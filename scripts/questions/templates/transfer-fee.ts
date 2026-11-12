@@ -20,6 +20,7 @@ interface Row extends AnswerRow {
  */
 export const transferFee: Template = {
   key: "transfer-fee",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select t.to_club_id as club_id, c.name as club_name, t.player_id,

@@ -11,6 +11,7 @@ interface Row extends AnswerRow {
 /** "Name a player who has played in both the Premier League and Serie A since 2012/13." */
 export const twoLeagues: Template = {
   key: "two-leagues",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     // A player counts as involved only as far as their lesser league, hence min().
     const rows = warehouse.query<Row>(`

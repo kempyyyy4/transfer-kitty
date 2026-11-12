@@ -7,6 +7,7 @@ import {
   countQuestions,
   getIdsByTransfermarktId,
   importQuestions,
+  retireGeneratedQuestionsExcept,
   upsertClubs,
   upsertPlayers,
   type ClubImport,
@@ -17,29 +18,26 @@ import { openWarehouse } from "../data/warehouse";
 import { QUESTIONS_PATH } from "./paths";
 import type { FinishedQuestion } from "./types";
 
-const DATA_SOURCE = "transfermarkt";
-
 function readPlayers(): PlayerImport[] {
   const warehouse = openWarehouse();
   const rows = warehouse.query<{
     player_id: number;
+    wikidata_id: string | null;
     name: string;
     country: string | null;
     birth_year: number | null;
     position: string | null;
     fame: number;
   }>(`
-    select p.player_id, p.name, p.country_of_citizenship as country,
-           cast(substr(p.date_of_birth, 1, 4) as integer) as birth_year,
-           p.position, f.fame
-    from tm_players p
+    select p.player_id, p.wikidata_id, p.name, p.country, p.birth_year, p.position, f.fame
+    from all_players p
     join player_fame f on f.player_id = p.player_id
-    where p.name is not null
   `);
   warehouse.close();
 
   return rows.map((row) => ({
     transfermarktId: row.player_id,
+    wikidataId: row.wikidata_id,
     name: row.name,
     country: row.country,
     birthYear: row.birth_year,
@@ -68,7 +66,7 @@ function toImport(question: FinishedQuestion, playerIds: Map<number, number>): Q
   return {
     prompt: question.prompt,
     answerType: "player",
-    dataSource: DATA_SOURCE,
+    dataSource: question.dataSource,
     templateKey: question.templateKey,
     templateParams: question.params,
     dedupeKey: question.dedupeKey,
@@ -102,5 +100,13 @@ await importQuestions(questions, (imported) => {
   }
 });
 
+// A question this run no longer produces is out of date, so it is taken out of play.
+const retired = await retireGeneratedQuestionsExcept(
+  new Set(questions.map((question) => question.dedupeKey)),
+);
+console.log(`questions: ${retired} out-of-date questions retired`);
+
 const totals = await countQuestions();
-console.log(`database now holds ${totals.questions} questions and ${totals.answers} answers`);
+console.log(
+  `database now holds ${totals.activeQuestions} active questions and ${totals.answers} answers`,
+);

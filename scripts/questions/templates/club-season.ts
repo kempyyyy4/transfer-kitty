@@ -20,6 +20,7 @@ interface Row extends AnswerRow {
 /** "Name a player who played for Leicester City in the Premier League in 2015/16." */
 export const clubSeason: Template = {
   key: "club-season",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select s.club_id, c.name as club_name, s.competition_id, s.season,

@@ -10,6 +10,7 @@ interface Row extends AnswerRow {
 /** "Name a player who has scored a hat-trick in La Liga since 2012/13." */
 export const hatTrick: Template = {
   key: "hat-trick",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select competition_id, player_id, count(*) as context

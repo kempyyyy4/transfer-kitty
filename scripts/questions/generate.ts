@@ -12,7 +12,7 @@ import { QUESTIONS_PATH, REPORT_PATH } from "./paths";
 import { startingPopularity } from "./popularity";
 import { buildReport, type TemplateOutcome } from "./report";
 import { TEMPLATES } from "./templates";
-import type { DraftQuestion, FinishedQuestion } from "./types";
+import type { DataSource, DraftQuestion, FinishedQuestion } from "./types";
 
 const warehouse = openWarehouse();
 
@@ -22,7 +22,7 @@ const fameByPlayer = new Map(
     .map((row) => [row.player_id, row.fame]),
 );
 
-function finish(draft: DraftQuestion): FinishedQuestion {
+function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion {
   const tiered = assignTiers(
     draft.answers.map((answer) => ({
       entityId: answer.playerId,
@@ -31,6 +31,7 @@ function finish(draft: DraftQuestion): FinishedQuestion {
   );
   return {
     ...draft,
+    dataSource,
     answers: tiered.map(({ entityId, popularity, tier }) => ({
       playerId: entityId,
       popularity,
@@ -52,7 +53,7 @@ for (const template of TEMPLATES) {
         d.answers.length >= GAME_RULES.minAnswersPerQuestion &&
         d.answers.length <= GAME_RULES.maxAnswersPerQuestion,
     )
-    .map(finish);
+    .map((draft) => finish(draft, template.dataSource));
 
   finished.push(...kept);
   outcomes.push({
@@ -80,7 +81,7 @@ if (repeated) {
 
 const playerNames = new Map(
   warehouse
-    .query<{ player_id: number; name: string }>("select player_id, name from tm_players")
+    .query<{ player_id: number; name: string }>("select player_id, name from all_players")
     .map((row) => [row.player_id, row.name]),
 );
 warehouse.close();

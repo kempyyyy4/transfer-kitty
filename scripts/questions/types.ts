@@ -32,14 +32,22 @@ export interface FinishedAnswer {
   tier: number;
 }
 
+/**
+ * Which datasets a question's answers came from. Stored with the question so that
+ * everything built on one source can be found, and pulled, if it proves unreliable.
+ */
+export type DataSource = "transfermarkt" | "transfermarkt+wikidata";
+
 /** A question that passed the filters, with every answer ranked and tiered. */
 export interface FinishedQuestion extends Omit<DraftQuestion, "answers"> {
+  dataSource: DataSource;
   /** Most popular answer first. */
   answers: FinishedAnswer[];
 }
 
 export interface Template {
   key: string;
+  dataSource: DataSource;
   generate(warehouse: Warehouse): DraftQuestion[];
 }
 

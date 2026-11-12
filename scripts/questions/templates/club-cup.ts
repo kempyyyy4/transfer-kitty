@@ -19,6 +19,7 @@ interface Row extends AnswerRow {
 /** "Name a player who has played for Celtic FC in the Champions League since 2012/13." */
 export const clubCup: Template = {
   key: "club-cup",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select s.club_id, c.name as club_name, s.competition_id,

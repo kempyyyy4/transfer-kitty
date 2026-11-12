@@ -13,6 +13,7 @@ interface Row extends AnswerRow {
  */
 export const worldCup2026: Template = {
   key: "world-cup-2026-group-stage",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select a.player_club_id as team_id, n.name as team, a.player_id, count(*) as context

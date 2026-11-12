@@ -13,6 +13,7 @@ interface Row extends AnswerRow {
 /** "Name a player who has scored 20 or more goals in a single Premier League season since 2012/13." */
 export const seasonGoals: Template = {
   key: "season-goals",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const targets = GOAL_TARGETS.map((target) => `(${target})`).join(", ");
     const rows = warehouse.query<Row>(`

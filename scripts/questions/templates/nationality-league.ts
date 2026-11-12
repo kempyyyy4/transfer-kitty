@@ -21,6 +21,7 @@ interface Row extends AnswerRow {
  */
 export const nationalityLeague: Template = {
   key: "nationality-league",
+  dataSource: "transfermarkt",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
       select s.competition_id, p.country_of_citizenship as country,
