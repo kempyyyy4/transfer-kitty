@@ -2,6 +2,7 @@
   "name": "transfer-kitty",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +13,14 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format:check && npm run lint && npm run typecheck && npm test"
+    "check": "npm run format:check && npm run lint && npm run typecheck && npm test",
+    "data:download": "tsx scripts/data/download-transfermarkt.ts",
+    "data:build": "tsx scripts/data/build-warehouse.ts && tsx scripts/data/load-wikidata.ts && tsx scripts/data/derive.ts",
+    "data:sql": "tsx scripts/data/sql.ts",
+    "wikidata:download": "tsx scripts/data/download-wikidata.ts",
+    "wikidata:compare": "tsx scripts/data/compare-wikidata.ts",
+    "questions:generate": "tsx scripts/questions/generate.ts",
+    "questions:load": "tsx --conditions=react-server --env-file=.env.local scripts/questions/load.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.119.0",
@@ -33,6 +41,7 @@
     "prettier": "^3.9.10",
     "supabase": "^3.1.0",
     "tailwindcss": "4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^5",
     "vitest": "^5.1.0"
   }

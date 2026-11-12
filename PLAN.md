@@ -91,6 +91,48 @@ The limits, honestly:
 
 If it passes, the player pool becomes "everyone in either source". If it fails, the game launches with 2012/13 onwards and says so on screen. The "report a missing answer" link and the admin page cover the gaps that remain either way.
 
+#### The accuracy numbers (measured 11 November 2026)
+
+867,149 club spells were downloaded from Wikidata and compared with Transfermarkt's match data for the players and seasons both cover. Reproduce with `npm run wikidata:compare`.
+
+**What Wikidata says is nearly always right, when it records games for the spell.** Share of Wikidata spells confirmed by a Transfermarkt appearance:
+
+| Games Wikidata records for the spell | Confirmed |
+| ------------------------------------ | --------- |
+| 5 or more                            | 98.6%     |
+| 1 to 4                               | 87.9%     |
+| No count recorded                    | 77.0%     |
+| Zero                                 | 26.4%     |
+
+**Wikidata is complete for older spells and patchy for recent ones.** Share of Transfermarkt spells (10 or more league games for a club) that Wikidata also has:
+
+| When the player first appeared for the club | Found in Wikidata |
+| ------------------------------------------- | ----------------- |
+| Already there in 2012                       | 97.5%             |
+| 2013 to 2018                                | 78.0%             |
+| 2019 to 2022                                | 46.7%             |
+| 2023 onwards                                | 43.0%             |
+
+It is also better for famous players (92.0% found) than obscure ones (60.6%). Where both have a start year, they agree within a year 91.6% of the time.
+
+**What this means.** The two sources are strong in opposite places. Transfermarkt is accurate from 2012/13 but blank before it. Wikidata is nearly complete before 2012 but volunteers have not kept up with recent transfers. Neither can be used alone for an all-time question.
+
+**Decision: combine them, with the inclusive rule.** Tom agreed on 11 November 2026. The two options were:
+
+- **Strict:** use only Wikidata spells with at least one game recorded. About 97% of accepted answers are right, but about 30% of real spells have no count and would be rejected as wrong answers.
+- **Inclusive (chosen):** also use spells with no count recorded. About 90% of accepted answers are right, and far fewer correct answers are rejected. A rejected correct answer is the worse mistake in this game, because it punishes exactly the deep knowledge the fees are meant to reward.
+
+**The rule as built**, set in `src/config/wikidata.ts`:
+
+- From 2012/13 onwards, a player counts for a club only if Transfermarkt shows a match appearance.
+- Before that, a player counts if Wikidata shows a spell that began by 2012.
+- A Wikidata spell recorded with zero games is never used.
+- A Wikidata spell with no dates is used only when it must predate the match data: it ended by 2012, or the player is not in the match data at all.
+
+**What it produced.** 192,493 players in total, 142,344 of them only in Wikidata. "Played for both Liverpool and Real Madrid" now returns the right 11 players, including McManaman, Morientes, Dudek and Núñez. The expected mistakes show up too. "Played for Arsenal in the 1990s" has 88 answers, and a few look wrong on reading them: Gustavo Costas, whom Wikidata links to Arsenal for 1996 to 1997 with no games recorded, and one or two names that look like youth players. These have not been checked against another source. They are spells with no game count, the kind the inclusive rule knowingly lets in.
+
+**Limits of the test.** It can only check Wikidata against seasons Transfermarkt covers. The 97.5% figure is for spells that began before 2012 by players still active then. Players who retired long before 2012 could not be checked, though they are mostly the well-documented famous names. 316,659 pre-2012 spells have a matched club and at least one game.
+
 ### 2.2 Make the GitHub repo private (open, Tom's choice)
 
 **Recommendation:** make it private now. Nothing in this project needs it public, and Vercel and the automated checks work the same with a private repo. The valid answers will live in the database, not the repo, but the question generator and the artwork code will be in the repo. You can switch it under Settings, General, Danger Zone, Change visibility. Renaming it later is also easy and can wait.
@@ -159,19 +201,19 @@ I cannot create accounts, sign in, or handle passwords and secret keys for you. 
 
 ## 5. Tech choices
 
-| Area              | Choice                                                                 | Why                                                                        |
-| ----------------- | ---------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Framework         | Next.js App Router, TypeScript strict, Tailwind                        | From the brief. Latest stable versions at setup.                           |
-| Package manager   | npm                                                                    | Nothing extra to install.                                                  |
-| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5.                                         |
-| Validation        | Zod on every API input                                                 | From the brief.                                                            |
-| Tests             | Vitest                                                                 | Fast, works with TypeScript without setup.                                 |
-| Lint and format   | ESLint and Prettier                                                    | From the brief.                                                            |
-| Dataset tooling   | DuckDB, called from TypeScript scripts                                 | Reads the dataset files directly and handles millions of rows on a laptop. |
-| Rate limiting     | A small Postgres-backed limiter behind one `rateLimit()` function      | No extra vendor. Can be swapped for Redis later without touching callers.  |
-| Sprites           | Pixel grids in code, drawn as SVG                                      | Fur, breed and kit colours swap by changing a palette.                     |
-| Sound             | Web Audio API tones made in code                                       | Original, tiny, no audio files to license.                                 |
-| Payments          | Stripe Checkout and a webhook                                          | From the brief.                                                            |
+| Area              | Choice                                                                 | Why                                                                                                                                  |
+| ----------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Framework         | Next.js App Router, TypeScript strict, Tailwind                        | From the brief. Latest stable versions at setup.                                                                                     |
+| Package manager   | npm                                                                    | Nothing extra to install.                                                                                                            |
+| Database and auth | Supabase Postgres, magic link and Google, anonymous sign-in for guests | From the brief, plus decision 1.5.                                                                                                   |
+| Validation        | Zod on every API input                                                 | From the brief.                                                                                                                      |
+| Tests             | Vitest                                                                 | Fast, works with TypeScript without setup.                                                                                           |
+| Lint and format   | ESLint and Prettier                                                    | From the brief.                                                                                                                      |
+| Dataset tooling   | SQLite, built into Node, called from TypeScript scripts                | Handles millions of rows on a laptop with nothing extra to install. DuckDB was the first choice but crashed on load on the build PC. |
+| Rate limiting     | A small Postgres-backed limiter behind one `rateLimit()` function      | No extra vendor. Can be swapped for Redis later without touching callers.                                                            |
+| Sprites           | Pixel grids in code, drawn as SVG                                      | Fur, breed and kit colours swap by changing a palette.                                                                               |
+| Sound             | Web Audio API tones made in code                                       | Original, tiny, no audio files to license.                                                                                           |
+| Payments          | Stripe Checkout and a webhook                                          | From the brief.                                                                                                                      |
 
 ### How the main anti-cheat rules work
 
@@ -239,42 +281,60 @@ transfer-kitty/
 
 ### What the Transfermarkt dataset covers
 
-Checked on 10 November 2026 by downloading five of its twelve tables.
+Checked on 11 November 2026 by loading nine of its tables into the local warehouse.
 
-- Match and appearance data for the main European leagues and cups runs from 2012/13 to 2025/26. Leagues outside Europe's main ones (Brazil, Argentina, MLS, Saudi Arabia, Japan and others) only have 2024 and 2025.
-- World Cups from 2006 to 2026 and Euros from 2008 to 2024 are in the games table. Whether full player appearances exist for the older tournaments is not checked yet.
+- Match and appearance data (1,894,350 appearances) for the main European leagues and cups runs from 2012/13 to 2025/26. Leagues outside Europe's main ones (Brazil, Argentina, MLS, Saudi Arabia, Japan and others) only have 2024 and 2025.
 - 50,149 players, every one active in 2012/13 or later.
-- 175,165 transfers for those players, including their moves before 2012. Fees are in euros.
-- Updates are paused. Games stop at 6 July 2026 and appearances at 28 June 2026, so the 2026/27 season is missing and the 2026 World Cup is cut off before its final. A 2026 World Cup pack needs its knockout rounds from another source, or waits until the dataset resumes.
+- **Transfers before 2012 are too patchy to use.** Only 6,165 of the 175,165 transfers are from the 2000s, so careers before the match data are mostly missing. Asked for Liverpool and Real Madrid players, the dataset alone finds two (Fabinho and Alexander-Arnold) and misses Xabi Alonso. Transfers are used only for fees since summer 2012. Fees are in euros.
+- **Older tournaments have results but no players.** World Cups from 2006 and Euros from 2008 are in the games table, but player appearances exist only for the 2026 World Cup group stage. Earlier tournaments need Wikidata.
+- Cup finals have full line-ups up to 2025. The 2026 finals are missing.
+- Updates are paused. Games stop at 6 July 2026, so the 2026/27 season is missing and the 2026 World Cup is cut off before its knockout rounds.
+
+Because of this, every question built from Transfermarkt alone is built from match appearances and says which seasons it covers ("since 2012/13", or a named season or final).
 
 ### Generator steps
 
 Runs on a developer machine against the downloaded data, never on the live site.
 
-1. **Download** the data into `data/raw/` (not committed).
-2. **Import** players and clubs into Supabase, with a fame score for each player. If Wikidata is approved, players are matched across the two sources by Transfermarkt ID.
-3. **Generate.** Each template is one file that returns a prompt, tags and the list of valid answers with the evidence behind each. Starting templates:
-   - played for both Club A and Club B
-   - a [nationality] player who played in [league]
-   - joined [club] for €Xm or more
-   - played in a [competition] final
-   - played in [league] in the [decade]
-   - played for [club] in the [decade]
-   - scored in [competition] for [club]
-   - played for [club] under [manager]
-   - in the [country] squad at [tournament]
-   - played alongside [player] at [club]
-4. **Filter.** Keep questions with at least 15 valid answers (config). Drop near-duplicates and questions so broad that almost any player is right (upper limit in config).
-5. **Tier.** Rank each question's answers by fame score and apply the shares in decision 1.2.
-6. **Load** into Supabase. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated.
+1. **Download** the data into `data/raw/` (not committed): `npm run data:download` for Transfermarkt and `npm run wikidata:download` for Wikidata.
+2. **Build the warehouse**, a local SQLite file with the raw tables from both sources, the merged player list, club spells and a fame score for each player: `npm run data:build`.
+3. **Generate**: `npm run questions:generate`. Each template is one file in `scripts/questions/templates` that returns a prompt, tags and the valid answers. The 16 templates built so far, the first two using both sources:
+   - played for both [club] and [club], all-time
+   - played for [club] in the [1990s, 2000s, 2010s or 2020s]
+   - played for [club] in [league] in [season]
+   - played a league match for [club] since 2012/13
+   - played for [club] under [manager], with the seasons named
+   - played for [club] in [cup] since 2012/13
+   - scored for [club] in [competition] since 2012/13
+   - played in both [league] and [league] since 2012/13
+   - a player from [country] who played in [league] since 2012/13
+   - a player from [country] who played for [club] since 2012/13
+   - played in the [year] [cup] final, and in any [cup] final
+   - scored [10, 15 or 20] or more goals in a [league] season
+   - scored a hat-trick in [competition]
+   - joined [club] for €Xm or more since summer 2012
+   - played for [country] in the group stage of the 2026 World Cup
+4. **Filter.** Keep questions with 15 to 400 valid answers (config). Above 400, almost any guess is right.
+5. **Tier.** Rank each question's answers by starting popularity and apply the shares in decision 1.2.
+6. **Load** into Supabase: `npm run questions:load`. Re-running is safe: each question has a `dedupe_key`, so an existing question is updated, not duplicated. A question the new run no longer produces is retired.
 
-**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals. Crowd recalculation and admin overrides fix what remains.
+**Runs so far.** 11 November 2026, Transfermarkt only: 6,581 questions. 12 November 2026, both sources: 10,271 questions and 468,058 answers in the development database, of which 2,872 are all-time "both clubs" questions (78 before) and 1,168 are decade questions (272 before).
 
-**"Played for" rule.** A player counts for a club if a source shows an appearance for it or a spell in its first team. Youth and reserve sides are separate clubs in the data and do not count.
+**The brief's own example does not make the cut.** "Played for both Liverpool and Real Madrid" has 11 correct answers, under the 15 the brief asks for, so it is not generated. Lowering the minimum is one number in `src/config/game.ts`. It is Tom's call.
 
-**Tags.** Every question is tagged by league, decade, competition, tournament, nationality, club and featured player where they apply. Packs are just saved tag filters.
+**Fame score.** Mainly career appearances in top leagues, weighted in `src/config/fame.ts` (the five biggest leagues count most, then other top divisions, plus Champions League appearances). International caps and peak market value are secondary signals.
 
-The generator prints a report: questions per template, answer-count spread, source agreement, and a random sample to eyeball. The target is several thousand questions. I will report the real numbers at the end of stage 3 before going further.
+**Fame for older players.** Match data starts in 2012/13, so on its own it makes Gerrard and Owen look obscure. For players born before 1990, and for players with no match data at all, fame is the higher of their match fame and a Wikipedia fame: how many language editions of Wikipedia have an article on them, matched by rank against players whose whole peak is in the match data. That puts Zidane level with Salah, and Henry, Gerrard and Owen just behind. Players born from 1990 keep match fame alone. Settings are in `src/config/wikidata.ts`. Crowd recalculation and admin overrides fix what remains.
+
+**Starting popularity.** Within one question, fame is scaled down for a player who barely featured in what is being asked. Salah is a rarer answer for "played for Chelsea" than for "played for Liverpool". The strength of this is set in `src/config/fame.ts`.
+
+**"Played for" rule.** From 2012/13, a player counts for a club only if the data shows a match appearance for it. Signing without playing does not count. Before then, the Wikidata rule in decision 2.1 applies.
+
+**Nationality** is the first citizenship the dataset lists for a player.
+
+**Tags.** Every question is tagged by league, decade, competition, tournament, nationality and club where they apply. Packs are just saved tag filters.
+
+The generator writes a report to `data/build/question-report.txt`: questions per template, the spread of answer counts, and one sample question per template with its most popular and rarest answers.
 
 ---
 
@@ -296,7 +356,7 @@ Row-level security is on for every table. "Server only" means no browser access 
 | Table              | Key columns                                                                                                                                                                                                                                       | Notes                                                 |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `questions`        | `id`, `prompt`, `answer_type` (player or club), `source` (generated or manual), `data_source`, `template_key`, `template_params`, `dedupe_key` unique, `status` (draft, active, retired), `answer_count`, `times_played`, `tiers_recalculated_at` | Server only                                           |
-| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `fame_score`, `times_given`. Primary key on question and entity.                                                                                              | Server only. This is the table that must never leak.  |
+| `question_answers` | `question_id`, `entity_id`, `starting_tier`, `current_tier`, `admin_tier_override`, `starting_popularity`, `times_given`. Primary key on question and entity.                                                                                     | Server only. This is the table that must never leak.  |
 | `question_tags`    | `question_id`, `tag_type` (league, decade, competition, tournament, nationality, club, featured_player), `tag_value`                                                                                                                              | Server only                                           |
 | `answer_reports`   | `id`, `question_id`, `user_id`, `suggested_answer`, `status`                                                                                                                                                                                      | Players' "missing answer" reports, reviewed in Admin. |
 

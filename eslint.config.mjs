@@ -32,8 +32,14 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  {
+    // Command-line tools report progress by printing, so the console rule is lifted for them.
+    files: ["scripts/**/*.ts"],
+    ignores: ["scripts/**/*.test.ts"],
+    rules: { "no-console": "off" },
+  },
   prettier,
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "data/**"]),
 ]);
 
 export default eslintConfig;
