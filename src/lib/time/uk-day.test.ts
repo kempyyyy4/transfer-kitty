@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { addDays, daysBetween, nextUkMidnight, ukDayOf } from "./uk-day";
+import { addDays, daysBetween, nextUkMidnight, ukDayOf, weekContaining } from "./uk-day";
 
 const at = (iso: string) => new Date(iso);
 
@@ -64,6 +64,22 @@ describe("nextUkMidnight", () => {
       expect(ukDayOf(midnight)).not.toBe(ukDayOf(justBefore));
       expect(ukDayOf(justBefore)).toBe(ukDayOf(at(iso)));
     }
+  });
+});
+
+describe("weekContaining", () => {
+  it("runs Monday to Sunday", () => {
+    // 12 November 2026 is a Thursday.
+    expect(weekContaining("2026-11-12")).toEqual({ from: "2026-11-09", to: "2026-11-15" });
+  });
+
+  it("puts a Monday at the start and a Sunday at the end of its own week", () => {
+    expect(weekContaining("2026-11-09").from).toBe("2026-11-09");
+    expect(weekContaining("2026-11-15")).toEqual({ from: "2026-11-09", to: "2026-11-15" });
+  });
+
+  it("crosses month and year ends", () => {
+    expect(weekContaining("2027-01-01")).toEqual({ from: "2026-12-28", to: "2027-01-03" });
   });
 });
 

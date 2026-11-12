@@ -31,6 +31,14 @@ export function daysBetween(earlier: string, later: string): number {
   );
 }
 
+/** The Monday-to-Sunday week a day falls in, as the first and last day. */
+export function weekContaining(day: string): { from: string; to: string } {
+  // getUTCDay counts Sunday as 0; shifting by 6 makes Monday the start of the week.
+  const daysSinceMonday = (new Date(`${day}T00:00:00Z`).getUTCDay() + 6) % 7;
+  const from = addDays(day, -daysSinceMonday);
+  return { from, to: addDays(from, 6) };
+}
+
 /**
  * The moment the next UK day begins.
  * Midnight in the UK is 00:00 or 23:00 in UTC depending on the clocks, so both candidates
