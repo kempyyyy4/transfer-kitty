@@ -20,9 +20,12 @@
     "wikidata:download": "tsx scripts/data/download-wikidata.ts",
     "wikidata:compare": "tsx scripts/data/compare-wikidata.ts",
     "questions:generate": "tsx scripts/questions/generate.ts",
-    "questions:load": "tsx --conditions=react-server --env-file=.env.local scripts/questions/load.ts"
+    "questions:load": "tsx --conditions=react-server --env-file=.env.local scripts/questions/load.ts",
+    "puzzles:schedule": "tsx --conditions=react-server --env-file=.env.local scripts/questions/schedule-puzzles.ts",
+    "smoke:game": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-game.ts"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.119.0",
     "next": "16.4.6",
     "react": "19.3.0",
