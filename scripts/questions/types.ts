@@ -41,6 +41,11 @@ export type DataSource = "transfermarkt" | "transfermarkt+wikidata";
 /** A question that passed the filters, with every answer ranked and tiered. */
 export interface FinishedQuestion extends Omit<DraftQuestion, "answers"> {
   dataSource: DataSource;
+  /**
+   * How well known the question's best answers are: the starting popularity of its third
+   * most popular answer. Daily puzzles only use questions where this is high.
+   */
+  prominence: number;
   /** Most popular answer first. */
   answers: FinishedAnswer[];
 }

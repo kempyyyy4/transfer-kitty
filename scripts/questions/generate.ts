@@ -14,6 +14,9 @@ import { buildReport, type TemplateOutcome } from "./report";
 import { TEMPLATES } from "./templates";
 import type { DataSource, DraftQuestion, FinishedQuestion } from "./types";
 
+/** A question's prominence is read from its third most popular answer (counting from 0). */
+const PROMINENCE_RANK = 2;
+
 const warehouse = openWarehouse();
 
 const fameByPlayer = new Map(
@@ -32,6 +35,7 @@ function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion 
   return {
     ...draft,
     dataSource,
+    prominence: tiered[PROMINENCE_RANK]?.popularity ?? 0,
     answers: tiered.map(({ entityId, popularity, tier }) => ({
       playerId: entityId,
       popularity,

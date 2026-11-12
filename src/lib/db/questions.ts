@@ -17,6 +17,8 @@ export interface QuestionImport {
   templateKey: string;
   templateParams: Record<string, string | number>;
   dedupeKey: string;
+  /** How well known the question's best answers are. Daily puzzles need a high value. */
+  prominence: number;
   tags: { type: string; value: string }[];
   answers: { entityId: number; tier: number; popularity: number }[];
 }
@@ -50,6 +52,7 @@ function toPayload(question: QuestionImport) {
     template_key: question.templateKey,
     template_params: question.templateParams,
     dedupe_key: question.dedupeKey,
+    prominence: question.prominence,
     tags: question.tags,
     answers: question.answers.map((answer) => ({
       entity_id: answer.entityId,
