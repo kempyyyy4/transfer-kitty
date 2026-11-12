@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { YourRank } from "@/features/leaderboard";
 import { formatFee } from "@/features/scoring";
 import { gameApi } from "../api-client";
 import type { GameSummary, QuestionAnswers } from "../types";
@@ -37,6 +38,7 @@ export function SummaryPanel({ sessionId, summary }: Props) {
       <p className="text-xl">
         Your kitty: <strong>{formatFee(summary.totalFee)}</strong>
       </p>
+      <YourRank />
 
       <ol className="flex flex-col gap-3">
         {summary.answers.map((answer) => {
