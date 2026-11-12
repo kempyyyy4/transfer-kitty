@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { gameApi } from "../api-client";
+import { bestMatch } from "../best-match";
 import type { PlayerSuggestion } from "../types";
 
 /** Wait this long after the last keystroke before searching, to spare the server. */
@@ -11,13 +12,20 @@ const SEARCH_DELAY_MS = 200;
 interface Props {
   disabled: boolean;
   onPick: (player: PlayerSuggestion) => void;
+  /** Reports what is typed and suggested, so it can still be sent if time runs out. */
+  onDraftChange: (draft: AnswerDraft) => void;
+}
+
+export interface AnswerDraft {
+  text: string;
+  suggestions: readonly PlayerSuggestion[];
 }
 
 /**
  * The answer box. Suggestions come from every player in the database, whatever the
  * question, so the list never hints at who is right.
  */
-export function AnswerInput({ disabled, onPick }: Props) {
+export function AnswerInput({ disabled, onPick, onDraftChange }: Props) {
   const [text, setText] = useState("");
   const [suggestions, setSuggestions] = useState<PlayerSuggestion[]>([]);
   const query = text.trim();
@@ -41,15 +49,19 @@ export function AnswerInput({ disabled, onPick }: Props) {
     };
   }, [query, canSearch]);
 
-  const shown = canSearch ? suggestions : [];
-  const first = shown[0];
+  const shown = useMemo(() => (canSearch ? suggestions : []), [canSearch, suggestions]);
+
+  useEffect(() => {
+    onDraftChange({ text, suggestions: shown });
+  }, [text, shown, onDraftChange]);
 
   return (
     <form
       className="flex flex-col gap-2"
       onSubmit={(event) => {
         event.preventDefault();
-        if (first && !disabled) onPick(first);
+        const match = bestMatch(text, shown);
+        if (match && !disabled) onPick(match);
       }}
     >
       <label htmlFor="answer" className="text-sm">

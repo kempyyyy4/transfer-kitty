@@ -2,17 +2,23 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { GAME_RULES } from "@/config/game";
+import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { formatFee } from "@/features/scoring";
 import { gameApi, GameApiError } from "../api-client";
+import { bestMatch, confidentMatch } from "../best-match";
 import type { AnswerFeedback, GameSummary, OpenQuestion, PlayerSuggestion } from "../types";
-import { AnswerInput } from "./AnswerInput";
+import { AnswerInput, type AnswerDraft } from "./AnswerInput";
 import { SummaryPanel } from "./SummaryPanel";
 import { outcomeLine, tierName } from "./tier-label";
 import { TimerBar } from "./TimerBar";
 
+/** The last-moment name lookup must leave time inside the server's grace period. */
+const TIMEOUT_LOOKUP_MS = 800;
+const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [] };
+
 type View =
   | { kind: "loading" }
-  | { kind: "question"; question: OpenQuestion }
+  | { kind: "question"; question: OpenQuestion; deadline: number }
   | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
   | { kind: "completed"; summary: GameSummary }
   | { kind: "error"; message: string };
@@ -29,23 +35,38 @@ export function GameScreen() {
   const sessionId = useRef<string | null>(null);
   // Stops the timer running out and a click landing together from sending two answers.
   const answering = useRef(false);
+  // What is in the answer box and listed under it, so it can still be sent if time runs out.
+  const draft = useRef<AnswerDraft>(EMPTY_DRAFT);
 
   const showNext = useCallback(async () => {
     if (!sessionId.current) return;
     try {
+      // The server starts its clock somewhere between asking and hearing back. Counting
+      // from the moment of asking puts this deadline at or before the server's, never after.
+      const askedAt = performance.now();
       const state = await gameApi.next(sessionId.current);
       answering.current = false;
+      draft.current = EMPTY_DRAFT;
       setView(
         state.status === "completed"
           ? { kind: "completed", summary: state.summary }
-          : { kind: "question", question: state },
+          : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
       );
     } catch (error) {
       setView(errorView(error));
     }
   }, []);
 
+  const rememberDraft = useCallback((latest: AnswerDraft) => {
+    draft.current = latest;
+  }, []);
+
+  // React runs this effect twice in development. Two starts at once, before the guest
+  // cookie exists, would sign the visitor in as two different guests.
+  const started = useRef(false);
   useEffect(() => {
+    if (started.current) return;
+    started.current = true;
     gameApi
       .start()
       .then((game) => {
@@ -54,6 +75,26 @@ export function GameScreen() {
       })
       .catch((error: unknown) => setView(errorView(error)));
   }, [showNext]);
+
+  /**
+   * Time is up: send whatever name is in the box rather than nothing. The suggestions
+   * already on screen are used when there are any; otherwise the name is looked up once
+   * more, inside the moment's grace the server allows for exactly this.
+   */
+  async function submitTyped(question: OpenQuestion) {
+    if (answering.current) return;
+    const { text, suggestions } = draft.current;
+    if (text.trim().length < PLAYER_SEARCH.minQueryLength) return submit(question, null);
+
+    // The list on screen can lag a keystroke behind, so it is only trusted for a clear fit.
+    const shown = confidentMatch(text, suggestions);
+    if (shown) return submit(question, shown);
+
+    const looked = await gameApi
+      .searchPlayers(text.trim(), AbortSignal.timeout(TIMEOUT_LOOKUP_MS))
+      .catch(() => []);
+    return submit(question, bestMatch(text, looked));
+  }
 
   async function submit(question: OpenQuestion, player: PlayerSuggestion | null) {
     if (!sessionId.current || answering.current) return;
@@ -102,15 +143,16 @@ export function GameScreen() {
       {view.kind === "question" ? (
         <>
           <TimerBar
-            key={question.position}
-            msRemaining={question.msRemaining}
+            key={`timer-${question.position}`}
+            deadline={view.deadline}
             msTotal={GAME_RULES.answerSeconds * 1000}
-            onExpire={() => void submit(question, null)}
+            onExpire={() => void submitTyped(question)}
           />
           <AnswerInput
-            key={question.position}
+            key={`answer-${question.position}`}
             disabled={false}
             onPick={(player) => void submit(question, player)}
+            onDraftChange={rememberDraft}
           />
         </>
       ) : (
