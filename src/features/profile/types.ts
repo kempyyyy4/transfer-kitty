@@ -16,4 +16,6 @@ export interface Profile {
   history: HistoryDay[];
   /** Today's UK day, so the calendar lines up with the server. */
   today: string;
+  /** "slot:id" of every item the player may wear: free today, or bought. */
+  wearable: string[];
 }

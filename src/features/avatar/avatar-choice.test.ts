@@ -1,10 +1,16 @@
 import { describe, expect, it } from "vitest";
 import { ACCESSORIES, BOOTS, BREEDS, DEFAULT_AVATAR, EYES, FURS } from "@/config/avatar-items";
 import { KITS } from "@/config/kits";
-import { checkChoice, DEFAULT_CHOICE, lookFor, parseStoredChoice } from "./avatar-choice";
+import {
+  checkChoice,
+  DEFAULT_CHOICE,
+  freeOrOwned,
+  lookFor,
+  parseStoredChoice,
+} from "./avatar-choice";
 import { buildCat } from "./cat/build-cat";
 
-const NOTHING_OWNED = new Set<string>();
+const NOTHING_OWNED = freeOrOwned(new Set<string>());
 
 describe("the avatar catalogue", () => {
   it("uses each ID once within a slot", () => {
@@ -47,7 +53,7 @@ describe("checkChoice", () => {
     const choice = { ...DEFAULT_CHOICE, kit: priced?.id ?? "" };
 
     expect(checkChoice(choice, NOTHING_OWNED)).toBe("not_owned");
-    expect(checkChoice(choice, new Set([priced?.id ?? ""]))).toBeNull();
+    expect(checkChoice(choice, freeOrOwned(new Set([`kit:${priced?.id ?? ""}`])))).toBeNull();
   });
 
   it("refuses the same accessory twice", () => {

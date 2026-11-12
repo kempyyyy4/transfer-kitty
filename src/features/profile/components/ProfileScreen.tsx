@@ -35,7 +35,7 @@ export function ProfileScreen() {
       <HistoryCalendar history={profile.history} today={profile.today} />
 
       {profile.status === "signed_in" && profile.displayName ? (
-        <AvatarBuilder initial={profile.avatar} />
+        <AvatarBuilder initial={profile.avatar} wearable={profile.wearable} />
       ) : (
         <AvatarTeaser profile={profile} />
       )}

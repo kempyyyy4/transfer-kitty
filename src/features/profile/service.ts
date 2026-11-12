@@ -1,5 +1,6 @@
 import "server-only";
-import { checkChoice, parseStoredChoice, type AvatarChoice } from "@/features/avatar";
+import { checkChoice, itemKey, parseStoredChoice, type AvatarChoice } from "@/features/avatar";
+import { wearableKeys } from "@/features/shop/server";
 import { getVisitor } from "@/lib/auth";
 import { getDisplayName, getPlayerHistory, getStoredAvatar, saveAvatar } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
@@ -18,13 +19,15 @@ export async function getProfile(now: Date): Promise<Profile> {
       stats: computeStats([], today),
       history: [],
       today,
+      wearable: [],
     };
   }
 
-  const [history, displayName, storedAvatar] = await Promise.all([
+  const [history, displayName, storedAvatar, wearable] = await Promise.all([
     getPlayerHistory(visitor.userId),
     visitor.isGuest ? null : getDisplayName(visitor.userId),
     visitor.isGuest ? null : getStoredAvatar(visitor.userId),
+    visitor.isGuest ? new Set<string>() : wearableKeys(visitor.userId),
   ]);
 
   return {
@@ -34,6 +37,7 @@ export async function getProfile(now: Date): Promise<Profile> {
     stats: computeStats(history, today),
     history,
     today,
+    wearable: [...wearable],
   };
 }
 
@@ -45,14 +49,14 @@ export type AvatarOutcome =
 
 /**
  * Saves the signed-in player's avatar after checking every item exists and is theirs to
- * wear. Until the shop opens in stage 11 nobody owns a priced item, so only free ones pass.
+ * wear: free at today's price, or bought in the shop.
  */
 export async function setAvatar(choice: AvatarChoice): Promise<AvatarOutcome> {
   const visitor = await getVisitor();
   if (!visitor || visitor.isGuest) return { status: "not_signed_in" };
 
-  const owned = new Set<string>();
-  const problem = checkChoice(choice, owned);
+  const wearable = await wearableKeys(visitor.userId);
+  const problem = checkChoice(choice, (slot, itemId) => wearable.has(itemKey(slot, itemId)));
   if (problem) return { status: problem };
 
   const saved = await saveAvatar(visitor.userId, choice);

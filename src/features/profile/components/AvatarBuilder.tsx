@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { ACCESSORIES, BOOTS, BREEDS, EYES, FURS, MAX_ACCESSORIES } from "@/config/avatar-items";
 import { KITS } from "@/config/kits";
-import { CatSprite, lookFor, type AvatarChoice } from "@/features/avatar";
+import Link from "next/link";
+import { CatSprite, itemKey, lookFor, type AvatarChoice, type ItemSlot } from "@/features/avatar";
 import { profileApi, ProfileApiError } from "../api-client";
 import { OptionRow, type Option } from "./OptionRow";
 
@@ -39,9 +40,18 @@ const SLOTS: { slot: Slot; title: string; options: Option[] }[] = [
   },
 ];
 
-/** Build your cat footballer. Priced items show their price and wait for the shop. */
-export function AvatarBuilder({ initial }: { initial: AvatarChoice }) {
+interface Props {
+  initial: AvatarChoice;
+  /** "slot:id" of every item the player may wear. */
+  wearable: string[];
+}
+
+/** Build your cat footballer. Items not yet bought show their price and link to the shop. */
+export function AvatarBuilder({ initial, wearable }: Props) {
   const [choice, setChoice] = useState(initial);
+  const mayWear = new Set(wearable);
+  const shown = (slot: ItemSlot, options: readonly Option[]) =>
+    options.map((option) => ({ ...option, locked: !mayWear.has(itemKey(slot, option.id)) }));
   const [message, setMessage] = useState<string | null>(null);
 
   function toggleAccessory(id: string) {
@@ -72,17 +82,20 @@ export function AvatarBuilder({ initial }: { initial: AvatarChoice }) {
         <OptionRow
           key={slot}
           title={title}
-          options={options}
+          options={shown(slot, options)}
           isChosen={(id) => choice[slot] === id}
           onChoose={(id) => setChoice((current) => ({ ...current, [slot]: id }))}
         />
       ))}
       <OptionRow
         title={`EXTRAS (UP TO ${MAX_ACCESSORIES})`}
-        options={[...ACCESSORIES]}
+        options={shown("accessory", ACCESSORIES)}
         isChosen={(id) => choice.accessories.includes(id)}
         onChoose={toggleAccessory}
       />
+      <Link href="/shop" className="self-start text-lg text-chalk-dim underline hover:text-chalk">
+        Locked items are in the shop
+      </Link>
       <button
         type="button"
         onClick={() => void save()}
