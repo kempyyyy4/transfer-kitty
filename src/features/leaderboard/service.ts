@@ -1,6 +1,7 @@
 import "server-only";
 import { randomInt } from "node:crypto";
 import { LEADERBOARD, LEAGUES } from "@/config/leaderboard";
+import { parseStoredChoice } from "@/features/avatar";
 import {
   addLeagueMember,
   insertLeague,
@@ -48,7 +49,11 @@ export async function getBoard(
     includeGuests: LEADERBOARD.includeGuests,
   });
   const signInToAppear = viewer.isGuest && !LEADERBOARD.includeGuests && rows.you !== null;
-  return { period, leagueId, ...rows, signInToAppear };
+  const entries = rows.entries.map((entry) => ({
+    ...entry,
+    avatar: parseStoredChoice(entry.avatar),
+  }));
+  return { period, leagueId, ...rows, entries, signInToAppear };
 }
 
 export function getMyLeagues(userId: string): Promise<League[]> {

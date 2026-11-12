@@ -6,6 +6,7 @@ import { TIERS } from "@/config/tiers";
 import { TierSprite } from "@/features/avatar";
 import { YourRank } from "@/features/leaderboard";
 import { formatFee } from "@/features/scoring";
+import { ShareButton } from "@/features/share";
 import { gameApi } from "../api-client";
 import type { GameSummary, QuestionAnswers } from "../types";
 import { AnswerList } from "./AnswerList";
@@ -47,6 +48,13 @@ export function SummaryPanel({ sessionId, summary }: Props) {
         </p>
       </div>
       <YourRank />
+      {summary.puzzleNumber && summary.completed ? (
+        <ShareButton
+          puzzleNumber={summary.puzzleNumber}
+          totalFee={summary.totalFee}
+          tierLevels={summary.answers.map((answer) => answer.tier)}
+        />
+      ) : null}
 
       <ol className="flex flex-col gap-4">
         {summary.answers.map((answer) => {

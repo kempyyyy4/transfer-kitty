@@ -15,8 +15,10 @@ export function PixelSprite({ grid, scale = 6, label, className }: Props) {
 
   return (
     <svg
-      role="img"
-      aria-label={label}
+      // An empty label means decoration, such as an avatar beside a name already read out.
+      role={label ? "img" : undefined}
+      aria-label={label || undefined}
+      aria-hidden={label ? undefined : true}
       viewBox={`0 0 ${width} ${height}`}
       width={width * scale}
       height={height * scale}

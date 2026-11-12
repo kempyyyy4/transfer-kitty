@@ -77,7 +77,16 @@ Club names are used exactly as the dataset has them, which is sometimes more for
 
 Nothing outstanding.
 
-## 8. Transfer records on the kitty gauge (stage 8)
+## 8. Profile, avatars and sharing (stage 9)
+
+- **Coin prices on avatar items and kits are placeholders**, needing your approval before the shop opens in stage 11. They are in `src/config/avatar-items.ts` and `src/config/kits.ts`. Free for everyone now: 5 furs, 3 breeds, 4 eye colours, 3 boot colours, headband, sweatbands, and 3 kits (Kitty Teal, Plain White, Midnight Navy). Priced: 100 to 500 coins.
+- **Kit names**: Merseyside Red, Sky Blue Mancs, Claret & Blue, Black & White Stripes, Green & White Hoops, Gold Sash. Made-up names in club-like colours, with no crests, badges or real club names.
+- **Avatars need sign-in and a chosen name**, because only signed-in players appear on Top Kitties. Guests see the default cat and a sign-in prompt.
+- **Up to 2 accessories** can be worn at once.
+- **The share text leaves out the Galacticat count when there are none**, for example `🐱 £8.5m · Transfer Kitty #1`. The emoji row uses ⬛ Stray, ⬜ Copycat, 🟫 Alley Cat, 🟩 Squad Moggy, 🟦 Tomcat, 🟪 Pick of the Litter, 🟧 Big Cat and 🦁 Galacticat. It does not include a link to the site; say if you want one added.
+- **A streak survives until the end of the day after your last game**, so not having played yet today does not break it.
+
+## 9. Transfer records on the kitty gauge (stage 8)
 
 These are written from memory, not taken from a data source, so they need checking. They live in `src/config/manual-facts.ts`. Fees are as commonly reported in the UK, in pounds.
 
@@ -90,7 +99,7 @@ These are written from memory, not taken from a data source, so they need checki
 
 Real names appear only as text labels on the gauge. No likenesses, crests or logos are used.
 
-## 9. The look and characters (stage 8)
+## 10. The look and characters (stage 8)
 
 - All characters are cat-headed footballers drawn in code from pixel grids in `src/features/avatar`. Kit the mascot is a smoky blue cat in a teal kit with a yellow sash. Please confirm none of them reminds you of an existing character.
 - Kits on the tier characters use made-up colour schemes. The Big Cat's claret and sky-blue stripes and the Tomcat's red and white stripes echo common real club colours, with no names or badges.

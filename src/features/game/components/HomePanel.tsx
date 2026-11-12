@@ -43,6 +43,9 @@ export function HomePanel() {
         <Link href="/top-kitties" className="pixel-button px-2 py-3 text-[10px]">
           TOP KITTIES
         </Link>
+        <Link href="/profile" className="pixel-button px-2 py-3 text-[10px]">
+          PROFILE
+        </Link>
         <Link href="/account" className="pixel-button px-2 py-3 text-[10px]">
           ACCOUNT
         </Link>

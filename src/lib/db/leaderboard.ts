@@ -19,6 +19,7 @@ const boardSchema = z.object({
     z.object({
       rank: z.number(),
       name: z.string(),
+      avatar: z.unknown(),
       total: z.number(),
       days: z.number(),
       is_you: z.boolean(),
@@ -29,7 +30,15 @@ const boardSchema = z.object({
 
 export interface LeaderboardRows {
   players: number;
-  entries: { rank: number; name: string; total: number; days: number; isYou: boolean }[];
+  entries: {
+    rank: number;
+    name: string;
+    /** As stored, unchecked: the caller parses it. */
+    avatar: unknown;
+    total: number;
+    days: number;
+    isYou: boolean;
+  }[];
   you: { rank: number; total: number; days: number } | null;
 }
 
@@ -51,6 +60,7 @@ export async function readLeaderboard(query: LeaderboardQuery): Promise<Leaderbo
     entries: board.entries.map((entry) => ({
       rank: entry.rank,
       name: entry.name,
+      avatar: entry.avatar,
       total: entry.total,
       days: entry.days,
       isYou: entry.is_you,
