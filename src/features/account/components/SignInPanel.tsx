@@ -22,7 +22,7 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
 
   if (sentTo) {
     return (
-      <div className="flex flex-col gap-2 border-2 border-amber-400 p-4" role="status">
+      <div className="pixel-panel flex flex-col gap-2 border-floodlight p-4" role="status">
         <p className="font-bold">Check your email</p>
         <p>
           We sent a sign-in link to {sentTo}. Open it on this device, in this browser, within the
@@ -48,18 +48,18 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           autoComplete="email"
-          className="border-2 border-slate-100 bg-slate-900 p-3"
+          className="pixel-input p-3"
         />
-        <button type="submit" className="border-2 border-amber-400 p-3 font-bold">
+        <button
+          type="submit"
+          className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
+        >
           Email me a sign-in link
         </button>
       </form>
 
-      <p className="text-center text-sm text-slate-400">or</p>
-      <a
-        href={accountApi.googleSignInPath}
-        className="border-2 border-slate-100 p-3 text-center font-bold"
-      >
+      <p className="text-center text-sm text-chalk-dim">or</p>
+      <a href={accountApi.googleSignInPath} className="pixel-button px-4 py-3 text-xs">
         Sign in with Google
       </a>
 

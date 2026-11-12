@@ -37,9 +37,12 @@ export function NamePanel({ current, onSaved }: Props) {
           minLength={ACCOUNT.displayNameMinLength}
           maxLength={ACCOUNT.displayNameMaxLength}
           autoComplete="nickname"
-          className="min-w-0 flex-1 border-2 border-slate-100 bg-slate-900 p-3"
+          className="min-w-0 flex-1 pixel-input p-3"
         />
-        <button type="submit" className="border-2 border-amber-400 px-4 font-bold">
+        <button
+          type="submit"
+          className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
+        >
           Save
         </button>
       </div>
