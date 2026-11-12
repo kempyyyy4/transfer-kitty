@@ -26,7 +26,7 @@ import { getServiceClient } from "@/lib/supabase/server";
 import { ukDayOf } from "@/lib/time/uk-day";
 
 const db = getServiceClient();
-const cleanUp: (() => Promise<unknown>)[] = [];
+const cleanUp: (() => PromiseLike<unknown>)[] = [];
 
 function passed(rule: string): void {
   console.log(`  ok  ${rule}`);
