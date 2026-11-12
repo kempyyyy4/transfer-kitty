@@ -64,7 +64,7 @@ export function AnswerInput({ disabled, onPick, onDraftChange }: Props) {
         if (match && !disabled) onPick(match);
       }}
     >
-      <label htmlFor="answer" className="text-sm">
+      <label htmlFor="answer" className="text-lg text-chalk-dim">
         Type a player&apos;s name, then choose from the list
       </label>
       <input
@@ -76,19 +76,19 @@ export function AnswerInput({ disabled, onPick, onDraftChange }: Props) {
         autoComplete="off"
         autoCapitalize="words"
         autoFocus
-        className="border-2 border-slate-100 bg-slate-900 p-3 text-lg"
+        className="pixel-input p-3"
       />
-      <ul className="flex flex-col gap-1">
+      <ul className="flex flex-col gap-2">
         {shown.map((player) => (
           <li key={player.id}>
             <button
               type="button"
               disabled={disabled}
               onClick={() => onPick(player)}
-              className="w-full border-2 border-slate-600 p-2 text-left hover:border-amber-400"
+              className="w-full border-4 border-stand bg-night-deep px-3 py-1 text-left text-xl hover:border-floodlight focus-visible:border-floodlight focus-visible:outline-none"
             >
               {player.name}
-              <span className="text-sm text-slate-400">{describe(player)}</span>
+              <span className="text-lg text-chalk-dim">{describe(player)}</span>
             </button>
           </li>
         ))}
