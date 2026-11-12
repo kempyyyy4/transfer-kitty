@@ -47,6 +47,11 @@ export function SummaryPanel({ sessionId, summary }: Props) {
           {formatFee(summary.totalFee)}
         </p>
       </div>
+      {summary.coinsEarned > 0 ? (
+        <p className="text-center font-pixel text-xs text-scoreboard">
+          +{summary.coinsEarned} COINS
+        </p>
+      ) : null}
       <YourRank />
       {summary.puzzleNumber && summary.completed ? (
         <ShareButton

@@ -1,6 +1,7 @@
 import "server-only";
 import { ANSWER_TIME_LIMIT_MS, GAME_RULES } from "@/config/game";
-import { TIERS } from "@/config/tiers";
+import { TIERS, TOP_LEVEL } from "@/config/tiers";
+import { payRoundCoins } from "@/features/coins/server";
 import { puzzleNumberFor, scheduleDailyPuzzles } from "@/features/questions";
 import { percentOfPlayers } from "@/features/scoring";
 import {
@@ -144,10 +145,22 @@ export async function getGameSummary(
   const summary = await getSessionSummary(sessionId, userId);
   if (!summary) return null;
 
+  // Only a finished daily round earns coins. Paying is safe to repeat.
+  const coinsEarned =
+    summary.completed && summary.puzzleNumber !== null
+      ? await payRoundCoins(
+          userId,
+          sessionId,
+          summary.answers.filter((answer) => answer.tier === TOP_LEVEL).length,
+          new Date(),
+        )
+      : 0;
+
   return {
     puzzleNumber: summary.puzzleNumber,
     completed: summary.completed,
     totalQuestions: summary.totalQuestions,
+    coinsEarned,
     totalFee: summary.answers.reduce((total, answer) => total + answer.fee, 0),
     answers: summary.answers.map((answer) => ({
       position: answer.position,

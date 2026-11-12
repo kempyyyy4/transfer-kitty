@@ -21,6 +21,9 @@ export const RATE_LIMITS = {
   accountChange: { name: "account-change", limit: 20, windowSeconds: 600 },
   /** Creating, joining and leaving leagues. Low, because a script could spam invite codes. */
   leagueChange: { name: "league-change", limit: 10, windowSeconds: 600 },
+  shop: { name: "shop", limit: 60, windowSeconds: 60 },
+  /** Buying an item with coins. */
+  purchase: { name: "purchase", limit: 20, windowSeconds: 600 },
   /** Reporting a missing answer after a round. */
   answerReport: { name: "answer-report", limit: 20, windowSeconds: 600 },
   /** Typing the admin password. Counted per IP address, and kept very low. */

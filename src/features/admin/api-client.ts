@@ -12,6 +12,17 @@ import type {
   UpcomingPuzzle,
 } from "./types";
 
+import type { ItemSlot } from "@/features/avatar";
+
+export interface AdminShopItem {
+  slot: ItemSlot;
+  id: string;
+  name: string;
+  configPrice: number;
+  priceCoins: number;
+  onSale: boolean;
+}
+
 /** An error the server explained, with a message fit to show. */
 export class AdminApiError extends Error {}
 
@@ -91,6 +102,10 @@ export const adminApi = {
     send<{ added: true }>("POST", `${pack(packId)}/questions`, { questionId }),
   removeFromPack: (packId: string, questionId: string) =>
     send<{ removed: true }>("DELETE", `${pack(packId)}/questions`, { questionId }),
+
+  shopPrices: () => call<AdminShopItem[]>("/api/admin/shop"),
+  setShopPrice: (slot: ItemSlot, itemId: string, priceCoins: number, onSale: boolean) =>
+    send<{ saved: true }>("POST", "/api/admin/shop", { slot, itemId, priceCoins, onSale }),
 
   searchPlayers: (query: string, signal: AbortSignal) =>
     call<{ id: number; name: string; birthYear: number | null; country: string | null }[]>(

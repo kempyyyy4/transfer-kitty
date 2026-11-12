@@ -90,6 +90,9 @@ export const TIERS: readonly Tier[] = [
   },
 ];
 
+/** The rarest tier, Galacticat. */
+export const TOP_LEVEL = Math.max(...TIERS.map((tier) => tier.level));
+
 /** The level given to a wrong answer or a timeout. */
 export const STRAY_LEVEL = 0;
 /** The level given to the most popular valid answers: whatever is left after the shares below. */

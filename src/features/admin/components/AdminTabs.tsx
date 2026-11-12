@@ -7,6 +7,7 @@ import { QuestionDetailPanel } from "./QuestionDetailPanel";
 import { QuestionsPanel } from "./QuestionsPanel";
 import { ReportsPanel } from "./ReportsPanel";
 import { SchedulePanel } from "./SchedulePanel";
+import { ShopPricesPanel } from "./ShopPricesPanel";
 
 const TABS = [
   { key: "questions", label: "QUESTIONS" },
@@ -14,6 +15,7 @@ const TABS = [
   { key: "reports", label: "REPORTS" },
   { key: "packs", label: "PACKS" },
   { key: "schedule", label: "SCHEDULE" },
+  { key: "shop", label: "SHOP PRICES" },
 ] as const;
 
 type Tab = (typeof TABS)[number]["key"];
@@ -53,6 +55,7 @@ export function AdminTabs() {
       {!openQuestion && tab === "reports" ? <ReportsPanel onOpen={setOpenQuestion} /> : null}
       {!openQuestion && tab === "packs" ? <PacksPanel onOpen={setOpenQuestion} /> : null}
       {!openQuestion && tab === "schedule" ? <SchedulePanel onOpen={setOpenQuestion} /> : null}
+      {!openQuestion && tab === "shop" ? <ShopPricesPanel /> : null}
     </div>
   );
 }

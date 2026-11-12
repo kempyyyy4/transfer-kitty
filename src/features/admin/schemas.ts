@@ -1,8 +1,7 @@
 import { z } from "zod";
 import { GAME_RULES } from "@/config/game";
-import { STRAY_LEVEL, TIERS } from "@/config/tiers";
+import { STRAY_LEVEL, TOP_LEVEL } from "@/config/tiers";
 
-const TOP_LEVEL = Math.max(...TIERS.map((tier) => tier.level));
 /** A tier an answer can have: every level except Stray, which means a wrong answer. */
 const tierLevel = z
   .number()

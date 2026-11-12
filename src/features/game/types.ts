@@ -41,6 +41,8 @@ export interface GameSummary {
   completed: boolean;
   totalQuestions: number;
   totalFee: number;
+  /** Coins this round earned. 0 until the daily round is finished. */
+  coinsEarned: number;
   answers: AnsweredQuestion[];
 }
 

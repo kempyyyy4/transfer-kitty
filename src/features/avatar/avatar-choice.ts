@@ -25,35 +25,71 @@ export type AvatarChoice = z.infer<typeof avatarChoiceSchema>;
 
 export const DEFAULT_CHOICE: AvatarChoice = DEFAULT_AVATAR;
 
-/** Every item a choice names, with the slot it fills and its price. */
-function itemsIn(choice: AvatarChoice) {
+/** The slots an avatar is built from. A shop item is identified by its slot and ID. */
+export const ITEM_SLOTS = ["fur", "breed", "eyes", "boots", "kit", "accessory"] as const;
+export type ItemSlot = (typeof ITEM_SLOTS)[number];
+
+/** Item IDs are only unique within a slot, so owned items are keyed by both. */
+export const itemKey = (slot: ItemSlot, id: string) => `${slot}:${id}`;
+
+interface PricedItem {
+  id: string;
+  priceCoins: number;
+}
+
+/** Every item a choice names, with the slot it fills. Unknown IDs come back as undefined. */
+function itemsIn(choice: AvatarChoice): [ItemSlot, PricedItem | undefined][] {
   return [
-    FURS.find((item) => item.id === choice.fur),
-    BREEDS.find((item) => item.id === choice.breed),
-    EYES.find((item) => item.id === choice.eyes),
-    BOOTS.find((item) => item.id === choice.boots),
-    KITS.find((item) => item.id === choice.kit),
-    ...choice.accessories.map((id) => ACCESSORIES.find((item) => item.id === id)),
+    ["fur", FURS.find((item) => item.id === choice.fur)],
+    ["breed", BREEDS.find((item) => item.id === choice.breed)],
+    ["eyes", EYES.find((item) => item.id === choice.eyes)],
+    ["boots", BOOTS.find((item) => item.id === choice.boots)],
+    ["kit", KITS.find((item) => item.id === choice.kit)],
+    ...choice.accessories.map((id): [ItemSlot, PricedItem | undefined] => [
+      "accessory",
+      ACCESSORIES.find((item) => item.id === id),
+    ]),
   ];
 }
 
 export type ChoiceProblem = "unknown_item" | "not_owned" | "repeated_accessory";
 
 /**
- * Whether a player may wear this choice. `owned` holds IDs of priced items they have
- * bought; free items need no owning. Returns the first problem found, or null.
+ * Whether a player may wear this choice. `mayWear` says whether one known item is free or
+ * owned; the server decides that from current prices and the player's items.
+ * Returns the first problem found, or null.
  */
 export function checkChoice(
   choice: AvatarChoice,
-  owned: ReadonlySet<string>,
+  mayWear: (slot: ItemSlot, itemId: string) => boolean,
 ): ChoiceProblem | null {
   if (new Set(choice.accessories).size !== choice.accessories.length) return "repeated_accessory";
 
-  for (const item of itemsIn(choice)) {
+  for (const [slot, item] of itemsIn(choice)) {
     if (!item) return "unknown_item";
-    if (item.priceCoins > 0 && !owned.has(item.id)) return "not_owned";
+    if (!mayWear(slot, item.id)) return "not_owned";
   }
   return null;
+}
+
+/** Wearable if free at its catalogue price or owned. For checks that ignore admin prices. */
+export function freeOrOwned(owned: ReadonlySet<string>) {
+  return (slot: ItemSlot, itemId: string) =>
+    owned.has(itemKey(slot, itemId)) || cataloguePrice(slot, itemId) === 0;
+}
+
+const CATALOGUE: Record<ItemSlot, readonly PricedItem[]> = {
+  fur: FURS,
+  breed: BREEDS,
+  eyes: EYES,
+  boots: BOOTS,
+  kit: KITS,
+  accessory: ACCESSORIES,
+};
+
+/** An item's price in src/config, or null if there is no such item. */
+export function cataloguePrice(slot: ItemSlot, itemId: string): number | null {
+  return CATALOGUE[slot].find((item) => item.id === itemId)?.priceCoins ?? null;
 }
 
 /**
