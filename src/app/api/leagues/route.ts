@@ -1,7 +1,7 @@
 import { RATE_LIMITS } from "@/config/rate-limits";
 import { LEAGUES } from "@/config/leaderboard";
 import { createLeague, createLeagueSchema, getMyLeagues } from "@/features/leaderboard/server";
-import { getUserId } from "@/lib/auth";
+import { getOrCreateUserId, getUserId } from "@/lib/auth";
 import { jsonError, notSignedIn, readJsonBody, tooManyRequests } from "@/lib/http";
 import { isWithinRateLimit } from "@/lib/rate-limit";
 
@@ -14,10 +14,12 @@ export async function GET() {
   return Response.json(await getMyLeagues(userId));
 }
 
-/** Creates a friends league with the visitor as its first member. */
+/**
+ * Creates a friends league with the visitor as its first member. A first-time visitor
+ * becomes a guest to do so, as they would by pressing Kick Off.
+ */
 export async function POST(request: Request) {
-  const userId = await getUserId();
-  if (!userId) return notSignedIn();
+  const userId = await getOrCreateUserId();
   if (!(await isWithinRateLimit(RATE_LIMITS.leagueChange, userId))) return tooManyRequests();
 
   const body = await readJsonBody(request, createLeagueSchema);

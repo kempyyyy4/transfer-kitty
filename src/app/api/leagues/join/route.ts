@@ -1,8 +1,8 @@
 import { LEAGUES } from "@/config/leaderboard";
 import { RATE_LIMITS } from "@/config/rate-limits";
 import { joinLeague, joinLeagueSchema } from "@/features/leaderboard/server";
-import { getUserId } from "@/lib/auth";
-import { jsonError, notSignedIn, readJsonBody, tooManyRequests } from "@/lib/http";
+import { getOrCreateUserId } from "@/lib/auth";
+import { jsonError, readJsonBody, tooManyRequests } from "@/lib/http";
 import { isWithinRateLimit } from "@/lib/rate-limit";
 
 const MESSAGES = {
@@ -12,10 +12,9 @@ const MESSAGES = {
   full: "That league is full.",
 } as const;
 
-/** Joins a friends league by invite code. */
+/** Joins a friends league by invite code. A first-time visitor becomes a guest to join. */
 export async function POST(request: Request) {
-  const userId = await getUserId();
-  if (!userId) return notSignedIn();
+  const userId = await getOrCreateUserId();
   if (!(await isWithinRateLimit(RATE_LIMITS.leagueChange, userId))) return tooManyRequests();
 
   const body = await readJsonBody(request, joinLeagueSchema);

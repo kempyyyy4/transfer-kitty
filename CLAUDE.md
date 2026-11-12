@@ -118,7 +118,7 @@ Ask Tom before any decision that is hard to change later: database schema change
 
 Every route handler follows the same order, and stays thin:
 
-1. Identify the visitor with `getUserId()` from `@/lib/auth`. Only `/api/game/start` uses `getOrCreateUserId()`, which signs a new visitor in as a guest.
+1. Identify the visitor with `getUserId()` from `@/lib/auth`. A route for something a first-time visitor should be able to do straight away (starting a game, creating or joining a league) uses `getOrCreateUserId()`, which silently makes them a guest. Never ask a visitor to sign in before they can play; prompt for sign-in only where it changes something for them.
 2. Check the rate limit with `isWithinRateLimit()` and a rule from `src/config/rate-limits.ts`.
 3. Check the input against a Zod schema, with `readJsonBody()` for a JSON body.
 4. Call one function from a feature's `service.ts` and return what it gives.
