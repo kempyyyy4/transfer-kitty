@@ -109,17 +109,24 @@ async function run(): Promise<void> {
 
   const todayBoard = await getBoard(alice, "today", league.id, now);
   assert.ok(todayBoard);
-  assert.equal(todayBoard.players, 3);
+  assert.equal(todayBoard.players, 2);
   assert.deepEqual(
     todayBoard.entries.map((entry) => [entry.rank, entry.isYou, entry.total]),
     [
       [1, false, 300_000_000],
       [2, true, 300_000_000],
-      [3, false, 100_000_000],
     ],
   );
   assert.equal(todayBoard.you?.rank, 2);
-  passed("today's league board ranks by kitty, and a tie goes to the faster player");
+  passed("today's league board ranks by kitty, a tie goes to the faster player, guests are off");
+
+  const guestView = await getBoard(guest, "today", league.id, now);
+  assert.equal(
+    guestView?.entries.some((entry) => entry.isYou),
+    false,
+  );
+  assert.equal(guestView?.you?.rank, 3);
+  passed("a guest is not on the board but still sees their own rank");
 
   if (laterThisWeek) {
     const weekBoard = await getBoard(alice, "week", league.id, now);
@@ -137,7 +144,7 @@ async function run(): Promise<void> {
   passed("someone outside a league cannot see its board");
 
   const everyone = await getBoard(alice, "today", null, now);
-  assert.ok(everyone && everyone.players >= 3);
+  assert.ok(everyone && everyone.players >= 2);
   const bobRankEverywhere = (await getBoard(bob, "today", null, now))?.you?.rank ?? 0;
   assert.ok(bobRankEverywhere < (everyone.you?.rank ?? 0));
   passed(`the everyone board includes these players (${everyone.players} players today)`);
