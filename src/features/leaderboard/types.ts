@@ -1,3 +1,5 @@
+import type { AvatarChoice } from "@/features/avatar";
+
 /** What the leaderboard API sends to the browser. Other players are never identified by ID. */
 
 export type Period = "today" | "week" | "all";
@@ -5,6 +7,7 @@ export type Period = "today" | "week" | "all";
 export interface BoardEntry {
   rank: number;
   name: string;
+  avatar: AvatarChoice;
   total: number;
   days: number;
   isYou: boolean;

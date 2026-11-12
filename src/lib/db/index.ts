@@ -40,6 +40,7 @@ export {
   type LeagueRow,
 } from "./leagues";
 export { searchPlayers, type PlayerMatch } from "./players";
+export { getPlayerHistory, getStoredAvatar, saveAvatar, type HistoryRow } from "./profile";
 export {
   createDailyPuzzle,
   getDailyPuzzle,
