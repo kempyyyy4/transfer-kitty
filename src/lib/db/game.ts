@@ -149,6 +149,70 @@ export async function submitAnswer(submission: AnswerSubmission): Promise<Answer
   };
 }
 
+const answerListsSchema = z.discriminatedUnion("status", [
+  z.object({ status: z.literal("not_completed") }),
+  z.object({
+    status: z.literal("completed"),
+    questions: z.array(
+      z.object({
+        position: z.number(),
+        prompt: z.string(),
+        times_played: z.number(),
+        your_answer: z.number().nullable(),
+        answers: z.array(
+          z.object({
+            id: z.number(),
+            name: z.string(),
+            tier: z.number(),
+            times_given: z.number(),
+          }),
+        ),
+      }),
+    ),
+  }),
+]);
+
+export interface QuestionAnswerList {
+  position: number;
+  prompt: string;
+  timesPlayed: number;
+  /** The player the user gave, or null if they gave none. */
+  yourAnswerId: number | null;
+  answers: { id: number; name: string; tier: number; timesGiven: number }[];
+}
+
+/**
+ * Every valid answer to each question in a session. "not_completed" while the session is
+ * still being played, so answers are never revealed early. Null if the session is not theirs.
+ */
+export async function getSessionAnswerLists(
+  sessionId: string,
+  userId: string,
+): Promise<QuestionAnswerList[] | "not_completed" | null> {
+  const { data, error } = await getServiceClient().rpc("get_session_answer_lists", {
+    p_session_id: sessionId,
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Reading the answer lists failed: ${error.message}`);
+  if (data === null) return null;
+
+  const lists = answerListsSchema.parse(data);
+  if (lists.status === "not_completed") return "not_completed";
+
+  return lists.questions.map((question) => ({
+    position: question.position,
+    prompt: question.prompt,
+    timesPlayed: question.times_played,
+    yourAnswerId: question.your_answer,
+    answers: question.answers.map((answer) => ({
+      id: answer.id,
+      name: answer.name,
+      tier: answer.tier,
+      timesGiven: answer.times_given,
+    })),
+  }));
+}
+
 const summarySchema = z.object({
   puzzle_date: z.string().nullable(),
   puzzle_number: z.number().nullable(),

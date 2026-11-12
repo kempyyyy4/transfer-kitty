@@ -7,12 +7,14 @@ export {
 } from "./entities";
 export {
   findDailySession,
+  getSessionAnswerLists,
   getSessionSummary,
   serveNextQuestion,
   startDailySession,
   submitAnswer,
   type AnswerOutcome,
   type AnswerResult,
+  type QuestionAnswerList,
   type ServedState,
   type SessionSummary,
 } from "./game";
@@ -33,3 +35,8 @@ export {
   type QuestionImport,
 } from "./questions";
 export { consumeRateLimit } from "./rate-limits";
+export {
+  getAnswerPlayCounts,
+  getQuestionsDueForRecalculation,
+  saveRecalculatedTiers,
+} from "./tiers";
