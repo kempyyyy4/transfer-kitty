@@ -42,6 +42,8 @@ The server keeps the clock running. The question on screen when the player left 
 
 Supabase's anonymous sign-in is the device ID. Signing up converts the same user in place. Logging in to an existing account merges the guest's play into it. Guests see their own rank, but only signed-in players are named on Top Kitties, because a guest can clear their browser and replay.
 
+**As built in stage 7.** Rather than two paths (convert for new accounts, merge for existing ones), every sign-in signs in to an account and then merges the guest into it. The player sees the same result, and there is one path to test and secure. On a day both the guest and the account played, the account's game is kept.
+
 ### 1.6 Launch extras are in scope
 
 Added as stage 13: privacy policy, terms of sale, cookie consent banner, display-name filter, and a "report a missing answer" link. I can draft the policy and terms text, but it should be checked by someone qualified before launch.

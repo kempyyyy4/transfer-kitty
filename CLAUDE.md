@@ -40,6 +40,7 @@ Questions are built offline from downloaded data, then loaded into the database.
 | `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules     |
 | `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does          |
 | `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database               |
+| `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database   |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
@@ -123,6 +124,13 @@ Every route handler follows the same order, and stays thin:
 4. Call one function from a feature's `service.ts` and return what it gives.
 
 Sign-in goes through `src/lib/auth` only, the same way database access goes through `src/lib/db` only. ESLint enforces both.
+
+## Accounts
+
+- Every visitor who plays is a Supabase user: a guest (anonymous) until they sign in by emailed link or Google.
+- Signing in always signs in to an account, new or existing, then merges the guest into it (`merge_guest_into_account`). There is no separate "convert guest" path. The guest is found through a random token in an httpOnly cookie, matched on the server in `pending_merges`, never from an ID the browser sends.
+- The sign-in return page, `/auth/callback`, only ever redirects to fixed pages on this site.
+- Redirect with `NextResponse.redirect`, not `Response.redirect`, from any route that sets cookies.
 
 A feature's `service.ts` is server-only. Its client components import from their neighbouring files (`../types`, `../api-client`), never from the feature's `index.ts`, which would pull server code into the browser.
 
