@@ -33,6 +33,9 @@ export function HomePanel() {
       <p>
         Next puzzle in <Countdown />
       </p>
+      <Link href="/top-kitties" className="border-2 border-slate-100 px-6 py-2 font-bold">
+        Top Kitties
+      </Link>
     </div>
   );
 }

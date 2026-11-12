@@ -39,6 +39,7 @@ Questions are built offline from downloaded data, then loaded into the database.
 | `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                |
 | `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules     |
 | `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does          |
+| `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database               |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
@@ -107,7 +108,8 @@ Ask Tom before any decision that is hard to change later: database schema change
 - One daily attempt per user is enforced by a database constraint, not just by code.
 - The full answer lists come only from `get_session_answer_lists`, which refuses until the session is completed. Never add another path that returns `question_answers` to the browser.
 - Tiers are recalculated only by the nightly job, never for a question in today's daily puzzle, so a fee never changes during the day it is played.
-- A server-only part of a feature (such as `src/features/scoring/recalculation-job.ts`) is imported by its file path, not from the feature's `index.ts`, which client screens also use.
+- A feature's `index.ts` must be safe for browser code, because other features' screens import it. Server-only parts go in the feature's `server.ts` (see `src/features/leaderboard/server.ts`), or are imported by file path (`src/features/scoring/recalculation-job.ts`). The game feature predates this rule and still mixes both in its index; split it when it is next changed.
+- Leaderboards never send another player's user ID to the browser. They send a display name and an `isYou` flag.
 - Types in `src/features/game/types.ts` are what the browser receives. Adding a field there is a decision about what players can see.
 - After changing game logic, run `npm run smoke:game` against the development database.
 

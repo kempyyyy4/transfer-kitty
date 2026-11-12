@@ -19,6 +19,17 @@ export {
   type SessionSummary,
 } from "./game";
 export { isDatabaseReachable } from "./health";
+export { readLeaderboard, type LeaderboardQuery, type LeaderboardRows } from "./leaderboard";
+export {
+  addLeagueMember,
+  insertLeague,
+  isLeagueMember,
+  readMyLeagues,
+  removeLeagueMember,
+  type CreateLeagueResult,
+  type JoinLeagueResult,
+  type LeagueRow,
+} from "./leagues";
 export { searchPlayers, type PlayerMatch } from "./players";
 export {
   createDailyPuzzle,
