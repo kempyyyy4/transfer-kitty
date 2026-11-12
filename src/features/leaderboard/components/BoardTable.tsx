@@ -1,10 +1,20 @@
 import { formatFee } from "@/features/scoring";
 import type { Board } from "../types";
+import { SignInToAppear } from "./SignInToAppear";
 
 /** One leaderboard: the top rows, then your own row if you are further down. */
 export function BoardTable({ board }: { board: Board }) {
   if (board.players === 0) {
     return <p>Nobody has finished a game in this period yet.</p>;
+  }
+  if (board.entries.length === 0 && board.signInToAppear) {
+    // Only guests have played so far, so the board itself is empty.
+    return (
+      <div className="flex flex-col gap-2">
+        <p>No signed-in players have finished a game in this period yet.</p>
+        <SignInToAppear />
+      </div>
+    );
   }
 
   const youAreShown = board.entries.some((entry) => entry.isYou);
@@ -25,6 +35,7 @@ export function BoardTable({ board }: { board: Board }) {
           />
         ))}
       </ol>
+      {board.signInToAppear ? <SignInToAppear /> : null}
       {board.you && !youAreShown ? (
         <ol className="flex flex-col border-t-2 border-slate-600 pt-2">
           <Row

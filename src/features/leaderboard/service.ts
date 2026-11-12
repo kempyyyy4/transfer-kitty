@@ -23,26 +23,32 @@ function dateRange(period: Period, now: Date): { from: string | null; to: string
   return { from: null, to: null };
 }
 
+interface Viewer {
+  userId: string;
+  isGuest: boolean;
+}
+
 /**
- * A board for a period, for everyone or one league. Null if the user asked for a league
+ * A board for a period, for everyone or one league. Null if the viewer asked for a league
  * they are not in.
  */
 export async function getBoard(
-  userId: string,
+  viewer: Viewer,
   period: Period,
   leagueId: string | null,
   now: Date,
 ): Promise<Board | null> {
-  if (leagueId && !(await isLeagueMember(userId, leagueId))) return null;
+  if (leagueId && !(await isLeagueMember(viewer.userId, leagueId))) return null;
 
   const rows = await readLeaderboard({
     ...dateRange(period, now),
     leagueId,
-    userId,
+    userId: viewer.userId,
     limit: LEADERBOARD.entriesShown,
     includeGuests: LEADERBOARD.includeGuests,
   });
-  return { period, leagueId, ...rows };
+  const signInToAppear = viewer.isGuest && !LEADERBOARD.includeGuests && rows.you !== null;
+  return { period, leagueId, ...rows, signInToAppear };
 }
 
 export function getMyLeagues(userId: string): Promise<League[]> {

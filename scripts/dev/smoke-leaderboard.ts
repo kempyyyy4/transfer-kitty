@@ -27,6 +27,11 @@ const now = new Date();
 const today = ukDayOf(now);
 const created: string[] = [];
 
+/** Who is looking at a board. */
+function viewer(userId: string, isGuest = false) {
+  return { userId, isGuest };
+}
+
 function passed(rule: string): void {
   console.log(`  ok  ${rule}`);
 }
@@ -107,7 +112,7 @@ async function run(): Promise<void> {
   assert.deepEqual(await joinLeague(outsider, "ZZZZZZ"), { status: "not_found" });
   passed("a malformed or unknown code is refused");
 
-  const todayBoard = await getBoard(alice, "today", league.id, now);
+  const todayBoard = await getBoard(viewer(alice), "today", league.id, now);
   assert.ok(todayBoard);
   assert.equal(todayBoard.players, 2);
   assert.deepEqual(
@@ -120,32 +125,34 @@ async function run(): Promise<void> {
   assert.equal(todayBoard.you?.rank, 2);
   passed("today's league board ranks by kitty, a tie goes to the faster player, guests are off");
 
-  const guestView = await getBoard(guest, "today", league.id, now);
+  const guestView = await getBoard(viewer(guest, true), "today", league.id, now);
   assert.equal(
     guestView?.entries.some((entry) => entry.isYou),
     false,
   );
   assert.equal(guestView?.you?.rank, 3);
-  passed("a guest is not on the board but still sees their own rank");
+  assert.equal(guestView?.signInToAppear, true);
+  assert.equal(todayBoard.signInToAppear, false);
+  passed("a guest is not on the board, sees their own rank, and is asked to sign in");
 
   if (laterThisWeek) {
-    const weekBoard = await getBoard(alice, "week", league.id, now);
+    const weekBoard = await getBoard(viewer(alice), "week", league.id, now);
     assert.equal(weekBoard?.entries[0]?.isYou, true);
     assert.equal(weekBoard?.entries[0]?.total, 400_000_000);
     assert.equal(weekBoard?.entries[0]?.days, 2);
     passed("the weekly board adds up every day of the week");
   }
 
-  const allBoard = await getBoard(bob, "all", league.id, now);
+  const allBoard = await getBoard(viewer(bob), "all", league.id, now);
   assert.equal(allBoard?.you?.total, 300_000_000);
   passed("the all-time board totals every finished game");
 
-  assert.equal(await getBoard(outsider, "today", league.id, now), null);
+  assert.equal(await getBoard(viewer(outsider), "today", league.id, now), null);
   passed("someone outside a league cannot see its board");
 
-  const everyone = await getBoard(alice, "today", null, now);
+  const everyone = await getBoard(viewer(alice), "today", null, now);
   assert.ok(everyone && everyone.players >= 2);
-  const bobRankEverywhere = (await getBoard(bob, "today", null, now))?.you?.rank ?? 0;
+  const bobRankEverywhere = (await getBoard(viewer(bob), "today", null, now))?.you?.rank ?? 0;
   assert.ok(bobRankEverywhere < (everyone.you?.rank ?? 0));
   passed(`the everyone board includes these players (${everyone.players} players today)`);
 
