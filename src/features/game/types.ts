@@ -53,6 +53,24 @@ export interface AnswerFeedback {
   percent: number;
 }
 
+/** One valid answer to a question, shown only after the player's round is finished. */
+export interface ValidAnswer {
+  id: number;
+  name: string;
+  tier: number;
+  fee: number;
+  percent: number;
+}
+
+export interface QuestionAnswers {
+  position: number;
+  prompt: string;
+  /** The player the user gave, or null if they gave none. */
+  yourAnswerId: number | null;
+  /** Cheapest tier first, most given first within a tier. */
+  answers: ValidAnswer[];
+}
+
 export interface PlayerSuggestion {
   id: number;
   name: string;

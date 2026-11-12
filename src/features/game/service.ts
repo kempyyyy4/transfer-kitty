@@ -6,13 +6,21 @@ import { percentOfPlayers } from "@/features/scoring";
 import {
   findDailySession,
   getDailyPuzzle,
+  getSessionAnswerLists,
   getSessionSummary,
   serveNextQuestion,
   startDailySession,
   submitAnswer,
 } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
-import type { AnswerFeedback, GameSummary, PlayState, StartedGame, TodayStatus } from "./types";
+import type {
+  AnswerFeedback,
+  GameSummary,
+  PlayState,
+  QuestionAnswers,
+  StartedGame,
+  TodayStatus,
+} from "./types";
 
 /** The fee for each tier, in level order, as the database's answer function expects it. */
 const FEES_BY_TIER = [...TIERS].sort((a, b) => a.level - b.level).map((tier) => tier.feeGbp);
@@ -101,6 +109,31 @@ export async function answerQuestion(
     fee: result.fee,
     percent: percentOfPlayers(result.timesGiven, result.timesPlayed),
   };
+}
+
+/**
+ * Every valid answer to each of the session's questions, for after the round.
+ * "not_completed" while the round is still being played; null if the session is not theirs.
+ */
+export async function getAnswerLists(
+  userId: string,
+  sessionId: string,
+): Promise<QuestionAnswers[] | "not_completed" | null> {
+  const lists = await getSessionAnswerLists(sessionId, userId);
+  if (lists === null || lists === "not_completed") return lists;
+
+  return lists.map((question) => ({
+    position: question.position,
+    prompt: question.prompt,
+    yourAnswerId: question.yourAnswerId,
+    answers: question.answers.map((answer) => ({
+      id: answer.id,
+      name: answer.name,
+      tier: answer.tier,
+      fee: FEES_BY_TIER[answer.tier] ?? 0,
+      percent: percentOfPlayers(answer.timesGiven, question.timesPlayed),
+    })),
+  }));
 }
 
 /** Everything the player has answered so far. Null if the session is not theirs. */

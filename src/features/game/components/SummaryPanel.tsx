@@ -1,10 +1,34 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { formatFee } from "@/features/scoring";
-import type { GameSummary } from "../types";
+import { gameApi } from "../api-client";
+import type { GameSummary, QuestionAnswers } from "../types";
+import { AnswerList } from "./AnswerList";
 import { outcomeLine, tierName } from "./tier-label";
 
-/** The end-of-game breakdown. Plain for now: the full Results screen comes in stage 5. */
-export function SummaryPanel({ summary }: { summary: GameSummary }) {
+interface Props {
+  sessionId: string;
+  summary: GameSummary;
+}
+
+/**
+ * The Results screen: each answer with its tier, fee and share of players, the day's
+ * kitty, and every valid answer once the round is over. Rank, coins and sharing join in
+ * later stages.
+ */
+export function SummaryPanel({ sessionId, summary }: Props) {
+  const [lists, setLists] = useState<QuestionAnswers[] | null>(null);
+
+  useEffect(() => {
+    gameApi
+      .answerLists(sessionId)
+      .then(setLists)
+      // Without the lists the rest of the results still show; they are a bonus.
+      .catch(() => undefined);
+  }, [sessionId]);
+
   return (
     <section className="flex flex-col gap-4">
       <h1 className="text-2xl font-bold">
@@ -15,18 +39,22 @@ export function SummaryPanel({ summary }: { summary: GameSummary }) {
       </p>
 
       <ol className="flex flex-col gap-3">
-        {summary.answers.map((answer) => (
-          <li key={answer.position} className="border-2 border-slate-600 p-3">
-            <p className="text-sm text-slate-400">
-              {answer.position}. {answer.prompt}
-            </p>
-            <p>{outcomeLine(answer.outcome, answer.answer)}</p>
-            <p>
-              <strong>{tierName(answer.tier)}</strong> · {formatFee(answer.fee)}
-              {answer.outcome === "correct" ? ` · ${answer.percent}% of players said this` : ""}
-            </p>
-          </li>
-        ))}
+        {summary.answers.map((answer) => {
+          const list = lists?.find((question) => question.position === answer.position);
+          return (
+            <li key={answer.position} className="flex flex-col gap-2 border-2 border-slate-600 p-3">
+              <p className="text-sm text-slate-400">
+                {answer.position}. {answer.prompt}
+              </p>
+              <p>{outcomeLine(answer.outcome, answer.answer)}</p>
+              <p>
+                <strong>{tierName(answer.tier)}</strong> · {formatFee(answer.fee)}
+                {answer.outcome === "correct" ? ` · ${answer.percent}% of players said this` : ""}
+              </p>
+              {list ? <AnswerList question={list} /> : null}
+            </li>
+          );
+        })}
       </ol>
 
       <p>That is today&apos;s game done. A new one starts at midnight UK time.</p>
