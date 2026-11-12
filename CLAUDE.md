@@ -38,6 +38,7 @@ Questions are built offline from downloaded data, then loaded into the database.
 | `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local` |
 | `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                |
 | `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules     |
+| `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does          |
 | `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                       |
 | `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                    |
 
@@ -104,6 +105,9 @@ Ask Tom before any decision that is hard to change later: database schema change
 - Valid answers and tiers are never sent to the browser until the server has that player's round of 7 marked as finished.
 - The 25-second timer is judged by the database clock, not the client. `serve_next_question` stamps the time a question is handed out and `submit_answer` measures from it, both inside Postgres, so a game step is one atomic call.
 - One daily attempt per user is enforced by a database constraint, not just by code.
+- The full answer lists come only from `get_session_answer_lists`, which refuses until the session is completed. Never add another path that returns `question_answers` to the browser.
+- Tiers are recalculated only by the nightly job, never for a question in today's daily puzzle, so a fee never changes during the day it is played.
+- A server-only part of a feature (such as `src/features/scoring/recalculation-job.ts`) is imported by its file path, not from the feature's `index.ts`, which client screens also use.
 - Types in `src/features/game/types.ts` are what the browser receives. Adding a field there is a decision about what players can see.
 - After changing game logic, run `npm run smoke:game` against the development database.
 

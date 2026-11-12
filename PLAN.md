@@ -143,6 +143,10 @@ Whatever the visibility, no passwords or keys are ever committed.
 
 Once a player has finished a round of 7, the Results screen lets them open each question and see every valid answer with its tier, fee and the % of players who gave it, with a search box to find a name in the list. Everyone sees the same list for the same question.
 
+**As built in stage 5.** The list shows each answer's tier as it stands now. After a nightly recalculation that can differ from the tier a player was paid on an earlier day; the player's own fee is locked and never changes. Their own answer is highlighted in the list.
+
+**Tier recalculation as built.** Each night the job recalculates every question with 200 or more plays that has been played since its last recalculation, except questions in today's puzzle. Answers are ranked by how often they were given, with the starting data breaking ties, and the same tier shares are applied, so a question keeps 1 to 3 Galacticats. Admin overrides sit in their own column and always win.
+
 - The list is only sent after the server has that player's round marked as finished. Before that, valid answers still never reach the browser.
 - This applies to every mode: daily, Archive, Unlimited and packs.
 - Answers will spread faster on the day, since anyone who has finished can pass them on. That is accepted as part of the feature.
