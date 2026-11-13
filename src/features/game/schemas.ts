@@ -16,3 +16,10 @@ export const answerSchema = z.object({
 export const playerSearchSchema = z.object({
   q: z.string().trim().min(PLAYER_SEARCH.minQueryLength).max(PLAYER_SEARCH.maxQueryLength),
 });
+
+/** Which round to start that is not the daily. Access is checked on the server. */
+export const practiceRoundSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("unlimited") }),
+  z.object({ mode: z.literal("archive"), date: z.iso.date() }),
+  z.object({ mode: z.literal("pack"), packId: z.uuid() }),
+]);
