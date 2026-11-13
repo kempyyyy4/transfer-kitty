@@ -1,14 +1,6 @@
+// Safe for browser code. Server-only parts are exported from ./server.
 export { GameScreen } from "./components/GameScreen";
 export { HomePanel } from "./components/HomePanel";
-export { answerSchema, nextQuestionSchema, playerSearchSchema } from "./schemas";
-export {
-  advanceGame,
-  answerQuestion,
-  getAnswerLists,
-  getGameSummary,
-  getTodayStatus,
-  startDailyGame,
-} from "./service";
 export type {
   AnswerFeedback,
   AnsweredQuestion,
@@ -17,6 +9,7 @@ export type {
   OpenQuestion,
   PlayerSuggestion,
   PlayState,
+  PracticeRound,
   QuestionAnswers,
   StartedGame,
   TodayStatus,

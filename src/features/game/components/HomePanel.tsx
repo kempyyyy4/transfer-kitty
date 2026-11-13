@@ -52,23 +52,17 @@ export function HomePanel() {
         <Link href="/shop" className="pixel-button px-2 py-3 text-[10px]">
           SHOP
         </Link>
-        {COMING_LATER.map((label) => (
-          <ComingLater key={label} label={label} />
-        ))}
+        <Link href="/archive" className="pixel-button px-2 py-3 text-[10px]">
+          ARCHIVE
+        </Link>
+        <Link href="/packs" className="pixel-button px-2 py-3 text-[10px]">
+          THEMED PACKS
+        </Link>
+        <Link href="/unlimited" className="pixel-button px-2 py-3 text-[10px]">
+          UNLIMITED
+        </Link>
       </nav>
     </div>
-  );
-}
-
-/** Buttons for modes that later stages build. Shown now so the menu is complete. */
-const COMING_LATER = ["ARCHIVE", "THEMED PACKS", "UNLIMITED"];
-
-function ComingLater({ label }: { label: string }) {
-  return (
-    <button type="button" disabled className="pixel-button relative px-2 py-3 text-[10px]">
-      {label}
-      <span className="absolute -top-3 -right-2 bg-claret px-1 text-[8px] text-chalk">SOON</span>
-    </button>
   );
 }
 

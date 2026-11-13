@@ -2,6 +2,7 @@ import type {
   AnswerFeedback,
   PlayerSuggestion,
   PlayState,
+  PracticeRound,
   QuestionAnswers,
   StartedGame,
   TodayStatus,
@@ -37,6 +38,7 @@ function post<T>(path: string, body?: object): Promise<T> {
 export const gameApi = {
   today: () => call<TodayStatus>("/api/game/today"),
   start: () => post<StartedGame>("/api/game/start"),
+  practice: (round: PracticeRound) => post<StartedGame>("/api/game/practice", round),
   next: (sessionId: string) => post<PlayState>("/api/game/next", { sessionId }),
   answer: (sessionId: string, position: number, playerId: number | null) =>
     post<AnswerFeedback>("/api/game/answer", { sessionId, position, playerId }),

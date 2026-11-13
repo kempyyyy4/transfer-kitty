@@ -1,5 +1,5 @@
 import { RATE_LIMITS } from "@/config/rate-limits";
-import { getAnswerLists, nextQuestionSchema } from "@/features/game";
+import { getAnswerLists, nextQuestionSchema } from "@/features/game/server";
 import { getUserId } from "@/lib/auth";
 import { jsonError, notFound, notSignedIn, tooManyRequests } from "@/lib/http";
 import { isWithinRateLimit } from "@/lib/rate-limit";

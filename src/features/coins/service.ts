@@ -1,4 +1,5 @@
 import "server-only";
+import { getAccess } from "@/features/payments/server";
 import { computeStats } from "@/features/profile/server";
 import { getCoinBalance, getCoinsForSession, getPlayerHistory, grantCoins } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
@@ -14,8 +15,8 @@ export async function payRoundCoins(
   galacticats: number,
   now: Date,
 ): Promise<number> {
-  const history = await getPlayerHistory(userId);
-  const streak = computeStats(history, ukDayOf(now)).currentStreak;
+  const [history, access] = await Promise.all([getPlayerHistory(userId), getAccess(userId)]);
+  const streak = computeStats(history, ukDayOf(now), { nineLives: access.lifetime }).currentStreak;
   await grantCoins(userId, roundRewards({ sessionId, galacticats, streak }));
   return getCoinsForSession(userId, sessionId);
 }
