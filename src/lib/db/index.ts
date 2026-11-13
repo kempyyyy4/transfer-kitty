@@ -23,6 +23,7 @@ export {
   submitAnswer,
   type AnswerOutcome,
   type AnswerResult,
+  type GameMode,
   type QuestionAnswerList,
   type ServedState,
   type SessionSummary,
@@ -110,3 +111,22 @@ export {
   type CoinGrant,
   type StoredPriceChange,
 } from "./coins";
+export {
+  attachStripeSession,
+  fulfilPurchase,
+  getEntitlementKeys,
+  getPurchase,
+  getPurchaseByStripeSession,
+  insertPurchase,
+  type FulfilOutcome,
+  type PurchaseRow,
+} from "./payments";
+export {
+  getArchiveDays,
+  getLivePacks,
+  getPuzzleQuestionIds,
+  pickPracticeQuestions,
+  startPracticeSession,
+  type ArchiveDay,
+  type LivePack,
+} from "./practice";

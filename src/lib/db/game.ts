@@ -213,7 +213,11 @@ export async function getSessionAnswerLists(
   }));
 }
 
+export type GameMode = "daily" | "archive" | "unlimited" | "pack";
+
 const summarySchema = z.object({
+  mode: z.enum(["daily", "archive", "unlimited", "pack"]),
+  pack_name: z.string().nullable(),
   puzzle_date: z.string().nullable(),
   puzzle_number: z.number().nullable(),
   completed: z.boolean(),
@@ -233,6 +237,9 @@ const summarySchema = z.object({
 });
 
 export interface SessionSummary {
+  mode: GameMode;
+  /** The pack's name, for a pack round. */
+  packName: string | null;
   puzzleNumber: number | null;
   completed: boolean;
   totalQuestions: number;
@@ -266,6 +273,8 @@ export async function getSessionSummary(
 
   const summary = summarySchema.parse(data);
   return {
+    mode: summary.mode,
+    packName: summary.pack_name,
     puzzleNumber: summary.puzzle_number,
     completed: summary.completed,
     totalQuestions: summary.total_questions,
