@@ -7,7 +7,13 @@ import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { formatFee } from "@/features/scoring";
 import { gameApi, GameApiError } from "../api-client";
 import { bestMatch, confidentMatch } from "../best-match";
-import type { AnswerFeedback, GameSummary, OpenQuestion, PlayerSuggestion } from "../types";
+import type {
+  AnswerFeedback,
+  GameSummary,
+  OpenQuestion,
+  PlayerSuggestion,
+  PracticeRound,
+} from "../types";
 import { AnswerInput, type AnswerDraft } from "./AnswerInput";
 import { FeedbackPanel } from "./FeedbackPanel";
 import { KittyGauge } from "./KittyGauge";
@@ -31,8 +37,11 @@ function errorView(error: unknown): View {
   return { kind: "error", message };
 }
 
-/** Plays today's game: one question at a time, each judged by the server. */
-export function GameScreen() {
+/**
+ * Plays a round: today's daily, or an Archive, Unlimited or pack round when `round` is given.
+ * One question at a time, each judged by the server.
+ */
+export function GameScreen({ round }: { round?: PracticeRound }) {
   const [view, setView] = useState<View>({ kind: "loading" });
   const sessionId = useRef<string | null>(null);
   // Stops the timer running out and a click landing together from sending two answers.
@@ -70,14 +79,13 @@ export function GameScreen() {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    gameApi
-      .start()
+    (round ? gameApi.practice(round) : gameApi.start())
       .then((game) => {
         sessionId.current = game.sessionId;
         return showNext();
       })
       .catch((error: unknown) => setView(errorView(error)));
-  }, [showNext]);
+  }, [showNext, round]);
 
   /**
    * Time is up: send whatever name is in the box rather than nothing. The suggestions

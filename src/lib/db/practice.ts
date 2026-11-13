@@ -59,7 +59,7 @@ const archiveSchema = z.array(
 export type ArchiveDay = z.infer<typeof archiveSchema>[number];
 
 /** Past daily puzzles, newest first. */
-export async function getArchiveDays(userId: string, today: string): Promise<ArchiveDay[]> {
+export async function getArchiveDays(userId: string | null, today: string): Promise<ArchiveDay[]> {
   const { data, error } = await getServiceClient().rpc("get_archive", {
     p_user_id: userId,
     p_today: today,
