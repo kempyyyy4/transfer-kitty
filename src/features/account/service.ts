@@ -2,11 +2,12 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { ACCOUNT } from "@/config/account";
-import { completeSignIn, getVisitor, type SignInProof, type Visitor } from "@/lib/auth";
+import { completeSignIn, getVisitor, signOut, type SignInProof, type Visitor } from "@/lib/auth";
 import {
   deleteUser,
   getDisplayName,
   mergeGuestIntoAccount,
+  prepareAccountDeletion,
   saveDisplayName,
   savePendingMerge,
   takePendingMerge,
@@ -99,4 +100,19 @@ export async function setDisplayName(rawName: string): Promise<NameOutcome> {
 
   const saved = await saveDisplayName(visitor.userId, checked.name);
   return saved === "taken" ? { status: "taken" } : { status: "saved", name: checked.name };
+}
+
+/**
+ * Deletes the signed-in player's account and everything tied to it: games, coins, items,
+ * purchases' access, profile and league places. Leagues they created pass to another
+ * member. Stripe keeps its own record of any payment, as the law requires.
+ */
+export async function deleteAccount(): Promise<"deleted" | "not_signed_in"> {
+  const visitor = await getVisitor();
+  if (!visitor || visitor.isGuest) return "not_signed_in";
+
+  await prepareAccountDeletion(visitor.userId);
+  await signOut();
+  await deleteUser(visitor.userId);
+  return "deleted";
 }

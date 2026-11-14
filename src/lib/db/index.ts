@@ -2,6 +2,7 @@ export {
   deleteUser,
   getDisplayName,
   mergeGuestIntoAccount,
+  prepareAccountDeletion,
   saveDisplayName,
   savePendingMerge,
   takePendingMerge,
