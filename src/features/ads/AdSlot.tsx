@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useAccess } from "@/features/payments";
 import { getPublicEnv } from "@/lib/env";
-import { hasAdConsent } from "./consent";
 
 const SCRIPT_ID = "adsbygoogle-script";
 
@@ -15,21 +14,16 @@ declare global {
 
 /**
  * One AdSense ad, for free players only, on the Results and Top Kitties screens, never
- * mid-game. Nothing loads unless AdSense is set up, the player has agreed to ads, and they
- * have not bought the lifetime unlock.
+ * mid-game. Nothing loads unless AdSense is set up and the player has no lifetime unlock.
+ * Consent is asked by Google's own certified message (AdSense, Privacy & messaging), which
+ * the AdSense script shows to UK and EU visitors before any personalised ad.
  */
 export function AdSlot() {
   const access = useAccess();
-  const [consented, setConsented] = useState(false);
   const client = getPublicEnv().adsenseClient;
   const pushed = useRef(false);
 
-  useEffect(() => {
-    const timer = setTimeout(() => setConsented(hasAdConsent()), 0);
-    return () => clearTimeout(timer);
-  }, []);
-
-  const show = Boolean(client) && consented && access !== null && !access.lifetime;
+  const show = Boolean(client) && access !== null && !access.lifetime;
 
   useEffect(() => {
     if (!show || !client || pushed.current) return;

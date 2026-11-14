@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { SoundToggle } from "@/features/audio";
+import { SiteFooter } from "@/features/legal";
 import "./globals.css";
 
 const pixelFont = Press_Start_2P({
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col font-mono">
         <SoundToggle />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );

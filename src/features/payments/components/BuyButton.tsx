@@ -36,6 +36,12 @@ export function BuyButton({ product, label }: Props) {
       >
         {busy ? "OPENING..." : label}
       </button>
+      <p className="max-w-56 text-center text-base text-chalk-dim">
+        Starts straight away, so you give up the 14-day right to cancel.{" "}
+        <a href="/terms" className="underline">
+          Terms
+        </a>
+      </p>
       {message ? (
         <p role="status" className="text-center text-claret">
           {message}
