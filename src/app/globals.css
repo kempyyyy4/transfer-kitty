@@ -87,7 +87,29 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-/* Old television lines across the logo. */
+/* Mown stripes for the pitch behind every screen. */
+@utility pitch {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--color-turf) 0,
+    var(--color-turf) 7vh,
+    var(--color-turf-light) 7vh,
+    var(--color-turf-light) 14vh
+  );
+}
+
+/* Old television lines across the whole scene. */
+@utility scanlines {
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.22) 0,
+    rgb(0 0 0 / 0.22) 2px,
+    transparent 2px,
+    transparent 4px
+  );
+}
+
+/* Old television lines across one element. */
 @utility crt {
   position: relative;
 
@@ -169,6 +191,130 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Two crowd frames take turns, so the fans seem to bob and wave. */
+@keyframes crowd-swap {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes flag-wave {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes pitch-sheen {
+  0% {
+    background-position: -60vw 0;
+  }
+  100% {
+    background-position: 160vw 0;
+  }
+}
+
+@keyframes kitty-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes keepy-up {
+  0%,
+  100% {
+    transform: translate(-50%, 0);
+  }
+  50% {
+    transform: translate(-50%, -260%);
+  }
+}
+
+@keyframes kickoff-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow:
+      6px 6px 0 #000,
+      0 0 0 0 rgb(255 210 63 / 0.6);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow:
+      6px 6px 0 #000,
+      0 0 0 10px rgb(255 210 63 / 0);
+  }
+}
+
+@keyframes flame-flicker {
+  0%,
+  100% {
+    transform: translateY(0) scaleY(1);
+  }
+  50% {
+    transform: translateY(-1px) scaleY(1.08);
+  }
+}
+
+.animate-twinkle {
+  animation: twinkle 4s infinite steps(2);
+}
+.animate-crowd-a {
+  animation: crowd-swap 0.9s infinite steps(1);
+}
+.animate-crowd-b {
+  animation: crowd-swap 0.9s infinite steps(1) reverse;
+}
+.animate-flag-wave {
+  animation: flag-wave 0.6s infinite steps(2);
+}
+.animate-pitch-sheen {
+  background-image: linear-gradient(
+    100deg,
+    transparent 0,
+    rgb(255 255 255 / 0.07) 8vw,
+    transparent 16vw
+  );
+  background-repeat: no-repeat;
+  background-size: 40vw 100%;
+  animation: pitch-sheen 9s infinite linear;
+}
+.animate-kitty-bob {
+  animation: kitty-bob 1.4s infinite steps(2);
+}
+.animate-keepy-up {
+  animation: keepy-up 0.7s infinite steps(4);
+}
+.animate-kickoff {
+  animation: kickoff-pulse 1.6s infinite steps(4);
+}
+.animate-flame {
+  animation: flame-flicker 0.5s infinite steps(2);
+  transform-origin: bottom;
+}
+
 .animate-crt-flicker {
   animation: crt-flicker 6s infinite steps(1);
 }
@@ -190,7 +336,19 @@ svg[shape-rendering="crispEdges"],
   .animate-paw-step,
   .animate-tier-flash,
   .animate-sprite-pop,
-  .animate-floodlight {
+  .animate-floodlight,
+  .animate-twinkle,
+  .animate-crowd-a,
+  .animate-crowd-b,
+  .animate-flag-wave,
+  .animate-pitch-sheen,
+  .animate-kitty-bob,
+  .animate-keepy-up,
+  .animate-kickoff,
+  .animate-flame {
     animation: none;
+  }
+  .animate-crowd-b {
+    opacity: 0;
   }
 }

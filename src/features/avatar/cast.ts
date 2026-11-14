@@ -120,3 +120,100 @@ export const TIER_SPRITES: Record<string, CatLook> = {
     accessories: ["sunglasses"],
   },
 };
+
+/**
+ * The home screen's line-up. Loosely styled on football fashions that famous players have
+ * made popular (Tom's choice); never named, and never a copy of anyone's face or kit.
+ */
+export const LINEUP: readonly { look: CatLook; label: string }[] = [
+  {
+    label: "Bleached-crop winger",
+    look: {
+      fur: "#c98a4b",
+      furShade: "#a46c34",
+      muzzle: "#f3e2cc",
+      eyes: "#4a8cff",
+      ears: "pointy",
+      markings: "none",
+      kit: { primary: "#f2f4ff", secondary: "#c9a227", pattern: "plain", shorts: "#f2f4ff" },
+      boots: "#f5c518",
+      hair: { style: "crop", colour: "#f6ecb4", shade: "#d9c77a" },
+      accessories: [],
+    },
+  },
+  {
+    label: "Man-bun playmaker",
+    look: {
+      fur: "#e9e2d6",
+      furShade: "#c9bfae",
+      muzzle: "#ffffff",
+      eyes: "#3fd17a",
+      ears: "pointy",
+      markings: "tabby",
+      kit: { primary: "#6cabdd", secondary: "#1c2a5c", pattern: "plain", shorts: "#f2f4ff" },
+      boots: "#f2f4ff",
+      hair: { style: "bun", colour: "#5a3b22", shade: "#3f2816", band: "#141414" },
+      accessories: [],
+    },
+  },
+  {
+    label: "Afro midfield general",
+    look: {
+      fur: "#6b4a33",
+      furShade: "#523725",
+      muzzle: "#c9a98c",
+      eyes: "#f5c518",
+      ears: "pointy",
+      markings: "none",
+      kit: { primary: "#c8102e", secondary: "#f2f4ff", pattern: "plain", shorts: "#c8102e" },
+      boots: "#141414",
+      hair: { style: "afro", colour: "#2a1a10", shade: "#43291a" },
+      accessories: [],
+    },
+  },
+  {
+    label: "Flowing-hair captain",
+    look: {
+      fur: "#f0c27a",
+      furShade: "#d6a457",
+      muzzle: "#fff3dd",
+      eyes: "#4a8cff",
+      ears: "folded",
+      markings: "none",
+      kit: { primary: "#1c2a5c", secondary: "#c8102e", pattern: "halves", shorts: "#1c2a5c" },
+      boots: "#e23d3d",
+      hair: { style: "long", colour: "#f6d36b", shade: "#d8ae3c", band: "#f2f4ff" },
+      accessories: ["captainsArmband"],
+    },
+  },
+  {
+    label: "Mohawk striker",
+    look: {
+      fur: "#2b2b33",
+      furShade: "#1f1f26",
+      muzzle: "#d9d9de",
+      eyes: "#e23d3d",
+      ears: "torn",
+      markings: "none",
+      kit: { primary: "#f2f4ff", secondary: "#1a1a1a", pattern: "stripes", shorts: "#1a1a1a" },
+      boots: "#ff4fa3",
+      hair: { style: "mohawk", colour: "#f5c518", shade: "#c99f10" },
+      accessories: [],
+    },
+  },
+  {
+    label: "Braided keeper",
+    look: {
+      fur: "#8d8d8d",
+      furShade: "#6e6e6e",
+      muzzle: "#e6e6e6",
+      eyes: "#3fd17a",
+      ears: "pointy",
+      markings: "tuxedo",
+      kit: { primary: "#b6e03a", secondary: "#1a1a1a", pattern: "plain", shorts: "#1a1a1a" },
+      boots: "#141414",
+      hair: { style: "braids", colour: "#1a1a1a", shade: "#3a2a1a" },
+      accessories: ["gloves"],
+    },
+  },
+];

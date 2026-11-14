@@ -2,6 +2,7 @@ import "server-only";
 import { ANSWER_TIME_LIMIT_MS, GAME_RULES } from "@/config/game";
 import { TIERS, TOP_LEVEL } from "@/config/tiers";
 import { payRoundCoins } from "@/features/coins/server";
+import { getStreak } from "@/features/profile/server";
 import { puzzleNumberFor, scheduleDailyPuzzles } from "@/features/questions";
 import { percentOfPlayers } from "@/features/scoring";
 import {
@@ -44,10 +45,12 @@ async function createMissingPuzzle(today: string) {
 export async function getTodayStatus(userId: string | null, now: Date): Promise<TodayStatus> {
   const today = ukDayOf(now);
   const puzzleNumber = await todaysPuzzleNumber(today);
-  const session = userId ? await findDailySession(userId, today) : null;
+  const [session, streak] = userId
+    ? await Promise.all([findDailySession(userId, today), getStreak(userId, now)])
+    : [null, 0];
 
-  if (!session) return { puzzleNumber, played: "not_started" };
-  return { puzzleNumber, played: session.completed ? "completed" : "in_progress" };
+  if (!session) return { puzzleNumber, played: "not_started", streak };
+  return { puzzleNumber, played: session.completed ? "completed" : "in_progress", streak };
 }
 
 /** Starts today's game for the user, or picks up the one they already started. */

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, VT323 } from "next/font/google";
+import { StadiumScene } from "@/components/scene/StadiumScene";
+import { SiteMenu } from "@/components/SiteMenu";
 import { SoundToggle } from "@/features/audio";
 import { SiteFooter } from "@/features/legal";
 import "./globals.css";
@@ -25,6 +27,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`h-full ${pixelFont.variable} ${bodyFont.variable}`}>
       <body className="flex min-h-full flex-col font-mono">
+        <StadiumScene />
+        <SiteMenu />
         <SoundToggle />
         {children}
         <SiteFooter />

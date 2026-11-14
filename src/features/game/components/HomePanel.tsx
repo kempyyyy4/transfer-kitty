@@ -9,10 +9,10 @@ import type { TodayStatus } from "../types";
 const BUTTON_LABELS: Record<TodayStatus["played"], string> = {
   not_started: "KICK OFF",
   in_progress: "CARRY ON",
-  completed: "SEE YOUR KITTY",
+  completed: "YOUR KITTY",
 };
 
-/** The home screen's live part: today's puzzle, the play button and the countdown. */
+/** The big kick-off button, with the streak flame on its corner. */
 export function HomePanel() {
   const [today, setToday] = useState<TodayStatus | null>(null);
 
@@ -25,44 +25,44 @@ export function HomePanel() {
   }, []);
 
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-5">
-      <p className="font-pixel text-xs text-chalk-dim">
-        {today ? `PUZZLE #${today.puzzleNumber}` : " "}
-      </p>
+    <div className="relative w-full max-w-sm">
       <Link
         href="/play"
-        className="pixel-button w-full border-floodlight px-6 py-5 text-xl text-floodlight"
+        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-7 text-2xl text-floodlight sm:text-3xl"
       >
         {BUTTON_LABELS[today?.played ?? "not_started"]}
+        {today?.played === "completed" ? (
+          <span className="font-mono text-xl text-chalk">
+            Next puzzle in <Countdown />
+          </span>
+        ) : null}
       </Link>
-      <p className="text-xl">
-        Next puzzle in <Countdown />
-      </p>
-
-      <nav aria-label="More" className="grid w-full grid-cols-2 gap-4">
-        <Link href="/top-kitties" className="pixel-button px-2 py-3 text-[10px]">
-          TOP KITTIES
-        </Link>
-        <Link href="/profile" className="pixel-button px-2 py-3 text-[10px]">
-          PROFILE
-        </Link>
-        <Link href="/account" className="pixel-button px-2 py-3 text-[10px]">
-          ACCOUNT
-        </Link>
-        <Link href="/shop" className="pixel-button px-2 py-3 text-[10px]">
-          SHOP
-        </Link>
-        <Link href="/archive" className="pixel-button px-2 py-3 text-[10px]">
-          ARCHIVE
-        </Link>
-        <Link href="/packs" className="pixel-button px-2 py-3 text-[10px]">
-          THEMED PACKS
-        </Link>
-        <Link href="/unlimited" className="pixel-button px-2 py-3 text-[10px]">
-          UNLIMITED
-        </Link>
-      </nav>
+      {today && today.streak > 0 ? <StreakBadge streak={today.streak} /> : null}
     </div>
+  );
+}
+
+/** A flame and the streak, sitting on the button's corner like an app's notification. */
+function StreakBadge({ streak }: { streak: number }) {
+  return (
+    <span
+      className="absolute -top-4 -right-3 flex items-center gap-1 border-4 border-black bg-claret px-2 py-1 font-pixel text-xs text-chalk"
+      aria-label={`${streak} day streak`}
+    >
+      <svg
+        viewBox="0 0 5 6"
+        shapeRendering="crispEdges"
+        aria-hidden
+        className="animate-flame h-5 w-4"
+      >
+        <rect x={2} y={0} width={1} height={1} fill="#ffd23f" />
+        <rect x={1} y={1} width={3} height={1} fill="#ffb000" />
+        <rect x={0} y={2} width={5} height={3} fill="#ffb000" />
+        <rect x={1} y={3} width={3} height={2} fill="#ffd23f" />
+        <rect x={1} y={5} width={3} height={1} fill="#e8a21c" />
+      </svg>
+      {streak}
+    </span>
   );
 }
 

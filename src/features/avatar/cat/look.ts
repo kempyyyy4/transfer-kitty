@@ -15,6 +15,16 @@ export type Accessory =
   | "mirror"
   | "mud";
 
+export type HairStyle = "crop" | "bun" | "mohawk" | "afro" | "long" | "braids";
+
+export interface Hair {
+  style: HairStyle;
+  colour: string;
+  shade: string;
+  /** An alice band or hair tie, where the style has one. */
+  band?: string;
+}
+
 export interface KitColours {
   primary: string;
   secondary: string;
@@ -34,5 +44,6 @@ export interface CatLook {
   boots: string;
   /** A lion's mane, drawn behind the head. */
   mane?: { main: string; shade: string };
+  hair?: Hair;
   accessories: readonly Accessory[];
 }

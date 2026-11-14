@@ -5,6 +5,8 @@ export type AnswerOutcome = "correct" | "wrong" | "timeout";
 export interface TodayStatus {
   puzzleNumber: number;
   played: "not_started" | "in_progress" | "completed";
+  /** Days in a row played, for the flame on the kick-off button. */
+  streak: number;
 }
 
 export interface StartedGame {
