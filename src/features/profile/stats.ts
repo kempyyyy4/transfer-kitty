@@ -13,14 +13,39 @@ export interface PlayerStats {
   bestStreak: number;
   averageKitty: number;
   bestDay: PlayedDay | null;
+  /** Nine Lives only: whether this month's one missed day has been used. */
+  lifeUsedThisMonth: boolean;
 }
 
-/** Lengths of each run of consecutive days, from sorted, distinct days. */
-function runs(days: readonly string[]): { end: string; length: number }[] {
+export interface StreakRules {
+  /** Lifetime unlock: one missed day per UK calendar month does not break a streak. */
+  nineLives: boolean;
+}
+
+const monthOf = (day: string) => day.slice(0, 7);
+
+/**
+ * Lengths of each run of consecutive days, from sorted, distinct days. With Nine Lives a
+ * single missed day is bridged, once per calendar month; `livesUsed` collects those months.
+ * A run's length counts the days played.
+ */
+function runs(
+  days: readonly string[],
+  rules: StreakRules,
+  livesUsed: Set<string>,
+): { end: string; length: number }[] {
   const found: { end: string; length: number }[] = [];
   for (const day of days) {
     const last = found.at(-1);
-    if (last && addDays(last.end, 1) === day) {
+    const missed = last ? addDays(last.end, 1) : null;
+    const bridged =
+      last &&
+      missed &&
+      rules.nineLives &&
+      addDays(missed, 1) === day &&
+      !livesUsed.has(monthOf(missed));
+    if (last && (missed === day || bridged)) {
+      if (bridged && missed) livesUsed.add(monthOf(missed));
       last.end = day;
       last.length++;
     } else {
@@ -34,11 +59,21 @@ function runs(days: readonly string[]): { end: string; length: number }[] {
  * A player's record from their finished daily games. A streak survives until the end of
  * the day after the last game, so not having played yet today does not break it.
  */
-export function computeStats(history: readonly PlayedDay[], today: string): PlayerStats {
+export function computeStats(
+  history: readonly PlayedDay[],
+  today: string,
+  rules: StreakRules = { nineLives: false },
+): PlayerStats {
   const days = [...new Set(history.map((day) => day.date))].filter((day) => day <= today).sort();
-  const allRuns = runs(days);
+  const livesUsed = new Set<string>();
+  const allRuns = runs(days, rules, livesUsed);
   const lastRun = allRuns.at(-1);
-  const alive = lastRun && (lastRun.end === today || lastRun.end === addDays(today, -1));
+  const yesterday = addDays(today, -1);
+  // With a life left for yesterday's month, a streak ending the day before survives too.
+  const savedByLife =
+    rules.nineLives && lastRun?.end === addDays(today, -2) && !livesUsed.has(monthOf(yesterday));
+  if (savedByLife) livesUsed.add(monthOf(yesterday));
+  const alive = lastRun && (lastRun.end === today || lastRun.end === yesterday || savedByLife);
 
   const total = history.reduce((sum, day) => sum + day.totalFee, 0);
   const bestDay = history.reduce<PlayedDay | null>(
@@ -57,5 +92,6 @@ export function computeStats(history: readonly PlayedDay[], today: string): Play
     bestStreak: Math.max(0, ...allRuns.map((run) => run.length)),
     averageKitty: history.length === 0 ? 0 : Math.round(total / history.length),
     bestDay,
+    lifeUsedThisMonth: rules.nineLives && livesUsed.has(monthOf(today)),
   };
 }

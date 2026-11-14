@@ -1,8 +1,9 @@
+import Link from "next/link";
 import { formatFee } from "@/features/scoring";
 import type { PlayerStats } from "../stats";
 
-/** Streaks, games, average and best day, plus where Nine Lives will show. */
-export function StatsPanel({ stats }: { stats: PlayerStats }) {
+/** Streaks, games, average and best day, and Nine Lives for lifetime players. */
+export function StatsPanel({ stats, nineLives }: { stats: PlayerStats; nineLives: boolean }) {
   const tiles = [
     { label: "STREAK", value: `${stats.currentStreak}` },
     { label: "BEST STREAK", value: `${stats.bestStreak}` },
@@ -26,10 +27,22 @@ export function StatsPanel({ stats }: { stats: PlayerStats }) {
           ? `${formatFee(stats.bestDay.totalFee)} on ${readableDate(stats.bestDay.date)}`
           : "not played yet"}
       </p>
-      <p className="text-lg text-chalk-dim">
-        Nine Lives: comes with the lifetime unlock, opening soon. It lets you miss one day a month
-        without losing your streak.
-      </p>
+      {nineLives ? (
+        <p className="text-lg">
+          Nine Lives:{" "}
+          {stats.lifeUsedThisMonth
+            ? "used this month. A missed day would end your streak until next month."
+            : "ready. Miss one day this month and your streak carries on."}
+        </p>
+      ) : (
+        <p className="text-lg text-chalk-dim">
+          Nine Lives comes with the{" "}
+          <Link href="/shop" className="underline hover:text-chalk">
+            lifetime unlock
+          </Link>
+          . It lets you miss one day a month without losing your streak.
+        </p>
+      )}
     </section>
   );
 }

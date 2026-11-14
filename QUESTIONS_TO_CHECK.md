@@ -120,3 +120,12 @@ Real names appear only as text labels on the gauge. No likenesses, crests or log
 - **Guests earn coins** and keep them when they sign in. If a guest and their account both played the same day, the account's game is kept and the guest's coins for that day are dropped with it.
 - **Buying needs sign-in.** Coin packs are shown with their prices but marked SOON until payments arrive in stage 12.
 - **The streak bonus is paid when a round is finished.** Nine Lives, which protects a streak, comes in stage 12.
+
+## 13. Payments and paid modes (stage 12)
+
+- **Your choices**: Nine Lives covers the first missed day in each UK calendar month automatically. Archive replays any past day, even ones already played. Packs play rounds of 7, unseen questions first. None of these count on Top Kitties or earn coins.
+- **Keeping the daily fair**: a paid round never shows a question from today's or a coming daily puzzle. Unlimited also skips pack questions and famous questions that are still waiting for their turn as a daily, and those are released into Unlimited once they have been a daily. A question in any pack, even a draft one, is never picked for a daily.
+- **Replays don't change tiers**: only daily answers count towards the crowd figures that reshape tiers.
+- **Refunds**: refund in the Stripe dashboard. The unlock or coins are not taken back automatically yet; tell me if you want that.
+- **Ads stay off for now**: they need your AdSense account, the publisher ID in the keys file, and the cookie banner from stage 13 asking players to agree. Lifetime players never see ads.
+- **Legal check before taking real money** (PLAN.md section 3): the Transfermarkt data licence, player names on packs, and the policy pages.

@@ -31,7 +31,7 @@ export function ProfileScreen() {
         {profile.displayName ? profile.displayName.toUpperCase() : "YOUR PROFILE"}
       </h1>
 
-      <StatsPanel stats={profile.stats} />
+      <StatsPanel stats={profile.stats} nineLives={profile.nineLives} />
       <HistoryCalendar history={profile.history} today={profile.today} />
 
       {profile.status === "signed_in" && profile.displayName ? (

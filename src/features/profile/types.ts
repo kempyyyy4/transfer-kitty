@@ -18,4 +18,6 @@ export interface Profile {
   today: string;
   /** "slot:id" of every item the player may wear: free today, or bought. */
   wearable: string[];
+  /** The lifetime unlock's Nine Lives: one missed day a month keeps the streak. */
+  nineLives: boolean;
 }

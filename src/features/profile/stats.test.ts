@@ -15,6 +15,7 @@ describe("computeStats", () => {
       bestStreak: 0,
       averageKitty: 0,
       bestDay: null,
+      lifeUsedThisMonth: false,
     });
   });
 
@@ -57,5 +58,42 @@ describe("computeStats", () => {
 
     expect(stats.averageKitty).toBe(233_333_333);
     expect(stats.bestDay).toEqual({ date: "2026-11-11", totalFee: 300_000_000 });
+  });
+});
+
+describe("Nine Lives", () => {
+  const lives = { nineLives: true };
+
+  it("bridges one missed day in a month", () => {
+    const history = played("2026-11-08", "2026-11-09", "2026-11-11", "2026-11-12");
+    expect(computeStats(history, TODAY, lives)).toMatchObject({
+      currentStreak: 4,
+      lifeUsedThisMonth: true,
+    });
+    expect(computeStats(history, TODAY).currentStreak).toBe(2);
+  });
+
+  it("only bridges one missed day per month", () => {
+    const history = played("2026-11-05", "2026-11-07", "2026-11-09", "2026-11-10");
+    expect(computeStats(history, "2026-11-10", lives)).toMatchObject({ bestStreak: 2 });
+  });
+
+  it("gives a fresh life each calendar month", () => {
+    const history = played("2026-10-29", "2026-10-31", "2026-11-01", "2026-11-03");
+    expect(computeStats(history, "2026-11-03", lives).currentStreak).toBe(4);
+  });
+
+  it("never bridges two missed days in a row", () => {
+    const history = played("2026-11-08", "2026-11-11");
+    expect(computeStats(history, "2026-11-11", lives).currentStreak).toBe(1);
+  });
+
+  it("keeps a streak alive through yesterday when a life is left", () => {
+    const history = played("2026-11-09", "2026-11-10");
+    expect(computeStats(history, TODAY, lives)).toMatchObject({
+      currentStreak: 2,
+      lifeUsedThisMonth: true,
+    });
+    expect(computeStats(history, TODAY).currentStreak).toBe(0);
   });
 });

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader } from "@/components/Loader";
 import { COIN_REWARDS } from "@/config/coins";
+import { LifetimeCard } from "@/features/payments";
 import { shopApi, ShopApiError } from "../api-client";
 import { SHOP_SLOTS, SLOT_LABELS } from "../catalogue";
 import type { Shop, ShopItem } from "../types";
@@ -99,6 +100,7 @@ export function ShopScreen() {
           })
         : null}
 
+      <LifetimeCard />
       <CoinPacks />
 
       <Link href="/" className="pixel-button px-4 py-3 text-xs">

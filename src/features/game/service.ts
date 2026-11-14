@@ -147,7 +147,7 @@ export async function getGameSummary(
 
   // Only a finished daily round earns coins. Paying is safe to repeat.
   const coinsEarned =
-    summary.completed && summary.puzzleNumber !== null
+    summary.completed && summary.mode === "daily"
       ? await payRoundCoins(
           userId,
           sessionId,
@@ -157,6 +157,8 @@ export async function getGameSummary(
       : 0;
 
   return {
+    mode: summary.mode,
+    packName: summary.packName,
     puzzleNumber: summary.puzzleNumber,
     completed: summary.completed,
     totalQuestions: summary.totalQuestions,

@@ -1,5 +1,6 @@
 "use client";
 
+import { AdSlot } from "@/features/ads";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { leaderboardApi, LeaderboardApiError } from "../api-client";
@@ -103,6 +104,7 @@ export function TopKittiesScreen() {
         }}
       />
 
+      <AdSlot />
       <Link href="/" className="pixel-button px-4 py-3 text-xs">
         BACK TO HOME
       </Link>

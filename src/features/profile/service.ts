@@ -1,5 +1,6 @@
 import "server-only";
 import { checkChoice, itemKey, parseStoredChoice, type AvatarChoice } from "@/features/avatar";
+import { getAccess } from "@/features/payments/server";
 import { wearableKeys } from "@/features/shop/server";
 import { getVisitor } from "@/lib/auth";
 import { getDisplayName, getPlayerHistory, getStoredAvatar, saveAvatar } from "@/lib/db";
@@ -20,24 +21,27 @@ export async function getProfile(now: Date): Promise<Profile> {
       history: [],
       today,
       wearable: [],
+      nineLives: false,
     };
   }
 
-  const [history, displayName, storedAvatar, wearable] = await Promise.all([
+  const [history, displayName, storedAvatar, wearable, access] = await Promise.all([
     getPlayerHistory(visitor.userId),
     visitor.isGuest ? null : getDisplayName(visitor.userId),
     visitor.isGuest ? null : getStoredAvatar(visitor.userId),
     visitor.isGuest ? new Set<string>() : wearableKeys(visitor.userId),
+    getAccess(visitor.userId),
   ]);
 
   return {
     status: visitor.isGuest ? "guest" : "signed_in",
     displayName,
     avatar: parseStoredChoice(storedAvatar),
-    stats: computeStats(history, today),
+    stats: computeStats(history, today, { nineLives: access.lifetime }),
     history,
     today,
     wearable: [...wearable],
+    nineLives: access.lifetime,
   };
 }
 

@@ -31,22 +31,23 @@ If the dev server shows an old version of a page or stylesheet after a restart, 
 
 Questions are built offline from downloaded data, then loaded into the database. Nothing in `data/` is committed. Run these in order; each is safe to re-run.
 
-| Command                      | What it does                                                                |
-| ---------------------------- | --------------------------------------------------------------------------- |
-| `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                           |
-| `npm run wikidata:download`  | Download club histories and player profiles from Wikidata (resumable)       |
-| `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables       |
-| `npm run questions:generate` | Run every template and write the questions and a report to `data/build`     |
-| `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local`   |
-| `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                  |
-| `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules       |
-| `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does            |
-| `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database                 |
-| `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database     |
-| `npm run smoke:admin`        | Check the admin tools and missing-answer reports against that database      |
-| `npm run smoke:coins`        | Check coin rewards, spending and the guest carry-over against that database |
-| `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                         |
-| `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                      |
+| Command                      | What it does                                                                 |
+| ---------------------------- | ---------------------------------------------------------------------------- |
+| `npm run data:download`      | Download the Transfermarkt tables into `data/raw`                            |
+| `npm run wikidata:download`  | Download club histories and player profiles from Wikidata (resumable)        |
+| `npm run data:build`         | Load both into the local SQLite warehouse and build the merged tables        |
+| `npm run questions:generate` | Run every template and write the questions and a report to `data/build`      |
+| `npm run questions:load`     | Load players, clubs and questions into the database named in `.env.local`    |
+| `npm run puzzles:schedule`   | Create daily puzzles for the next 30 days in that database                   |
+| `npm run smoke:game`         | Play a full game against that database and check the anti-cheat rules        |
+| `npm run tiers:recalculate`  | Recalculate tiers from real answers now, as the nightly job does             |
+| `npm run smoke:leaderboard`  | Check Top Kitties and friends leagues against that database                  |
+| `npm run smoke:accounts`     | Check that a guest's play merges into an account, against that database      |
+| `npm run smoke:admin`        | Check the admin tools and missing-answer reports against that database       |
+| `npm run smoke:payments`     | Check Stripe webhooks, entitlements and the paid modes against that database |
+| `npm run smoke:coins`        | Check coin rewards, spending and the guest carry-over against that database  |
+| `npm run wikidata:compare`   | Measure how well Wikidata agrees with Transfermarkt                          |
+| `npm run data:sql -- "..."`  | Run one SQL query against the warehouse, for exploring                       |
 
 - Scripts live in `scripts/` and run with `tsx`. They may print to the console; app code may not.
 - A new kind of question is one new file in `scripts/questions/templates`, added to `index.ts` there. Each template names its `dataSource`.
@@ -113,7 +114,7 @@ Ask Tom before any decision that is hard to change later: database schema change
 - One daily attempt per user is enforced by a database constraint, not just by code.
 - The full answer lists come only from `get_session_answer_lists`, which refuses until the session is completed. Never add another path that returns `question_answers` to the browser.
 - Tiers are recalculated only by the nightly job, never for a question in today's daily puzzle, so a fee never changes during the day it is played.
-- A feature's `index.ts` must be safe for browser code, because other features' screens import it. Server-only parts go in the feature's `server.ts` (see `src/features/leaderboard/server.ts`), or are imported by file path (`src/features/scoring/recalculation-job.ts`). The game feature predates this rule and still mixes both in its index; split it when it is next changed.
+- A feature's `index.ts` must be safe for browser code, because other features' screens import it. Server-only parts go in the feature's `server.ts` (see `src/features/leaderboard/server.ts`), or are imported by file path (`src/features/scoring/recalculation-job.ts`).
 - Leaderboards never send another player's user ID to the browser. They send a display name and an `isYou` flag.
 - Types in `src/features/game/types.ts` are what the browser receives. Adding a field there is a decision about what players can see.
 - After changing game logic, run `npm run smoke:game` against the development database.
@@ -155,6 +156,18 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Owned items are keyed by slot and ID (`kit:gold-sash`), because IDs are only unique within a slot.
 - Shop prices show a real-money equivalent at the smallest coin pack's rate, rounded up (`moneyEquivalent`).
 - Direct purchase only. No random packs, loot boxes or mystery items.
+
+## Payments and paid modes
+
+- Everything sold is priced in `src/config/products.ts` and `src/config/coins.ts`. The browser only names a product (`lifetime`, `coins-500`, `pack:<id>`); the server sets the price on the Stripe Checkout it creates.
+- Buying needs a signed-in account, so purchases restore on any device. A `purchases` row is written before Checkout opens.
+- Only the webhook (`/api/stripe/webhook`) grants anything. It checks Stripe's signature, then `fulfil_purchase` grants once: the event ID is stored in `stripe_events`, the purchase must still be pending, and the amount paid must match. What is granted comes from the stored purchase, never the event's metadata.
+- Entitlements are `lifetime` and `pack:<id>`, in `entitlements`. Check them with `getAccess` from `src/features/payments/server.ts`.
+- Archive, Unlimited and pack rounds never count on Top Kitties, never earn coins, and never change the crowd figures that set tiers (only daily plays do, in `submit_answer`).
+- No paid round may show a question from today's or a coming daily puzzle. `pick_practice_questions` leaves those out; Unlimited also leaves out pack questions and famous questions still waiting for a daily; the daily never picks a pack question.
+- Nine Lives (lifetime) bridges one missed day per UK calendar month, automatically, in `computeStats`.
+- Ads load only with `NEXT_PUBLIC_ADSENSE_CLIENT` set, the player's consent, and no lifetime unlock, on Results and Top Kitties only.
+- To test payments locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`, and Stripe's test card 4242 4242 4242 4242.
 
 ## Question rules
 

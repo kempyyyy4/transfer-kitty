@@ -1,5 +1,6 @@
 import { PLAYER_SEARCH, RATE_LIMITS } from "@/config/rate-limits";
-import { playerSearchSchema, type PlayerSuggestion } from "@/features/game";
+import type { PlayerSuggestion } from "@/features/game";
+import { playerSearchSchema } from "@/features/game/server";
 import { getUserId } from "@/lib/auth";
 import { searchPlayers } from "@/lib/db";
 import { jsonError, notSignedIn, tooManyRequests } from "@/lib/http";

@@ -14,6 +14,10 @@ const serverEnvSchema = z.object({
   ADMIN_USER_ID: optional(z.uuid()),
   /** Asked for on the admin page, on top of being signed in as ADMIN_USER_ID. */
   ADMIN_PASSWORD: optional(z.string().min(16)),
+  /** Stripe's secret key (sk_test_... while testing). Without it, nothing can be bought. */
+  STRIPE_SECRET_KEY: optional(z.string().regex(/^(sk|rk)_(test|live)_/)),
+  /** Proves a webhook request came from Stripe (whsec_...). */
+  STRIPE_WEBHOOK_SECRET: optional(z.string().startsWith("whsec_")),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
@@ -33,4 +37,15 @@ let cachedEnv: ServerEnv | undefined;
 export function getServerEnv(): ServerEnv {
   cachedEnv ??= parseServerEnv(process.env);
   return cachedEnv;
+}
+
+/**
+ * Settings the browser may see. Next.js copies NEXT_PUBLIC_ values into the page when it
+ * is built, so each must be read by its full name here.
+ */
+export function getPublicEnv() {
+  return {
+    /** Google AdSense publisher ID (ca-pub-...). Without it, no ads are shown. */
+    adsenseClient: process.env.NEXT_PUBLIC_ADSENSE_CLIENT || null,
+  };
 }

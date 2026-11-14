@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { TIERS } from "@/config/tiers";
 import { TierSprite } from "@/features/avatar";
+import { AdSlot } from "@/features/ads";
 import { YourRank } from "@/features/leaderboard";
 import { formatFee } from "@/features/scoring";
 import { ShareButton } from "@/features/share";
@@ -33,11 +34,11 @@ export function SummaryPanel({ sessionId, summary }: Props) {
       .catch(() => undefined);
   }, [sessionId]);
 
+  const daily = summary.mode === "daily";
+
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">
-        TRANSFER KITTY{summary.puzzleNumber ? ` #${summary.puzzleNumber}` : ""}
-      </h1>
+      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">{titleOf(summary)}</h1>
       <div className="flex flex-col items-center gap-2">
         <p className="font-pixel text-[10px] text-chalk-dim">YOUR KITTY</p>
         <p
@@ -47,13 +48,13 @@ export function SummaryPanel({ sessionId, summary }: Props) {
           {formatFee(summary.totalFee)}
         </p>
       </div>
-      {summary.coinsEarned > 0 ? (
+      {daily && summary.coinsEarned > 0 ? (
         <p className="text-center font-pixel text-xs text-scoreboard">
           +{summary.coinsEarned} COINS
         </p>
       ) : null}
-      <YourRank />
-      {summary.puzzleNumber && summary.completed ? (
+      {daily ? <YourRank /> : null}
+      {daily && summary.puzzleNumber && summary.completed ? (
         <ShareButton
           puzzleNumber={summary.puzzleNumber}
           totalFee={summary.totalFee}
@@ -91,12 +92,40 @@ export function SummaryPanel({ sessionId, summary }: Props) {
         })}
       </ol>
 
-      <p className="text-xl">
-        That is today&apos;s game done. A new one starts at midnight UK time.
-      </p>
+      <AdSlot />
+      {daily ? (
+        <p className="text-xl">
+          That is today&apos;s game done. A new one starts at midnight UK time.
+        </p>
+      ) : (
+        <p className="text-xl text-chalk-dim">
+          Just for fun: this round does not count on Top Kitties or earn coins.
+        </p>
+      )}
+      {summary.mode === "unlimited" || summary.mode === "pack" ? (
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
+        >
+          PLAY ANOTHER ROUND
+        </button>
+      ) : null}
+      {summary.mode === "archive" ? (
+        <Link href="/archive" className="pixel-button px-4 py-3 text-xs">
+          BACK TO THE ARCHIVE
+        </Link>
+      ) : null}
       <Link href="/" className="pixel-button px-4 py-3 text-xs">
         BACK TO HOME
       </Link>
     </section>
   );
+}
+
+function titleOf(summary: GameSummary): string {
+  if (summary.mode === "unlimited") return "UNLIMITED";
+  if (summary.mode === "pack") return (summary.packName ?? "PACK").toUpperCase();
+  const number = summary.puzzleNumber ? ` #${summary.puzzleNumber}` : "";
+  return summary.mode === "archive" ? `ARCHIVE${number}` : `TRANSFER KITTY${number}`;
 }

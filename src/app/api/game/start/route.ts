@@ -1,5 +1,5 @@
 import { RATE_LIMITS } from "@/config/rate-limits";
-import { startDailyGame } from "@/features/game";
+import { startDailyGame } from "@/features/game/server";
 import { getOrCreateUserId } from "@/lib/auth";
 import { tooManyRequests } from "@/lib/http";
 import { isWithinRateLimit } from "@/lib/rate-limit";

@@ -1,4 +1,4 @@
-import { getTodayStatus } from "@/features/game";
+import { getTodayStatus } from "@/features/game/server";
 import { getUserId } from "@/lib/auth";
 
 /** Today's puzzle number and whether this visitor has played it. Creates no session. */

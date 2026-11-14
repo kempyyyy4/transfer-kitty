@@ -9,7 +9,8 @@ export interface TodayStatus {
 
 export interface StartedGame {
   sessionId: string;
-  puzzleNumber: number;
+  /** Null for a round that is not the daily. */
+  puzzleNumber: number | null;
 }
 
 export interface OpenQuestion {
@@ -36,7 +37,16 @@ export interface AnsweredQuestion {
   percent: number;
 }
 
+export type GameMode = "daily" | "archive" | "unlimited" | "pack";
+
+/** A round that is not the daily. Archive, Unlimited and packs need the matching purchase. */
+export type PracticeRound =
+  { mode: "unlimited" } | { mode: "archive"; date: string } | { mode: "pack"; packId: string };
+
 export interface GameSummary {
+  mode: GameMode;
+  /** The pack's name, for a pack round. */
+  packName: string | null;
   puzzleNumber: number | null;
   completed: boolean;
   totalQuestions: number;
