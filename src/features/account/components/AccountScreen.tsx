@@ -5,6 +5,7 @@ import { Loader } from "@/components/Loader";
 import { useEffect, useState } from "react";
 import { accountApi } from "../api-client";
 import type { AccountStatus } from "../types";
+import { DeleteAccountPanel } from "./DeleteAccountPanel";
 import { NamePanel } from "./NamePanel";
 import { SignInPanel } from "./SignInPanel";
 
@@ -58,6 +59,12 @@ export function AccountScreen() {
           >
             Sign out
           </button>
+          <DeleteAccountPanel
+            onDeleted={() => {
+              setAccount({ status: "none" });
+              setNotice("Your account has been deleted.");
+            }}
+          />
         </>
       ) : null}
 

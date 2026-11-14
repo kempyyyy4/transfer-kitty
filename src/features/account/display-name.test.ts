@@ -27,4 +27,22 @@ describe("checkDisplayName", () => {
     expect(checkDisplayName("player one").ok).toBe(false);
     expect(checkDisplayName("Playmaker").ok).toBe(true);
   });
+
+  it("refuses offensive names, including look-alike spellings", () => {
+    for (const name of ["shithead", "sh1thead", "Fuuuck off", "a s s h o l e"]) {
+      expect(checkDisplayName(name).ok, name).toBe(false);
+    }
+  });
+
+  it("does not refuse ordinary names that only contain a rude-looking run of letters", () => {
+    for (const name of ["Scunthorpe Fan", "Cassandra", "Matt Butcher", "Hancock FC", "Essex Lad"]) {
+      expect(checkDisplayName(name).ok, name).toBe(true);
+    }
+  });
+
+  it("refuses names that could pass for the game or its staff", () => {
+    for (const name of ["Admin", "Transfer_Kitty 1", "Official Kit", "Kit The Cat"]) {
+      expect(checkDisplayName(name).ok, name).toBe(false);
+    }
+  });
 });

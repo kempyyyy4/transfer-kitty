@@ -55,6 +55,14 @@ export async function mergeGuestIntoAccount(
 }
 
 /** Removes a user entirely. Used for a guest once their play has moved to an account. */
+/** Hands the user's leagues to other members, so deleting them never deletes a league. */
+export async function prepareAccountDeletion(userId: string): Promise<void> {
+  const { error } = await getServiceClient().rpc("prepare_account_deletion", {
+    p_user_id: userId,
+  });
+  if (error) throw new Error(`Preparing the deletion failed: ${error.message}`);
+}
+
 export async function deleteUser(userId: string): Promise<void> {
   const { error } = await getServiceClient().auth.admin.deleteUser(userId);
   if (error) throw new Error(`Removing the user failed: ${error.message}`);

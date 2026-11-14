@@ -29,6 +29,7 @@ export const accountApi = {
   emailLink: (email: string) => post<{ sent: true }>("/api/auth/email", { email }),
   setName: (name: string) => post<{ displayName: string }>("/api/account/name", { name }),
   signOut: () => post<{ signedOut: true }>("/api/auth/sign-out"),
+  deleteAccount: () => post<{ deleted: true }>("/api/account/delete", { confirm: "DELETE" }),
   /** A page, not an API call: the browser goes there and on to Google. */
   googleSignInPath: "/api/auth/google",
 };

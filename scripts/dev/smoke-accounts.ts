@@ -9,8 +9,10 @@ import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { ACCOUNT } from "@/config/account";
-import { createLeague, getMyLeagues } from "@/features/leaderboard/service";
+import { createLeague, getMyLeagues, joinLeague } from "@/features/leaderboard/service";
 import {
+  deleteUser,
+  prepareAccountDeletion,
   getDisplayName,
   mergeGuestIntoAccount,
   saveDisplayName,
@@ -124,6 +126,35 @@ async function run(): Promise<void> {
   for (const league of leagues) {
     await admin.from("leagues").delete().eq("id", league.id);
   }
+
+  await checkDeletion();
+}
+
+/** Deleting an account removes its data but never a league other players are in. */
+async function checkDeletion(): Promise<void> {
+  const leaving = await createAccount();
+  const staying = await createAccount();
+  await finishedGame(leaving, today, 1_000_000);
+  const shared = await createLeague(leaving, "Leaving Lads FC");
+  const solo = await createLeague(leaving, "Party Of One FC");
+  if (shared.status !== "created" || solo.status !== "created") throw new Error("No league");
+  assert.equal((await joinLeague(staying, shared.league.inviteCode)).status, "joined");
+
+  await prepareAccountDeletion(leaving);
+  await deleteUser(leaving);
+  created.splice(created.indexOf(leaving), 1);
+
+  const { data: kept } = await admin
+    .from("leagues")
+    .select("id, owner_id")
+    .eq("id", shared.league.id);
+  assert.equal(kept?.[0]?.owner_id, staying);
+  const { data: gone } = await admin.from("leagues").select("id").eq("id", solo.league.id);
+  assert.equal(gone?.length, 0);
+  assert.deepEqual(await gamesOf(leaving), []);
+  passed("deleting an account removes its data, and its leagues pass to another member");
+
+  await admin.from("leagues").delete().eq("id", shared.league.id);
 }
 
 try {
