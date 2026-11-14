@@ -129,3 +129,11 @@ Real names appear only as text labels on the gauge. No likenesses, crests or log
 - **Refunds**: refund in the Stripe dashboard. The unlock or coins are not taken back automatically yet; tell me if you want that.
 - **Ads stay off for now**: they need your AdSense account, the publisher ID in the keys file, and the cookie banner from stage 13 asking players to agree. Lifetime players never see ads.
 - **Legal check before taking real money** (PLAN.md section 3): the Transfermarkt data licence, player names on packs, and the policy pages.
+
+## 14. Launch extras (stage 13)
+
+- **Fill in before launch**: who runs Transfer Kitty and a contact email, in `src/config/legal.ts`. The pages show "to be confirmed" until then.
+- **Privacy policy and terms are drafts**, written in plain English, and must be checked by someone qualified. Points worth their attention: the 14-day cancellation wording (also shown next to every buy button), "for as long as Transfer Kitty runs" for the lifetime unlock, under-13s, and how long guest data is kept (there is no automatic clean-up yet).
+- **Ads consent** uses Google's own certified message. Set it up in AdSense under Privacy & messaging when your account is approved.
+- **Name filter**: the obscenity word list (English), with spacing squashed out so "a s s" is caught. That also blocks some real names, for example "Dick Advocaat". Reserved: admin, moderator, Transfer Kitty, Kit the Cat, official, support, staff.
+- **Delete my account** removes everything, including purchases' access, and cannot be undone. Leagues the player created pass to their longest-standing other member.
