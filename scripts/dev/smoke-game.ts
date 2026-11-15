@@ -103,7 +103,7 @@ async function play(userId: string): Promise<void> {
   passed("a question that has not been served cannot be answered");
 
   const wrong = await answerQuestion(userId, game.sessionId, 1, NOBODY);
-  assert.deepEqual(wrong, { outcome: "wrong", tier: 0, fee: 0, percent: 0 });
+  assert.deepEqual(wrong, { outcome: "wrong", tier: 0, fee: 0 });
   passed("a wrong answer is a Stray worth nothing");
 
   assert.equal(await answerQuestion(userId, game.sessionId, 1, NOBODY), "not_open");
