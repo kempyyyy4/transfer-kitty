@@ -49,6 +49,12 @@ const STYLES: Record<HairStyle, { x: number; y: number; rows: readonly string[] 
       ".O..........O.",
     ],
   },
+  /** Shaved, with one small tuft left at the front. */
+  tuft: {
+    x: 6,
+    y: 2,
+    rows: [".HH.", "OHhO"],
+  },
   braids: {
     x: 1,
     y: 1,

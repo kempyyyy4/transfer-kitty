@@ -28,7 +28,7 @@ export function HomePanel() {
     <div className="relative w-full max-w-sm">
       <Link
         href="/play"
-        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-7 text-2xl text-floodlight sm:text-3xl"
+        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-[2.6vh] text-2xl text-floodlight sm:text-3xl"
       >
         {BUTTON_LABELS[today?.played ?? "not_started"]}
         {today?.played === "completed" ? (

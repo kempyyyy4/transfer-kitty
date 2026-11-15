@@ -2,6 +2,7 @@ import { compose, type Grid, type Layer } from "../pixel/grid";
 import { BODY_ROWS, CAT_HEIGHT, CAT_WIDTH, EARS, SHIRT_MIDDLE } from "./base";
 import { accessoryLayers, maneLayer, markingLayers } from "./extras";
 import { hairLayer } from "./hair";
+import { poseLayers } from "./pose";
 import type { CatLook, KitColours } from "./look";
 
 /** Room round the cat for manes, bags and mirrors that reach past its edges. */
@@ -71,6 +72,7 @@ export function buildCat(look: CatLook): Grid {
     ...bodyLayers(look),
     ...markingLayers(look.markings, look),
     ...(look.hair ? [hairLayer(look.hair)] : []),
+    ...(look.pose ? poseLayers(look.pose, look) : []),
     ...look.accessories.flatMap((accessory) => accessoryLayers(accessory, look)),
   ];
   return compose(CANVAS_WIDTH, CANVAS_HEIGHT, layers.map(shift));

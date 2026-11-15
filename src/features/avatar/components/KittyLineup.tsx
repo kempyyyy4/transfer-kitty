@@ -1,40 +1,61 @@
+import type { CatLook } from "../cat/look";
 import { KIT_MASCOT, LINEUP } from "../cast";
 import { CatSprite } from "./CatSprite";
 
-/** Where Kit stands in the line-up: the middle. */
-const KIT_POSITION = Math.floor(LINEUP.length / 2);
-/** The kitty doing keepy-ups. */
-const JUGGLER = 1;
+/** The back-row kitty doing keepy-ups. */
+const JUGGLER = 4;
 
-/** The home screen's team photo: the line-up with Kit in the middle, bobbing on the spot. */
+interface Member {
+  look: CatLook;
+  label: string;
+}
+
+/**
+ * The home screen's team photo: a back row standing taller and a front row with Kit in the
+ * middle, everyone bobbing on the spot. Sized from the screen's width and height, so it
+ * never pushes the kick-off button off a phone.
+ */
 export function KittyLineup() {
-  const team = [...LINEUP];
-  team.splice(KIT_POSITION, 0, { look: KIT_MASCOT, label: "Kit, the mascot" });
+  const back = LINEUP.filter((member) => member.row === "back");
+  const front: Member[] = LINEUP.filter((member) => member.row === "front");
+  front.splice(Math.floor(front.length / 2), 0, { look: KIT_MASCOT, label: "Kit, the mascot" });
 
   return (
-    <div
-      className="flex items-end justify-center"
-      aria-label="The Transfer Kitty line-up"
-      role="img"
-    >
-      {team.map((member, index) => {
-        const isKit = member.look === KIT_MASCOT;
-        return (
-          <div
-            key={member.label}
-            className="animate-kitty-bob relative -mx-[1.5vw] sm:-mx-1"
-            style={{ animationDelay: `${(index % 4) * 180}ms` }}
-          >
-            {index === JUGGLER ? <Ball /> : null}
-            <CatSprite
-              look={member.look}
-              label=""
-              scale={4}
-              className={isKit ? "h-auto w-[17vw] max-w-[112px]" : "h-auto w-[13vw] max-w-[88px]"}
-            />
-          </div>
-        );
-      })}
+    <div className="flex flex-col items-center" aria-label="The Transfer Kitty team" role="img">
+      <Row members={back} size="w-[min(15vw,8.5vh)]" juggler={JUGGLER} />
+      <Row members={front} size="w-[min(17vw,10vh)]" className="-mt-[2.5vh]" />
+    </div>
+  );
+}
+
+function Row({
+  members,
+  size,
+  juggler,
+  className = "",
+}: {
+  members: readonly Member[];
+  size: string;
+  juggler?: number;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-end justify-center ${className}`}>
+      {members.map((member, index) => (
+        <div
+          key={member.label}
+          className="animate-kitty-bob relative -mx-[1vw]"
+          style={{ animationDelay: `${(index * 230) % 900}ms` }}
+        >
+          {index === juggler ? <Ball /> : null}
+          <CatSprite
+            look={member.look}
+            label=""
+            scale={4}
+            className={`h-auto ${member.look === KIT_MASCOT ? "w-[min(20vw,12vh)] max-w-[112px]" : `${size} max-w-[96px]`}`}
+          />
+        </div>
+      ))}
     </div>
   );
 }
@@ -46,7 +67,7 @@ function Ball() {
       viewBox="0 0 4 4"
       shapeRendering="crispEdges"
       aria-hidden
-      className="animate-keepy-up absolute bottom-0 left-1/2 h-[2.4vw] max-h-4 w-[2.4vw] max-w-4 -translate-x-1/2"
+      className="animate-keepy-up absolute bottom-0 left-1/2 h-[min(2.4vw,1.4vh)] w-[min(2.4vw,1.4vh)] -translate-x-1/2"
     >
       <rect x={1} width={2} height={4} fill="#f2f4ff" />
       <rect y={1} width={4} height={2} fill="#f2f4ff" />

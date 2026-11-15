@@ -54,9 +54,7 @@ export function SiteMenu() {
               href={link.href}
               onClick={() => setOpen(false)}
               aria-current={pathname === link.href ? "page" : undefined}
-              className={`pixel-button w-full max-w-xs px-4 py-3 text-center text-xs ${
-                pathname === link.href ? "border-floodlight text-floodlight" : ""
-              }`}
+              className="pixel-button w-full max-w-xs px-4 py-3 text-center text-xs"
             >
               {link.label}
             </Link>

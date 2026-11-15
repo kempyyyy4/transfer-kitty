@@ -135,3 +135,19 @@ export function playLionRoar(): void {
   growl.stop(now + length);
   rasp.stop(now + length);
 }
+
+/** A short click as the ball passes a kitty, higher for each tier further along. */
+export function playTick(level: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  tone(ctx, "square", 330 + level * 70, ctx.currentTime, 0.05, 0.05);
+}
+
+/** The thump of a boot on the ball. */
+export function playKick(): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const osc = tone(ctx, "sine", 160, now, 0.18, 0.35);
+  osc.frequency.exponentialRampToValueAtTime(50, now + 0.18);
+}

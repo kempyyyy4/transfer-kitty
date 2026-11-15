@@ -131,6 +131,6 @@ The gauge and its transfer-record milestones were removed after Tom's play-test,
 
 ## 15. After the first play-test
 
-- **The line-up kitties** on the home screen are loosely styled on famous players' looks (a bleached crop, a man bun, an afro, long hair with an alice band, a mohawk, braids), as you chose. They are not named. Add them to the legal check.
+- **The team photo kitties are close likenesses** of nine famous players in national-style kits (Portugal, Norway, Argentina, England, France, Brazil) doing their best-known celebrations, as you chose. They are never named. **The legal check must clear them before launch**; some celebrations are trademarked.
 - **45 seconds per question** makes looking answers up easier. Worth watching once real players arrive.
 - **Future daily puzzles on the dev database** were rebuilt under the new variety rule.

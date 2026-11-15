@@ -15,7 +15,10 @@ export type Accessory =
   | "mirror"
   | "mud";
 
-export type HairStyle = "crop" | "bun" | "mohawk" | "afro" | "long" | "braids";
+export type HairStyle = "crop" | "bun" | "mohawk" | "afro" | "long" | "braids" | "tuft";
+
+/** A celebration: where the arms go. */
+export type Pose = "armsUp" | "pointUp" | "armsOut" | "folded" | "fistUp";
 
 export interface Hair {
   style: HairStyle;
@@ -45,5 +48,6 @@ export interface CatLook {
   /** A lion's mane, drawn behind the head. */
   mane?: { main: string; shade: string };
   hair?: Hair;
+  pose?: Pose;
   accessories: readonly Accessory[];
 }

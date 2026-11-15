@@ -175,6 +175,15 @@ Git, GitHub CLI and Node.js were installed on 10 November 2026 with Tom's go-ahe
 - **The line-up kitties are loosely styled on famous players' looks** (hair, kit colours), by Tom's choice and against the brief's original "must not resemble any real footballer". They are never named or copied exactly, and this is on the legal check list.
 - **Speed**: the live site runs in Vercel's Frankfurt region beside the database, and starting a round returns its first question in the same request.
 
+### 2.7 Second play-test (15 November 2026, agreed)
+
+- **The home team photo uses close likenesses of famous players** (nine stars in national-style kits doing their best-known celebrations), by Tom's choice after being told the legal risk. Never named. **They must pass the legal check before launch**, and may need redrawing.
+- **Tiers will be gentler**: exactly one Galacticat per question, with more answers in the expensive tiers below it, studying Krillion's split. To be proposed with numbers before it changes.
+- **One daily**, plus a **round builder** for lifetime players (choose league or competition, decade and difficulty).
+- **Questions to come**: drop obscure clubs from club questions; add manager, team and stadium questions; a bell curve of the day's scores on the results.
+- **Design rules**: never purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes or over-the-top scroll animations. Animations smooth and tactile; buttons lift on hover and press in when tapped.
+- **The game has its own scene**: a single floodlight in the dark, not the stadium. The kick after each answer starts fast and slows to a crawl, ticking past each tier kitty, then the kitty takes a touch that matches its tier.
+
 ## 3. Costs and outside checks
 
 Prices read from each company's pricing page on 10 November 2026. They can change.

@@ -189,7 +189,10 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Buttons use the `pixel-button` utility, boxes `pixel-panel`, text boxes `pixel-input`. Pixel-font button labels are written in capitals.
 - Avatar and kit options live in `src/config/avatar-items.ts` and `src/config/kits.ts`. A player's avatar is stored as item IDs, so never rename an ID once players can pick it. The server checks every item exists and is free or owned before saving (`checkChoice`).
 - Characters are drawn from pixel grids in `src/features/avatar`: `cat/base.ts` is the body, `cat/extras.ts` the markings and accessories, `cast.ts` the mascot and tier characters. Change colours through a `CatLook`, never by editing the body rows.
-- Animations respect `prefers-reduced-motion` (see the end of `globals.css`).
+- Animations respect `prefers-reduced-motion` (see the end of `globals.css`). They ease smoothly; only the crowd swap and the old-TV flicker use steps.
+- Never use: purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes, or over-the-top scroll animations.
+- Hover styles only apply on devices that hover (`@media (hover: hover)`), so tapped buttons never stay lit on phones. Menus never keep the current page highlighted.
+- The game screen has its own scene (`src/components/scene/GameScene.tsx`) instead of the stadium.
 - Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
 - Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top left for the menu button and the top right for the sound button.
 - The animated stadium (`src/components/scene`) sits behind every screen, dimmed except on the home screen. Inner screens are opened from the menu (`src/components/SiteMenu.tsx`); keep the home screen to the title, line-up, kick-off button, description and policy links.
@@ -199,7 +202,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 - No real club crests, league logos, sponsor logos, player likenesses or photos.
 - Kits use made-up names and colours only.
 - Kit the mascot and every sprite must be original artwork drawn as code.
-- The home line-up (`LINEUP` in `src/features/avatar/cast.ts`) is loosely styled on famous players' looks, by Tom's choice (PLAN.md 2.6). Never name them, copy a face or a real kit exactly, or add a likeness elsewhere without asking.
+- The home team photo (`LINEUP` in `src/features/avatar/cast.ts`) shows close likenesses of famous players, by Tom's choice (PLAN.md 2.7). It must pass the legal check before launch. Never name them anywhere, and never add a likeness elsewhere without asking.
 - No random packs, loot boxes or mystery items. Direct purchase only.
 
 ## Keeping this file current

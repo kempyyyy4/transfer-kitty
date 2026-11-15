@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader } from "@/components/Loader";
+import { GameScene } from "@/components/scene/GameScene";
 import { GAME_RULES } from "@/config/game";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { formatFee } from "@/features/scoring";
@@ -130,7 +131,14 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
     }
   }
 
-  if (view.kind === "loading") return <Loader />;
+  if (view.kind === "loading") {
+    return (
+      <>
+        <GameScene />
+        <Loader />
+      </>
+    );
+  }
   if (view.kind === "completed") {
     return <SummaryPanel sessionId={view.sessionId} summary={view.summary} />;
   }
@@ -155,6 +163,7 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   const kitty = kittyShown(view);
   return (
     <section className="flex flex-col gap-4">
+      <GameScene />
       <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
         <span>
           {question.position}/{question.total}
