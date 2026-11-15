@@ -3,6 +3,7 @@ import { DAILY_PUZZLE, GAME_RULES } from "@/config/game";
 import { getAccess } from "@/features/payments/server";
 import { getPuzzleQuestionIds, pickPracticeQuestions, startPracticeSession } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
+import { firstState } from "./service";
 import type { PracticeRound, StartedGame } from "./types";
 
 export type PracticeStartOutcome =
@@ -47,5 +48,8 @@ export async function startPracticeGame(
     packId: round.mode === "pack" ? round.packId : null,
     questionIds,
   });
-  return { status: "started", game: { sessionId, puzzleNumber: null } };
+  return {
+    status: "started",
+    game: { sessionId, puzzleNumber: null, first: await firstState(userId, sessionId) },
+  };
 }

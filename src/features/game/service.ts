@@ -57,8 +57,14 @@ export async function startDailyGame(userId: string, now: Date): Promise<Started
   const today = ukDayOf(now);
   const puzzleNumber = await todaysPuzzleNumber(today);
   const sessionId = await startDailySession(userId, today);
+  return { sessionId, puzzleNumber, first: await firstState(userId, sessionId) };
+}
 
-  return { sessionId, puzzleNumber };
+/** The state a newly started round opens on. The session was just made for this user. */
+export async function firstState(userId: string, sessionId: string): Promise<PlayState> {
+  const state = await advanceGame(userId, sessionId);
+  if (!state) throw new Error("A round that was just started could not be found.");
+  return state;
 }
 
 /**

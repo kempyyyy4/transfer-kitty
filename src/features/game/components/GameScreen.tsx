@@ -12,6 +12,7 @@ import type {
   GameSummary,
   OpenQuestion,
   PlayerSuggestion,
+  PlayState,
   PracticeRound,
 } from "../types";
 import { AnswerInput, type AnswerDraft } from "./AnswerInput";
@@ -48,25 +49,31 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   // What is in the answer box and listed under it, so it can still be sent if time runs out.
   const draft = useRef<AnswerDraft>(EMPTY_DRAFT);
 
+  /**
+   * Shows a question or the summary. The server starts its clock somewhere between asking
+   * and hearing back, so counting from the moment of asking puts this deadline at or before
+   * the server's, never after.
+   */
+  const show = useCallback((id: string, state: PlayState, askedAt: number) => {
+    answering.current = false;
+    draft.current = EMPTY_DRAFT;
+    setView(
+      state.status === "completed"
+        ? { kind: "completed", sessionId: id, summary: state.summary }
+        : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
+    );
+  }, []);
+
   const showNext = useCallback(async () => {
     const id = sessionId.current;
     if (!id) return;
     try {
-      // The server starts its clock somewhere between asking and hearing back. Counting
-      // from the moment of asking puts this deadline at or before the server's, never after.
       const askedAt = performance.now();
-      const state = await gameApi.next(id);
-      answering.current = false;
-      draft.current = EMPTY_DRAFT;
-      setView(
-        state.status === "completed"
-          ? { kind: "completed", sessionId: id, summary: state.summary }
-          : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
-      );
+      show(id, await gameApi.next(id), askedAt);
     } catch (error) {
       setView(errorView(error));
     }
-  }, []);
+  }, [show]);
 
   const rememberDraft = useCallback((latest: AnswerDraft) => {
     draft.current = latest;
@@ -78,13 +85,14 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
+    const askedAt = performance.now();
     (round ? gameApi.practice(round) : gameApi.start())
       .then((game) => {
         sessionId.current = game.sessionId;
-        return showNext();
+        show(game.sessionId, game.first, askedAt);
       })
       .catch((error: unknown) => setView(errorView(error)));
-  }, [showNext, round]);
+  }, [show, round]);
 
   /**
    * Time is up: send whatever name is in the box rather than nothing. The suggestions

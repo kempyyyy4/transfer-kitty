@@ -13,6 +13,8 @@ export interface StartedGame {
   sessionId: string;
   /** Null for a round that is not the daily. */
   puzzleNumber: number | null;
+  /** The first question, or the summary if the round is already over, saving a request. */
+  first: PlayState;
 }
 
 export interface OpenQuestion {
