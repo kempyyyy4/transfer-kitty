@@ -174,16 +174,15 @@ svg[shape-rendering="crispEdges"],
 }
 
 @keyframes tier-flash {
-  0%,
-  40%,
-  80% {
-    color: var(--color-floodlight);
-    transform: scale(1.08);
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
   }
-  20%,
-  60%,
+  60% {
+    transform: scale(1.18);
+    opacity: 1;
+  }
   100% {
-    color: var(--color-chalk);
     transform: scale(1);
   }
 }

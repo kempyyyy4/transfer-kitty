@@ -142,9 +142,10 @@ export function BallJourney({ tier, onDone }: Props) {
               style={{ left: (marker.level + 1) * SPACING }}
             >
               <span
-                className={`mb-2 border-2 border-black px-1 font-pixel text-[8px] whitespace-nowrap ${
-                  here ? "bg-floodlight text-black" : "bg-night-deep/90 text-chalk"
+                className={`mb-2 border-2 border-black px-1 font-pixel whitespace-nowrap text-black ${
+                  here ? "text-[10px]" : "text-[8px]"
                 }`}
+                style={{ backgroundColor: marker.colour }}
               >
                 {marker.name.toUpperCase()} {formatFee(marker.feeGbp)}
               </span>

@@ -11,7 +11,7 @@ import { ShareButton } from "@/features/share";
 import { gameApi } from "../api-client";
 import type { GameSummary, QuestionAnswers } from "../types";
 import { AnswerList } from "./AnswerList";
-import { outcomeLine, tierName } from "./tier-label";
+import { outcomeLine, tierColour, tierName } from "./tier-label";
 
 interface Props {
   sessionId: string;
@@ -78,7 +78,10 @@ export function SummaryPanel({ sessionId, summary }: Props) {
                 <div>
                   <p className="text-xl">{outcomeLine(answer.outcome, answer.answer)}</p>
                   <p className="text-lg">
-                    <span className="font-pixel text-[10px] text-floodlight">
+                    <span
+                      className="font-pixel text-[10px]"
+                      style={{ color: tierColour(answer.tier) }}
+                    >
                       {tierName(answer.tier).toUpperCase()}
                     </span>{" "}
                     · {formatFee(answer.fee)}

@@ -7,7 +7,7 @@ import { playAnnoyedMeow, playCashRegister, playLionRoar } from "@/features/audi
 import type { AnswerFeedback } from "../types";
 import { BallJourney } from "./BallJourney";
 import { Scoreboard } from "./Scoreboard";
-import { outcomeLine, tierName } from "./tier-label";
+import { outcomeLine, tierColour, tierName } from "./tier-label";
 
 const TOP_LEVEL = Math.max(...TIERS.map((tier) => tier.level));
 
@@ -48,7 +48,12 @@ export function FeedbackPanel({ answer, feedback, isLast, onContinue }: Props) {
 
       {counted ? (
         <>
-          <p className="animate-tier-flash font-pixel text-lg">{tierName(feedback.tier)}</p>
+          <p
+            className="animate-tier-flash font-pixel text-xl"
+            style={{ color: tierColour(feedback.tier) }}
+          >
+            {tierName(feedback.tier)}
+          </p>
           {tier ? (
             <TierSprite
               spriteKey={tier.spriteKey}

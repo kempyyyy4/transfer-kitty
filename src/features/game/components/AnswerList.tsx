@@ -5,9 +5,12 @@ import { formatFee } from "@/features/scoring";
 import { toSearchName } from "@/lib/search-name";
 import type { QuestionAnswers } from "../types";
 import { ReportMissing } from "./ReportMissing";
-import { tierName } from "./tier-label";
+import { tierColour, tierName } from "./tier-label";
 
-/** Every valid answer to one question, with a search box. Shown only after the round. */
+/**
+ * Every valid answer to one question, grouped by tier with the rarest first, each tier in
+ * its own colour, with a search box. Shown only after the round.
+ */
 export function AnswerList({
   sessionId,
   question,
@@ -45,22 +48,33 @@ export function AnswerList({
           className="pixel-input p-2"
         />
       </label>
-      <ul className="flex max-h-80 flex-col overflow-y-auto text-lg">
-        {shown.map((answer) => (
-          <li
-            key={answer.id}
-            className={`flex justify-between gap-2 border-b-2 border-stand py-1 ${
-              answer.id === question.yourAnswerId ? "text-floodlight" : ""
-            }`}
-          >
-            <span>{answer.name}</span>
-            <span className="shrink-0 text-right">
-              {tierName(answer.tier)} · {formatFee(answer.fee)}
-            </span>
-          </li>
+      <div className="flex max-h-96 flex-col gap-3 overflow-y-auto pr-1">
+        {groupByTier(shown).map(({ tier, fee, answers }) => (
+          <section key={tier}>
+            <h3
+              className="sticky top-0 flex justify-between border-b-4 px-2 py-1 font-pixel text-[10px] text-night-deep"
+              style={{ backgroundColor: tierColour(tier), borderColor: "#000" }}
+            >
+              <span>
+                {tierName(tier).toUpperCase()} · {answers.length}
+              </span>
+              <span>{formatFee(fee)}</span>
+            </h3>
+            <ul className="flex flex-wrap gap-x-3 gap-y-1 px-2 py-2 text-lg">
+              {answers.map((answer) => (
+                <li
+                  key={answer.id}
+                  className={answer.id === question.yourAnswerId ? "font-bold text-floodlight" : ""}
+                >
+                  {answer.id === question.yourAnswerId ? "▶ " : ""}
+                  {answer.name}
+                </li>
+              ))}
+            </ul>
+          </section>
         ))}
-        {shown.length === 0 ? <li className="py-1">No answer matches that name.</li> : null}
-      </ul>
+        {shown.length === 0 ? <p className="py-1">No answer matches that name.</p> : null}
+      </div>
       <ReportMissing
         sessionId={sessionId}
         position={question.position}
@@ -68,4 +82,18 @@ export function AnswerList({
       />
     </div>
   );
+}
+
+/** Answers in tier groups, rarest tier first. Within a tier, the server's order is kept. */
+function groupByTier(answers: QuestionAnswers["answers"]) {
+  const groups = new Map<
+    number,
+    { tier: number; fee: number; answers: QuestionAnswers["answers"] }
+  >();
+  for (const answer of answers) {
+    const group = groups.get(answer.tier) ?? { tier: answer.tier, fee: answer.fee, answers: [] };
+    group.answers.push(answer);
+    groups.set(answer.tier, group);
+  }
+  return [...groups.values()].sort((a, b) => b.tier - a.tier);
 }

@@ -12,6 +12,8 @@ export interface Tier {
   spriteKey: string;
   /** One per answer in the spoiler-free share text. Rarer tiers are warmer colours. */
   shareEmoji: string;
+  /** The tier's colour on screen, matching its share square. */
+  colour: string;
   meaning: string;
 }
 
@@ -23,6 +25,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 0,
     spriteKey: "stray",
     shareEmoji: "⬛",
+    colour: "#6b6f80",
     meaning: "Wrong answer or timed out",
   },
   {
@@ -32,6 +35,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 500_000,
     spriteKey: "copycat",
     shareEmoji: "⬜",
+    colour: "#e9eef5",
     meaning: "The answer everyone gave",
   },
   {
@@ -41,6 +45,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 2_000_000,
     spriteKey: "alley-cat",
     shareEmoji: "🟫",
+    colour: "#b07a4a",
     meaning: "Very common",
   },
   {
@@ -50,6 +55,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 8_000_000,
     spriteKey: "squad-moggy",
     shareEmoji: "🟩",
+    colour: "#3fd17a",
     meaning: "Common",
   },
   {
@@ -59,6 +65,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 20_000_000,
     spriteKey: "tomcat",
     shareEmoji: "🟦",
+    colour: "#4a8cff",
     meaning: "Decent",
   },
   {
@@ -68,6 +75,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 40_000_000,
     spriteKey: "pick-of-the-litter",
     shareEmoji: "🟪",
+    colour: "#b07cff",
     meaning: "Rare",
   },
   {
@@ -77,6 +85,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 70_000_000,
     spriteKey: "big-cat",
     shareEmoji: "🟧",
+    colour: "#ff8a1f",
     meaning: "Very rare",
   },
   {
@@ -86,6 +95,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 100_000_000,
     spriteKey: "galacticat",
     shareEmoji: "🦁",
+    colour: "#ffd23f",
     meaning: "Hardly anyone said it",
   },
 ];

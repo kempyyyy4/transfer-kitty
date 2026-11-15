@@ -6,6 +6,11 @@ export function tierName(level: number): string {
   return TIERS.find((tier) => tier.level === level)?.name ?? "";
 }
 
+/** The tier's colour on screen. */
+export function tierColour(level: number): string {
+  return TIERS.find((tier) => tier.level === level)?.colour ?? "#f2f4ff";
+}
+
 /** A short line saying what happened, for the player. */
 export function outcomeLine(outcome: AnswerOutcome, answer: string | null): string {
   if (outcome === "timeout") return "Out of time";
