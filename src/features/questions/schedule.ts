@@ -1,5 +1,5 @@
 import "server-only";
-import { DAILY_PUZZLE, GAME_RULES } from "@/config/game";
+import { DAILY_PUZZLE, GAME_RULES, TEMPLATE_FAMILIES } from "@/config/game";
 import {
   createDailyPuzzle,
   getScheduledPuzzleDates,
@@ -46,6 +46,8 @@ export async function scheduleDailyPuzzles(today: string): Promise<string[]> {
     const picked = pickDailyQuestions(candidates.map(toDailyCandidate), {
       count: GAME_RULES.questionsPerRound,
       maxPerTemplate: DAILY_PUZZLE.maxQuestionsPerTemplate,
+      families: TEMPLATE_FAMILIES,
+      familyLimits: DAILY_PUZZLE.familyLimits,
     });
     if (!picked) {
       throw new Error(`Not enough unused questions left to build the puzzle for ${day}.`);

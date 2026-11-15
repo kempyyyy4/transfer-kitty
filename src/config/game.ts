@@ -1,7 +1,8 @@
 /** Core game rules. Change them here, never in components or logic. */
 export const GAME_RULES = {
   questionsPerRound: 7,
-  answerSeconds: 25,
+  /** Tom changed this from the brief's 25 seconds to 45 on 14 November 2026. */
+  answerSeconds: 45,
   /** Extra time the server allows for the answer to travel over the network. */
   answerGraceMs: 1500,
   /** A question needs at least this many valid answers to be kept. */
@@ -28,8 +29,24 @@ export const DAILY_PUZZLE = {
   minProminence: 400,
   /** Which answer prominence is read from, counting from 0 for the most popular. */
   prominenceAnswerRank: 2,
-  /** At most this many of a day's questions may come from the same template. */
-  maxQuestionsPerTemplate: 2,
+  /** At most this many of a day's questions may come from the same template. Tom chose 1. */
+  maxQuestionsPerTemplate: 1,
+  /**
+   * Templates that read alike ("Name a player who played for <club>...") form a family, and
+   * a day has at most this many from one family.
+   */
+  familyLimits: { club: 3 } as Record<string, number>,
   /** How many random candidates are drawn to choose a day's questions from. */
   candidateSampleSize: 300,
 } as const;
+
+/** Which family each template belongs to, for DAILY_PUZZLE.familyLimits. */
+export const TEMPLATE_FAMILIES: Readonly<Record<string, string>> = {
+  "club-season": "club",
+  "club-since-2012": "club",
+  "club-decade": "club",
+  "club-manager": "club",
+  "club-cup": "club",
+  "club-scorer": "club",
+  "nationality-club": "club",
+};

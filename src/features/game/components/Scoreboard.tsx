@@ -36,7 +36,7 @@ export function Scoreboard({ fee, onDone }: { fee: number; onDone?: () => void }
     <div
       aria-live="polite"
       aria-label={`Transfer fee ${formatFee(fee)}`}
-      className="border-4 border-stand bg-black px-4 py-3 font-pixel text-2xl text-scoreboard"
+      className="border-4 border-stand bg-black px-5 py-4 font-pixel text-4xl text-scoreboard"
       style={{ textShadow: "0 0 6px #ffb000" }}
     >
       {formatFee(shown)}

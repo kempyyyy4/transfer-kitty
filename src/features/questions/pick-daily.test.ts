@@ -84,4 +84,21 @@ describe("pickDailyQuestions", () => {
     expect(pickDailyQuestions(variedCandidates(6), LIMITS)).toBeNull();
     expect(pickDailyQuestions([], LIMITS)).toBeNull();
   });
+
+  it("keeps to the family limit when it can, and relaxes it when it must", () => {
+    const families = { "club-a": "club", "club-b": "club", "club-c": "club", "club-d": "club" };
+    const clubby = ["club-a", "club-b", "club-c", "club-d"].map((key, index) =>
+      candidate(`c${index}`, key, 100 + index),
+    );
+    const others = Array.from({ length: 6 }, (_, index) =>
+      candidate(`o${index}`, `other-${index}`, 200 + index),
+    );
+    const limits = { count: 7, maxPerTemplate: 1, families, familyLimits: { club: 2 } };
+
+    const picked = pickDailyQuestions([...clubby, ...others], limits) ?? [];
+    expect(picked.filter((question) => question.id.startsWith("c"))).toHaveLength(2);
+
+    const tight = pickDailyQuestions([...clubby, ...others.slice(0, 3)], limits) ?? [];
+    expect(tight).toHaveLength(7);
+  });
 });

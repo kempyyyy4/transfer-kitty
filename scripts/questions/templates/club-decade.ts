@@ -3,12 +3,16 @@ import { groupIntoQuestions, LEAGUE_IDS, slugify } from "../build";
 import type { AnswerRow, DraftQuestion, Template } from "../types";
 import type { Warehouse } from "../../data/warehouse";
 
-/** The decades questions are written about. `current` only changes the wording. */
+/**
+ * The decades questions are written about. Prompts name the years ("between 2000 and
+ * 2009"), because "the 2000s" can also be read as every year from 2000 on.
+ * `current` only changes the wording. The label stays in keys and tags.
+ */
 const DECADES = [
-  { label: "1990s", from: 1990, to: 1999, current: false },
-  { label: "2000s", from: 2000, to: 2009, current: false },
-  { label: "2010s", from: 2010, to: 2019, current: false },
-  { label: "2020s", from: 2020, to: 2029, current: true },
+  { label: "1990s", from: 1990, to: 1999, span: "between 1990 and 1999", current: false },
+  { label: "2000s", from: 2000, to: 2009, span: "between 2000 and 2009", current: false },
+  { label: "2010s", from: 2010, to: 2019, span: "between 2010 and 2019", current: false },
+  { label: "2020s", from: 2020, to: 2029, span: "since 2020", current: true },
 ] as const;
 
 type Decade = (typeof DECADES)[number];
@@ -19,7 +23,7 @@ interface Row extends AnswerRow {
 }
 
 /**
- * "Name a player who played for Arsenal FC in the 1990s."
+ * "Name a player who played for Arsenal FC between 1990 and 1999."
  * Years from 2012/13 come from match dates. Earlier years come from Wikidata spells,
  * which need a start year to be placed in a decade.
  */
@@ -67,7 +71,7 @@ function questionsForDecade(
   return groupIntoQuestions(rows, FULL_INVOLVEMENT.careerAppearances, (row) => ({
     dedupeKey: `club-decade:${row.club_id}:${decade.label}`,
     templateKey,
-    prompt: `Name a player who ${verb} for ${row.club_name} in the ${decade.label}.`,
+    prompt: `Name a player who ${verb} for ${row.club_name} ${decade.span}.`,
     params: { clubId: row.club_id, decade: decade.label },
     tags: [
       { type: "club", value: slugify(row.club_name) },

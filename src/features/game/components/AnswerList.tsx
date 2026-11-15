@@ -55,7 +55,7 @@ export function AnswerList({
           >
             <span>{answer.name}</span>
             <span className="shrink-0 text-right">
-              {tierName(answer.tier)} · {formatFee(answer.fee)} · {answer.percent}%
+              {tierName(answer.tier)} · {formatFee(answer.fee)}
             </span>
           </li>
         ))}

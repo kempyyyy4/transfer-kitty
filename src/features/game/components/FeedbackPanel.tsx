@@ -5,6 +5,7 @@ import { STRAY_LEVEL, TIERS } from "@/config/tiers";
 import { TierSprite } from "@/features/avatar";
 import { playAnnoyedMeow, playCashRegister, playLionRoar } from "@/features/audio";
 import type { AnswerFeedback } from "../types";
+import { BallJourney } from "./BallJourney";
 import { Scoreboard } from "./Scoreboard";
 import { outcomeLine, tierName } from "./tier-label";
 
@@ -17,8 +18,12 @@ interface Props {
   onContinue: () => void;
 }
 
-/** After each answer: the fee ticks up, the tier name flashes and its character appears. */
+/**
+ * After each answer: Kit kicks the ball to the tier you earned, then the fee ticks up, the
+ * tier name flashes and its character appears.
+ */
 export function FeedbackPanel({ answer, feedback, isLast, onContinue }: Props) {
+  const [arrived, setArrived] = useState(false);
   const [counted, setCounted] = useState(false);
   const tier = TIERS.find((candidate) => candidate.level === feedback.tier);
 
@@ -35,7 +40,11 @@ export function FeedbackPanel({ answer, feedback, isLast, onContinue }: Props) {
   return (
     <div className="pixel-panel flex flex-col items-center gap-3 p-4 text-center" role="status">
       <p className="text-xl">{outcomeLine(feedback.outcome, answer)}</p>
-      <Scoreboard fee={feedback.fee} onDone={finishCount} />
+      {arrived ? (
+        <Scoreboard fee={feedback.fee} onDone={finishCount} />
+      ) : (
+        <BallJourney tier={feedback.tier} onDone={() => setArrived(true)} />
+      )}
 
       {counted ? (
         <>
@@ -47,9 +56,6 @@ export function FeedbackPanel({ answer, feedback, isLast, onContinue }: Props) {
               scale={5}
               className="animate-sprite-pop"
             />
-          ) : null}
-          {feedback.outcome === "correct" ? (
-            <p className="text-lg text-chalk-dim">{feedback.percent}% of players said this</p>
           ) : null}
         </>
       ) : null}

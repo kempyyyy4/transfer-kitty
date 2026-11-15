@@ -82,7 +82,6 @@ export function SummaryPanel({ sessionId, summary }: Props) {
                       {tierName(answer.tier).toUpperCase()}
                     </span>{" "}
                     · {formatFee(answer.fee)}
-                    {answer.outcome === "correct" ? ` · ${answer.percent}% said this` : ""}
                   </p>
                 </div>
               </div>

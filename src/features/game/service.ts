@@ -4,7 +4,6 @@ import { TIERS, TOP_LEVEL } from "@/config/tiers";
 import { payRoundCoins } from "@/features/coins/server";
 import { getStreak } from "@/features/profile/server";
 import { puzzleNumberFor, scheduleDailyPuzzles } from "@/features/questions";
-import { percentOfPlayers } from "@/features/scoring";
 import {
   findDailySession,
   getDailyPuzzle,
@@ -111,7 +110,6 @@ export async function answerQuestion(
     outcome: result.outcome,
     tier: result.tier,
     fee: result.fee,
-    percent: percentOfPlayers(result.timesGiven, result.timesPlayed),
   };
 }
 
@@ -135,7 +133,6 @@ export async function getAnswerLists(
       name: answer.name,
       tier: answer.tier,
       fee: FEES_BY_TIER[answer.tier] ?? 0,
-      percent: percentOfPlayers(answer.timesGiven, question.timesPlayed),
     })),
   }));
 }
@@ -174,7 +171,6 @@ export async function getGameSummary(
       tier: answer.tier,
       fee: answer.fee,
       answer: answer.answer,
-      percent: percentOfPlayers(answer.timesGiven, answer.timesPlayed),
     })),
   };
 }

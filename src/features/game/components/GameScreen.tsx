@@ -16,7 +16,6 @@ import type {
 } from "../types";
 import { AnswerInput, type AnswerDraft } from "./AnswerInput";
 import { FeedbackPanel } from "./FeedbackPanel";
-import { KittyGauge } from "./KittyGauge";
 import { SummaryPanel } from "./SummaryPanel";
 import { TimerBar } from "./TimerBar";
 
@@ -147,41 +146,38 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   const { question } = view;
   const kitty = kittyShown(view);
   return (
-    <section className="flex gap-3">
-      <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
-          <span>
-            {question.position}/{question.total}
-          </span>
-          <span className="text-floodlight">KITTY {formatFee(kitty)}</span>
-        </p>
-        <h1 className="text-2xl leading-tight">{question.prompt}</h1>
+    <section className="flex flex-col gap-4">
+      <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
+        <span>
+          {question.position}/{question.total}
+        </span>
+        <span className="text-floodlight">KITTY {formatFee(kitty)}</span>
+      </p>
+      <h1 className="text-2xl leading-tight">{question.prompt}</h1>
 
-        {view.kind === "question" ? (
-          <>
-            <TimerBar
-              key={`timer-${question.position}`}
-              deadline={view.deadline}
-              msTotal={GAME_RULES.answerSeconds * 1000}
-              onExpire={() => void submitTyped(question)}
-            />
-            <AnswerInput
-              key={`answer-${question.position}`}
-              disabled={false}
-              onPick={(player) => void submit(question, player)}
-              onDraftChange={rememberDraft}
-            />
-          </>
-        ) : (
-          <FeedbackPanel
-            answer={view.answer}
-            feedback={view.feedback}
-            isLast={question.position === question.total}
-            onContinue={() => void showNext()}
+      {view.kind === "question" ? (
+        <>
+          <TimerBar
+            key={`timer-${question.position}`}
+            deadline={view.deadline}
+            msTotal={GAME_RULES.answerSeconds * 1000}
+            onExpire={() => void submitTyped(question)}
           />
-        )}
-      </div>
-      <KittyGauge kitty={kitty} />
+          <AnswerInput
+            key={`answer-${question.position}`}
+            disabled={false}
+            onPick={(player) => void submit(question, player)}
+            onDraftChange={rememberDraft}
+          />
+        </>
+      ) : (
+        <FeedbackPanel
+          answer={view.answer}
+          feedback={view.feedback}
+          isLast={question.position === question.total}
+          onContinue={() => void showNext()}
+        />
+      )}
     </section>
   );
 }
