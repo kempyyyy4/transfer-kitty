@@ -22,8 +22,8 @@ export function KittyLineup() {
 
   return (
     <div className="flex flex-col items-center" aria-label="The Transfer Kitty team" role="img">
-      <Row members={back} size="w-[min(15vw,8.5vh)]" juggler={JUGGLER} />
-      <Row members={front} size="w-[min(17vw,10vh)]" className="-mt-[2.5vh]" />
+      <Row members={back} size="w-[min(16vw,10vh)] max-w-[110px]" juggler={JUGGLER} />
+      <Row members={front} size="w-[min(18vw,11.5vh)] max-w-[124px]" className="-mt-[1.5vh]" />
     </div>
   );
 }
@@ -40,11 +40,11 @@ function Row({
   className?: string;
 }) {
   return (
-    <div className={`flex items-end justify-center ${className}`}>
+    <div className={`flex items-end justify-center gap-[2.5vw] ${className}`}>
       {members.map((member, index) => (
         <div
           key={member.label}
-          className="animate-kitty-bob relative -mx-[1vw]"
+          className="animate-kitty-bob relative"
           style={{ animationDelay: `${(index * 230) % 900}ms` }}
         >
           {index === juggler ? <Ball /> : null}
@@ -52,7 +52,7 @@ function Row({
             look={member.look}
             label=""
             scale={4}
-            className={`h-auto ${member.look === KIT_MASCOT ? "w-[min(20vw,12vh)] max-w-[112px]" : `${size} max-w-[96px]`}`}
+            className={`h-auto ${member.look === KIT_MASCOT ? "w-[min(21vw,13vh)] max-w-[144px]" : size}`}
           />
         </div>
       ))}

@@ -4,12 +4,14 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { nextUkMidnight } from "@/lib/time/uk-day";
 import { gameApi } from "../api-client";
+import { startDailyEarly } from "../start-early";
 import type { TodayStatus } from "../types";
 
-const BUTTON_LABELS: Record<TodayStatus["played"], string> = {
-  not_started: "KICK OFF",
-  in_progress: "CARRY ON",
-  completed: "YOUR KITTY",
+/** The button always says KICK OFF; underneath, a line says where today's game stands. */
+const STATUS_LINES: Record<TodayStatus["played"], string | null> = {
+  not_started: null,
+  in_progress: "Carry on where you left off",
+  completed: "See your kitty",
 };
 
 /** The big kick-off button, with the streak flame on its corner. */
@@ -28,12 +30,19 @@ export function HomePanel() {
     <div className="relative w-full max-w-sm">
       <Link
         href="/play"
-        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-[2.6vh] text-2xl text-floodlight sm:text-3xl"
+        onClick={startDailyEarly}
+        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-[2.4vh] text-[clamp(1.6rem,8vw,2.4rem)] text-floodlight"
       >
-        {BUTTON_LABELS[today?.played ?? "not_started"]}
-        {today?.played === "completed" ? (
+        KICK OFF
+        {today && STATUS_LINES[today.played] ? (
           <span className="font-mono text-xl text-chalk">
-            Next puzzle in <Countdown />
+            {STATUS_LINES[today.played]}
+            {today.played === "completed" ? (
+              <>
+                {" "}
+                · next in <Countdown />
+              </>
+            ) : null}
           </span>
         ) : null}
       </Link>

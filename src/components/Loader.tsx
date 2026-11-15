@@ -1,9 +1,12 @@
 const PAWS = [0, 1, 2, 3];
 
-/** "Scouting..." with paw prints walking across. */
+/**
+ * "Scouting..." with paw prints walking across. It fades in only if loading takes longer
+ * than about half a second, so a fast load shows nothing at all.
+ */
 export function Loader() {
   return (
-    <div role="status" className="flex flex-col items-center gap-4 py-10">
+    <div role="status" className="appear-if-slow flex flex-col items-center gap-4 py-10">
       <div className="flex items-end gap-3" aria-hidden>
         {PAWS.map((paw) => (
           <PawPrint key={paw} step={paw} />

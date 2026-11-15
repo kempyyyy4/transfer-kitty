@@ -1,6 +1,6 @@
 /** The Transfer Kitty wordmark: big pixel letters with a hard shadow. */
 export function Logo({ size = "large" }: { size?: "large" | "small" }) {
-  const text = size === "large" ? "text-[clamp(1.8rem,min(9.4vw,6.2vh),4.5rem)]" : "text-sm";
+  const text = size === "large" ? "text-[clamp(2.2rem,min(11vw,7.4vh),5rem)]" : "text-sm";
   return (
     <h1
       className={`inline-block px-2 py-1 text-center leading-tight ${text} font-pixel text-floodlight`}

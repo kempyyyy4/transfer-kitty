@@ -1,33 +1,65 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MenuArt, type MenuArtKind } from "./MenuArt";
 
-const LINKS = [
-  { href: "/", label: "HOME" },
-  { href: "/top-kitties", label: "TOP KITTIES" },
-  { href: "/profile", label: "PROFILE" },
-  { href: "/shop", label: "SHOP" },
-  { href: "/archive", label: "ARCHIVE" },
-  { href: "/packs", label: "THEMED PACKS" },
-  { href: "/unlimited", label: "UNLIMITED" },
-  { href: "/account", label: "ACCOUNT" },
-] as const;
+interface Tile {
+  href: string;
+  title: string;
+  description: string;
+  art: MenuArtKind;
+}
 
-/** The three-line menu button in the top left, opening every screen in the game. */
+/** Unlimited leads the menu, full width and lit up: it is what the unlock is for. */
+const FEATURED: Tile = {
+  href: "/unlimited",
+  title: "UNLIMITED",
+  description: "Endless rounds of 7, whenever you like. No waiting for tomorrow.",
+  art: "ball",
+};
+
+const TILES: readonly Tile[] = [
+  {
+    href: "/top-kitties",
+    title: "TOP KITTIES",
+    description: "Create leagues with your friends and see how you match up.",
+    art: "trophy",
+  },
+  {
+    href: "/profile",
+    title: "PROFILE",
+    description: "Build your cat, guard your streak, see every kitty.",
+    art: "kit",
+  },
+  {
+    href: "/shop",
+    title: "SHOP",
+    description: "Today's kits and gear, plus themed packs.",
+    art: "shirt",
+  },
+  {
+    href: "/archive",
+    title: "ARCHIVE",
+    description: "Replay any day's puzzle you missed.",
+    art: "calendar",
+  },
+];
+
+/** The three-line button, top left, opening a menu of big tiles for every part of the game. */
 export function SiteMenu() {
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     if (!open) return;
-    const close = (event: KeyboardEvent) => {
+    const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
-    window.addEventListener("keydown", close);
-    return () => window.removeEventListener("keydown", close);
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
   }, [open]);
+
+  const close = () => setOpen(false);
 
   return (
     <>
@@ -39,28 +71,77 @@ export function SiteMenu() {
         className="pixel-button fixed top-3 left-3 z-50 flex h-10 w-12 flex-col items-center justify-center gap-1"
       >
         {[0, 1, 2].map((bar) => (
-          <span key={bar} className="block h-1 w-6 bg-current" />
+          <span
+            key={bar}
+            className={`block h-1 w-6 bg-current transition-all duration-200 ${
+              open && bar === 0 ? "translate-y-2 rotate-45" : ""
+            } ${open && bar === 2 ? "-translate-y-2 -rotate-45" : ""} ${
+              open && bar === 1 ? "opacity-0" : ""
+            }`}
+          />
         ))}
       </button>
 
       {open ? (
         <nav
           aria-label="Menu"
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-3 bg-night-deep/95 px-6"
+          className="animate-menu-in fixed inset-0 z-40 flex flex-col overflow-y-auto bg-night-deep/95 px-4 pt-16 pb-6"
         >
-          {LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setOpen(false)}
-              aria-current={pathname === link.href ? "page" : undefined}
-              className="pixel-button w-full max-w-xs px-4 py-3 text-center text-xs"
-            >
-              {link.label}
-            </Link>
-          ))}
+          <div className="mx-auto flex w-full max-w-lg flex-col gap-3">
+            <MenuTile tile={FEATURED} featured onPick={close} />
+            <div className="grid grid-cols-2 gap-3">
+              {TILES.map((tile) => (
+                <MenuTile key={tile.href} tile={tile} onPick={close} />
+              ))}
+            </div>
+            <div className="flex justify-center gap-6 pt-2 font-pixel text-[10px]">
+              <Link href="/" onClick={close} className="text-chalk-dim hover:text-chalk">
+                HOME
+              </Link>
+              <Link href="/account" onClick={close} className="text-chalk-dim hover:text-chalk">
+                ACCOUNT
+              </Link>
+            </div>
+          </div>
         </nav>
       ) : null}
     </>
+  );
+}
+
+function MenuTile({
+  tile,
+  featured = false,
+  onPick,
+}: {
+  tile: Tile;
+  featured?: boolean;
+  onPick: () => void;
+}) {
+  return (
+    <Link
+      href={tile.href}
+      onClick={onPick}
+      className={`pixel-button relative flex flex-col justify-end overflow-hidden p-3 text-left ${
+        featured
+          ? "min-h-36 border-floodlight bg-floodlight text-night-deep hover:text-night-deep"
+          : "min-h-32"
+      }`}
+    >
+      <MenuArt
+        kind={tile.art}
+        className={`absolute -top-2 -right-2 h-24 w-24 ${featured ? "opacity-40" : "opacity-25"}`}
+      />
+      <span className={`relative font-pixel ${featured ? "text-xl" : "text-xs"}`}>
+        {tile.title}
+      </span>
+      <span
+        className={`relative mt-1 font-mono leading-tight ${
+          featured ? "text-xl text-night-deep" : "text-lg text-chalk-dim"
+        }`}
+      >
+        {tile.description}
+      </span>
+    </Link>
   );
 }

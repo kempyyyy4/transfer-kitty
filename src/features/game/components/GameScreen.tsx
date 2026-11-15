@@ -7,6 +7,7 @@ import { GAME_RULES } from "@/config/game";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { formatFee } from "@/features/scoring";
 import { gameApi, GameApiError } from "../api-client";
+import { takeDailyStart } from "../start-early";
 import { bestMatch, confidentMatch } from "../best-match";
 import type {
   AnswerFeedback,
@@ -86,8 +87,10 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    const askedAt = performance.now();
-    (round ? gameApi.practice(round) : gameApi.start())
+    const { started: request, askedAt } = round
+      ? { started: gameApi.practice(round), askedAt: performance.now() }
+      : takeDailyStart();
+    request
       .then((game) => {
         sessionId.current = game.sessionId;
         show(game.sessionId, game.first, askedAt);

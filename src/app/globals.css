@@ -227,6 +227,27 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
+/* The menu drops in and settles. */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 @keyframes twinkle {
   0%,
   100% {
@@ -355,6 +376,13 @@ svg[shape-rendering="crispEdges"],
 .animate-keepy-up {
   animation: keepy-up 0.75s infinite cubic-bezier(0.33, 0, 0.67, 1);
 }
+.animate-menu-in {
+  animation: menu-in 220ms cubic-bezier(0.2, 0.9, 0.3, 1) 1;
+}
+/* Waiting messages stay invisible for a moment, so a quick load never flashes one. */
+.appear-if-slow {
+  animation: fade-in 200ms ease-out 450ms both;
+}
 .animate-speck {
   animation: speck-rise 11s infinite linear;
 }
@@ -398,6 +426,7 @@ svg[shape-rendering="crispEdges"],
   .animate-keepy-up,
   .animate-kickoff,
   .animate-speck,
+  .animate-menu-in,
   .animate-flame {
     animation: none;
   }
