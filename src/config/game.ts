@@ -50,3 +50,15 @@ export const TEMPLATE_FAMILIES: Readonly<Record<string, string>> = {
   "club-scorer": "club",
   "nationality-club": "club",
 };
+
+/**
+ * Club questions in the daily only use clubs most fans know. Clubs are ranked by the fame
+ * of their 25 best-known players. Narrow questions (one season, a cup, scorers, one
+ * nationality, one manager) need a top `narrowRank` club; broad ones (a decade, since
+ * 2012, two clubs, big signings) a top `broadRank` club. Others stay in Unlimited.
+ */
+export const DAILY_CLUBS = {
+  narrowRank: 30,
+  broadRank: 60,
+  narrowTemplates: ["club-season", "club-cup", "club-scorer", "nationality-club", "club-manager"],
+} as const;

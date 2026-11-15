@@ -20,3 +20,6 @@ export const COIN_PACKS = [
  * the three, so the figure never understates what an item costs. Tom chose this.
  */
 export const MONEY_EQUIVALENT_PACK = COIN_PACKS[0];
+
+/** The item shop shows this many kits and avatar items each day, the same for everyone. */
+export const SHOP_ROTATION = { itemsPerDay: 6 } as const;

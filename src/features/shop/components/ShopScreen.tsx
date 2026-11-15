@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Countdown } from "@/components/Countdown";
 import { Loader } from "@/components/Loader";
+import { GameScreen } from "@/features/game";
+import { PackShelf } from "@/features/modes";
 import { COIN_REWARDS } from "@/config/coins";
 import { LifetimeCard } from "@/features/payments";
 import { shopApi, ShopApiError } from "../api-client";
-import { SHOP_SLOTS, SLOT_LABELS } from "../catalogue";
 import type { Shop, ShopItem } from "../types";
 import { CoinPacks } from "./CoinPacks";
 import { ShopItemCard } from "./ShopItemCard";
@@ -17,6 +19,7 @@ export function ShopScreen() {
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [playingPack, setPlayingPack] = useState<string | null>(null);
 
   useEffect(() => {
     shopApi
@@ -45,6 +48,8 @@ export function ShopScreen() {
       setBusy(false);
     }
   }
+
+  if (playingPack) return <GameScreen round={{ mode: "pack", packId: playingPack }} />;
 
   return (
     <section className="flex flex-col gap-4">
@@ -77,29 +82,32 @@ export function ShopScreen() {
 
       {failed ? <p className="text-claret">The shop did not load. Try again.</p> : null}
       {!shop && !failed ? <Loader /> : null}
-      {shop
-        ? SHOP_SLOTS.map((slot) => {
-            const items = shop.items.filter((item) => item.slot === slot && item.priceCoins > 0);
-            if (items.length === 0) return null;
-            return (
-              <div key={slot} className="flex flex-col gap-2">
-                <h2 className="font-pixel text-xs text-chalk">{SLOT_LABELS[slot].toUpperCase()}</h2>
-                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                  {items.map((item) => (
-                    <ShopItemCard
-                      key={`${item.slot}:${item.id}`}
-                      item={item}
-                      canBuy={shop.status === "signed_in" && !busy}
-                      affordable={shop.balance >= item.priceCoins}
-                      onBuy={() => void buy(item)}
-                    />
-                  ))}
-                </ul>
-              </div>
-            );
-          })
-        : null}
+      {shop ? (
+        <div className="flex flex-col gap-2">
+          <h2 className="flex flex-wrap items-baseline justify-between gap-2 font-pixel text-xs text-chalk">
+            TODAY&apos;S ITEMS
+            <span className="font-mono text-lg text-chalk-dim">
+              New items in <Countdown />
+            </span>
+          </h2>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {shop.items.map((item) => (
+              <ShopItemCard
+                key={`${item.slot}:${item.id}`}
+                item={item}
+                canBuy={shop.status === "signed_in" && !busy}
+                affordable={shop.balance >= item.priceCoins}
+                onBuy={() => void buy(item)}
+              />
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
+      <div className="flex flex-col gap-2">
+        <h2 className="font-pixel text-xs text-chalk">THEMED PACKS</h2>
+        <PackShelf onPlay={setPlayingPack} />
+      </div>
       <LifetimeCard />
       <CoinPacks />
 

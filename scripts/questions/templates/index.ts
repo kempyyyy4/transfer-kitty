@@ -8,9 +8,11 @@ import { clubSince2012 } from "./club-since-2012";
 import { cupFinal } from "./cup-final";
 import { cupFinalist } from "./cup-finalist";
 import { hatTrick } from "./hat-trick";
+import { lastSeasonGoals } from "./last-season-goals";
 import { nationalityClub } from "./nationality-club";
 import { nationalityLeague } from "./nationality-league";
 import { seasonGoals } from "./season-goals";
+import { topFiveGoals } from "./top-five-goals";
 import { transferFee } from "./transfer-fee";
 import { twoClubs } from "./two-clubs";
 import { twoLeagues } from "./two-leagues";
@@ -31,6 +33,8 @@ export const TEMPLATES: readonly Template[] = [
   cupFinal,
   cupFinalist,
   seasonGoals,
+  lastSeasonGoals,
+  topFiveGoals,
   hatTrick,
   transferFee,
   worldCup2026,
