@@ -181,7 +181,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 
 - Never write football facts from memory. Every generated question and every valid answer comes from a data source approved in `PLAN.md`.
 - Do not add a data source without a licence that allows commercial use, and not without Tom's approval.
-- Any fact that is not from an approved data source goes in `src/config/manual-facts.ts` and is listed in `QUESTIONS_TO_CHECK.md` for Tom to verify.
+- Any fact that is not from an approved data source must be listed in `QUESTIONS_TO_CHECK.md` for Tom to verify, and kept in one file in `src/config`.
 
 ## The look
 
@@ -191,13 +191,15 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Characters are drawn from pixel grids in `src/features/avatar`: `cat/base.ts` is the body, `cat/extras.ts` the markings and accessories, `cast.ts` the mascot and tier characters. Change colours through a `CatLook`, never by editing the body rows.
 - Animations respect `prefers-reduced-motion` (see the end of `globals.css`).
 - Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
-- Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top right for the sound button.
+- Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top left for the menu button and the top right for the sound button.
+- The animated stadium (`src/components/scene`) sits behind every screen, dimmed except on the home screen. Inner screens are opened from the menu (`src/components/SiteMenu.tsx`); keep the home screen to the title, line-up, kick-off button, description and policy links.
 
 ## Content rules
 
 - No real club crests, league logos, sponsor logos, player likenesses or photos.
 - Kits use made-up names and colours only.
 - Kit the mascot and every sprite must be original artwork drawn as code.
+- The home line-up (`LINEUP` in `src/features/avatar/cast.ts`) is loosely styled on famous players' looks, by Tom's choice (PLAN.md 2.6). Never name them, copy a face or a real kit exactly, or add a likeness elsewhere without asking.
 - No random packs, loot boxes or mystery items. Direct purchase only.
 
 ## Keeping this file current

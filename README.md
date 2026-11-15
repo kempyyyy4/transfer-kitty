@@ -1,6 +1,6 @@
 # Transfer Kitty
 
-The daily football trivia game where obvious answers earn pennies and rare ones earn a fortune. Seven questions a day at midnight UK time, 25 seconds each. Your answers' transfer fees add up to your daily kitty, ranked on the Top Kitties boards.
+The daily football trivia game where obvious answers earn pennies and rare ones earn a fortune. Seven questions a day at midnight UK time, 45 seconds each. Your answers' transfer fees add up to your daily kitty, ranked on the Top Kitties boards.
 
 - `BRIEF.md` is the original brief and the source of truth.
 - `PLAN.md` records the design, the database schema and every decision made along the way.
