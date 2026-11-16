@@ -94,6 +94,15 @@ export function SummaryPanel({ sessionId, summary }: Props) {
         })}
       </ol>
 
+      {daily ? (
+        <Link
+          href="/unlimited"
+          className="pixel-button flex flex-col gap-1 border-floodlight bg-floodlight p-4 text-left text-night-deep"
+        >
+          <span className="font-pixel text-base">PLAY UNLIMITED NOW</span>
+          <span className="font-mono text-xl">Endless rounds of 7, no waiting for tomorrow.</span>
+        </Link>
+      ) : null}
       <AdSlot />
       {daily ? (
         <p className="text-xl">
