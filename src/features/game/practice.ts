@@ -35,6 +35,7 @@ export async function startPracticeGame(
       userId,
       packId: round.mode === "pack" ? round.packId : null,
       today,
+      floorProminence: round.mode === "pack" ? 0 : DAILY_PUZZLE.unlimitedMinProminence,
       reserveProminence: DAILY_PUZZLE.minProminence,
       count: GAME_RULES.questionsPerRound,
     });

@@ -27,6 +27,11 @@ export const DAILY_PUZZLE = {
    * Daily questions must reach this, so even a casual fan can name someone.
    */
   minProminence: 400,
+  /**
+   * Unlimited only serves questions at or above this prominence, so every round is
+   * answerable by most fans. Unfair questions (lesser-known clubs) have prominence 0.
+   */
+  unlimitedMinProminence: 150,
   /** Which answer prominence is read from, counting from 0 for the most popular. */
   prominenceAnswerRank: 2,
   /** At most this many of a day's questions may come from the same template. Tom chose 1. */
@@ -52,15 +57,13 @@ export const TEMPLATE_FAMILIES: Readonly<Record<string, string>> = {
 };
 
 /**
- * Club questions in the daily only use clubs most fans know. Clubs are ranked by the fame
- * of their 25 best-known players. Narrow questions (one season, a cup, scorers, one
- * nationality, one manager) need a top `narrowRank` club; broad ones (a decade, since
- * 2012, two clubs, big signings) a top `broadRank` club. Others stay in Unlimited.
+ * Club questions only use clubs most fans know: any club that has played in the Premier
+ * League since 2012/13, and elsewhere only the `topOtherClubs` best-known clubs, ranked by
+ * the fame of their 25 best-known players. Tom set this on 16 November 2026, so lesser
+ * La Liga or Serie A sides never come up. Questions failing it are never served at all.
  */
 export const DAILY_CLUBS = {
-  narrowRank: 30,
-  broadRank: 60,
-  narrowTemplates: ["club-season", "club-cup", "club-scorer", "nationality-club", "club-manager"],
+  topOtherClubs: 25,
   /** Questions about one final's line-ups are only fair for the finals most fans watch. */
   finalCompetitions: ["CL", "EL", "FAC"],
 } as const;

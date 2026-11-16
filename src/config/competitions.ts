@@ -48,3 +48,23 @@ export const DATA_CUT_OFF_DATE = "2026-07-06";
 export function seasonLabel(season: number): string {
   return `${season}/${String((season + 1) % 100).padStart(2, "0")}`;
 }
+
+/**
+ * Short names fans use, for clubs whose official name in the data is a mouthful.
+ * Applied to question prompts as they are built.
+ */
+export const CLUB_SHORT_NAMES: Readonly<Record<string, string>> = {
+  "Associazione Sportiva Roma": "AS Roma",
+  "Società Sportiva Lazio S.p.A.": "Lazio",
+  "Olympiakos Syndesmos Filathlon Peiraios": "Olympiacos",
+  "Panathinaikos Athlitikos Omilos": "Panathinaikos",
+  "Beşiktaş Jimnastik Kulübü": "Beşiktaş",
+  "Sport Club Corinthians Paulista": "Corinthians",
+  "Clube de Regatas do Flamengo": "Flamengo",
+  "Sociedade Esportiva Palmeiras": "Palmeiras",
+  "Club Atlético River Plate": "River Plate",
+  "Club Atlético Boca Juniors": "Boca Juniors",
+  "São Paulo Futebol Clube": "São Paulo",
+  "Santos Futebol Clube": "Santos",
+  "Grêmio Foot-Ball Porto Alegrense": "Grêmio",
+};

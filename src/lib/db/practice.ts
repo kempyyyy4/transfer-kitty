@@ -7,6 +7,7 @@ export async function pickPracticeQuestions(query: {
   userId: string;
   packId: string | null;
   today: string;
+  floorProminence: number;
   reserveProminence: number;
   count: number;
 }): Promise<string[]> {
@@ -14,6 +15,7 @@ export async function pickPracticeQuestions(query: {
     p_user_id: query.userId,
     p_pack_id: query.packId,
     p_today: query.today,
+    p_floor: query.floorProminence,
     p_reserve: query.reserveProminence,
     p_count: query.count,
   });

@@ -88,16 +88,21 @@ export function SiteMenu() {
           className="animate-menu-in fixed inset-0 z-40 flex flex-col overflow-y-auto bg-night-deep/95 px-4 pt-16 pb-6"
         >
           <div className="mx-auto flex w-full max-w-lg flex-col gap-3">
+            <Link
+              href="/"
+              onClick={close}
+              className="pixel-button flex items-center justify-center gap-3 px-4 py-2 text-xs"
+            >
+              <HomeIcon />
+              HOME
+            </Link>
             <MenuTile tile={FEATURED} featured onPick={close} />
             <div className="grid grid-cols-2 gap-3">
               {TILES.map((tile) => (
                 <MenuTile key={tile.href} tile={tile} onPick={close} />
               ))}
             </div>
-            <div className="flex justify-center gap-6 pt-2 font-pixel text-[10px]">
-              <Link href="/" onClick={close} className="text-chalk-dim hover:text-chalk">
-                HOME
-              </Link>
+            <div className="flex justify-center pt-2 font-pixel text-[10px]">
               <Link href="/account" onClick={close} className="text-chalk-dim hover:text-chalk">
                 ACCOUNT
               </Link>
@@ -143,5 +148,19 @@ function MenuTile({
         {tile.description}
       </span>
     </Link>
+  );
+}
+
+/** A small pixel house. */
+function HomeIcon() {
+  return (
+    <svg viewBox="0 0 7 7" width={14} height={14} shapeRendering="crispEdges" aria-hidden>
+      <rect x={3} y={0} width={1} height={1} fill="currentColor" />
+      <rect x={2} y={1} width={3} height={1} fill="currentColor" />
+      <rect x={1} y={2} width={5} height={1} fill="currentColor" />
+      <rect x={0} y={3} width={7} height={1} fill="currentColor" />
+      <rect x={1} y={4} width={5} height={3} fill="currentColor" />
+      <rect x={3} y={5} width={1} height={2} fill="var(--color-night-deep)" />
+    </svg>
   );
 }
