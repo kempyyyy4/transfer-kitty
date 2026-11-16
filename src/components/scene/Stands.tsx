@@ -1,7 +1,7 @@
 /**
  * The night sky, floodlights and a packed stand, as a wide pixel strip across the top of
  * the scene. The crowd and stars come from a fixed seed, so the server and the browser
- * draw exactly the same picture. Two crowd layers swap back and forth so the fans move.
+ * draw exactly the same picture. A second crowd layer blinks over the first so the fans move.
  */
 
 const WIDTH = 240;
@@ -105,9 +105,7 @@ export function Stands({ className }: { className?: string }) {
 
       <rect y={STAND_TOP} width={WIDTH} height={HEIGHT - STAND_TOP} fill="#1a2140" />
       <rect y={STAND_TOP} width={WIDTH} height={2} fill="#2a3360" />
-      <g className="animate-crowd-a">
-        <Dots dots={CROWD_A} />
-      </g>
+      <Dots dots={CROWD_A} />
       <g className="animate-crowd-b">
         <Dots dots={CROWD_B} />
       </g>

@@ -33,6 +33,8 @@ const BALL_START = 26;
 /** Ghost balls behind a hard kick, and how many frames apart they sit. */
 const TRAIL_LENGTH = 4;
 const TRAIL_GAP = 2;
+/** Height the line of kitties needs, tallest sign and turf included, before the camera zooms out to fit. */
+const STAGE_NEEDS_PX = 220;
 
 function prefersReducedMotion(): boolean {
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -63,6 +65,10 @@ export function KickStage({ tier, onLanded }: Props) {
   const receiver = useRef<HTMLDivElement>(null);
   const trail = useRef<(HTMLDivElement | null)[]>([]);
   const mountedAt = useRef(0);
+  /** The camera's resting zoom: below 1 on a short screen, so every sign fits. */
+  const fit = useRef(1);
+  /** How close the camera moves in for the touch: only as far as the screen has room for. */
+  const zoomIn = useRef(1.12);
   const [arrived, setArrived] = useState(false);
   const [passing, setPassing] = useState(-1);
   const landed = useRef(false);
@@ -104,7 +110,7 @@ export function KickStage({ tier, onLanded }: Props) {
     (to: number) => {
       place(distanceFor(to), 0);
       drawTrail([]);
-      camera.current?.style.setProperty("transform", "scale(1)");
+      camera.current?.style.setProperty("transform", `scale(${fit.current})`);
       setPassing(-1);
       setArrived(true);
     },
@@ -114,6 +120,10 @@ export function KickStage({ tier, onLanded }: Props) {
   // The answer is in: Kit steps back and waits for the verdict.
   useEffect(() => {
     mountedAt.current = performance.now();
+    const room = (stage.current?.clientHeight ?? STAGE_NEEDS_PX) / STAGE_NEEDS_PX;
+    fit.current = Math.min(1, room);
+    zoomIn.current = Math.max(fit.current, Math.min(1.12, room));
+    camera.current?.style.setProperty("transform", `scale(${fit.current})`);
     place(BALL_START, 0);
     if (prefersReducedMotion()) return;
     const windUp = kit.current?.animate(
@@ -156,7 +166,10 @@ export function KickStage({ tier, onLanded }: Props) {
         const x = BALL_START + (distance - BALL_START) * easeOutCubic(t);
         const height = heightAt(t, power);
         place(x, height);
-        camera.current?.style.setProperty("transform", `scale(${cameraScaleAt(t, power)})`);
+        camera.current?.style.setProperty(
+          "transform",
+          `scale(${fit.current * cameraScaleAt(t, power)})`,
+        );
         if (power >= TRAIL_FROM_POWER) {
           history.push([x, height]);
           drawTrail(t < BOUNCES[0].at ? history : []);
@@ -271,10 +284,10 @@ export function KickStage({ tier, onLanded }: Props) {
     });
     const zoom = camera.current?.animate(
       [
-        { transform: "scale(1)" },
-        { transform: "scale(1.12)", offset: 0.25 },
-        { transform: "scale(1.12)", offset: 0.8 },
-        { transform: "scale(1)" },
+        { transform: `scale(${fit.current})` },
+        { transform: `scale(${zoomIn.current})`, offset: 0.25 },
+        { transform: `scale(${zoomIn.current})`, offset: 0.8 },
+        { transform: `scale(${fit.current})` },
       ],
       { duration: motion.durationMs, easing: "ease-in-out" },
     );
@@ -318,13 +331,13 @@ export function KickStage({ tier, onLanded }: Props) {
             return (
               <div
                 key={marker.level}
-                className={`absolute bottom-0 flex -translate-x-1/2 flex-col items-center transition-transform duration-300 ease-out ${
-                  here ? "scale-125" : marker.level === passing ? "scale-110" : ""
+                className={`absolute bottom-0 flex -translate-x-1/2 flex-col origin-bottom items-center transition-transform duration-300 ease-out ${
+                  here ? "scale-115" : marker.level === passing ? "scale-105" : ""
                 }`}
                 style={{ left: (marker.level + 1) * SPACING }}
               >
                 <span
-                  className="mb-2 flex max-w-[128px] flex-col items-center border-2 border-black px-1 py-0.5 text-center font-pixel text-[8px] leading-tight text-black"
+                  className="mb-1 flex max-w-[128px] flex-col items-center border-2 border-black px-1 py-0.5 text-center font-pixel text-[8px] leading-tight text-black"
                   style={{ backgroundColor: marker.colour }}
                 >
                   <span>{marker.name.toUpperCase()}</span>

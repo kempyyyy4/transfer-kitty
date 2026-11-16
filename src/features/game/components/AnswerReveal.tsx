@@ -1,7 +1,6 @@
 "use client";
 
-import { STRAY_LEVEL, TIERS } from "@/config/tiers";
-import { TierSprite } from "@/features/avatar";
+import { STRAY_LEVEL } from "@/config/tiers";
 import { formatFee } from "@/features/scoring";
 import type { AnswerFeedback } from "../types";
 import { outcomeLine, tierColour, tierName } from "./tier-label";
@@ -23,7 +22,6 @@ interface Props {
  */
 export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: Props) {
   const level = feedback?.tier ?? STRAY_LEVEL;
-  const tier = TIERS.find((candidate) => candidate.level === level);
   const stray = level === STRAY_LEVEL;
   const colour = tierColour(level);
 
@@ -38,11 +36,11 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
       <div className="flex min-h-5 items-baseline justify-between gap-3">
         {landed && feedback ? (
           <>
-            <p className="animate-tier-flash min-w-0 font-pixel text-xs" style={{ color: colour }}>
+            <p className="animate-tier-flash min-w-0 font-pixel text-sm" style={{ color: colour }}>
               {tierName(level).toUpperCase()}
             </p>
             <p
-              className="animate-tier-flash shrink-0 font-pixel text-sm text-scoreboard"
+              className="animate-tier-flash shrink-0 font-pixel text-lg text-scoreboard"
               style={{ textShadow: "0 0 8px #ffb000" }}
             >
               {stray ? "£0" : `+${formatFee(feedback?.fee ?? 0)}`}
@@ -50,19 +48,9 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
           </>
         ) : null}
       </div>
-      <div className="flex min-h-12 items-center gap-3">
-        {landed && tier ? (
-          <TierSprite
-            spriteKey={tier.spriteKey}
-            label={tier.name}
-            scale={3}
-            className="animate-sprite-pop"
-          />
-        ) : null}
-        <p className="min-w-0 flex-1 text-xl leading-tight">
-          {feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
-        </p>
-      </div>
+      <p className="text-xl leading-tight">
+        {feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
+      </p>
       <button
         type="button"
         autoFocus

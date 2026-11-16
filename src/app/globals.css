@@ -200,16 +200,6 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-@keyframes paw-step {
-  0%,
-  100% {
-    opacity: 0.15;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
 @keyframes tier-flash {
   0% {
     transform: scale(0.6);
@@ -352,7 +342,10 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-/* Two crowd frames take turns, so the fans seem to bob and wave. */
+/*
+ * The second crowd frame blinks on and off over the first, which never moves, so the fans
+ * seem to bob and wave but the stand is never empty.
+ */
 @keyframes crowd-swap {
   0%,
   49% {
@@ -427,11 +420,8 @@ svg[shape-rendering="crispEdges"],
 .animate-twinkle {
   animation: twinkle 4s infinite ease-in-out;
 }
-.animate-crowd-a {
-  animation: crowd-swap 0.9s infinite steps(1);
-}
 .animate-crowd-b {
-  animation: crowd-swap 0.9s infinite steps(1) reverse;
+  animation: crowd-swap 0.9s infinite steps(1);
 }
 .animate-flag-wave {
   animation: flag-wave 0.8s infinite ease-in-out;
@@ -489,9 +479,6 @@ svg[shape-rendering="crispEdges"],
 .animate-crt-flicker {
   animation: crt-flicker 6s infinite steps(1);
 }
-.animate-paw-step {
-  animation: paw-step 1.2s infinite ease-in-out;
-}
 .animate-tier-flash {
   animation: tier-flash 900ms ease-out 1;
 }
@@ -504,12 +491,10 @@ svg[shape-rendering="crispEdges"],
 
 @media (prefers-reduced-motion: reduce) {
   .animate-crt-flicker,
-  .animate-paw-step,
   .animate-tier-flash,
   .animate-sprite-pop,
   .animate-floodlight,
   .animate-twinkle,
-  .animate-crowd-a,
   .animate-crowd-b,
   .animate-flag-wave,
   .animate-pitch-sheen,

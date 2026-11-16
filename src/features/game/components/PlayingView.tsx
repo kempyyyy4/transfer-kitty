@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import { FullScreenScene } from "@/components/scene/FullScreenScene";
 import { GameScene } from "@/components/scene/GameScene";
 import { GAME_RULES } from "@/config/game";
 import { STRAY_LEVEL, TOP_LEVEL } from "@/config/tiers";
@@ -55,56 +56,58 @@ export function PlayingView({ view, onPick, onExpire, onDraftChange, onContinue 
   }, [feedback, question.position]);
 
   return (
-    <section className="fixed inset-0 z-20 flex h-[100dvh] flex-col gap-3 px-4 pt-16 pb-4">
-      <GameScene />
-      {celebrating ? <GalacticatFlash /> : null}
+    <FullScreenScene>
+      <section className="relative flex h-[100dvh] flex-col gap-3 px-4 pt-16 pb-4">
+        <GameScene />
+        {celebrating ? <GalacticatFlash /> : null}
 
-      <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
-        <div className="pixel-panel flex flex-col gap-2 p-3">
-          <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
-            <span>
-              {question.position}/{question.total}
-            </span>
-            <span className="text-scoreboard">KITTY {formatFee(kitty)}</span>
-          </p>
-          <h1 className="text-2xl leading-tight">{question.prompt}</h1>
+        <div className="mx-auto flex w-full max-w-2xl flex-col gap-3">
+          <div className="pixel-panel flex flex-col gap-2 p-3">
+            <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
+              <span>
+                {question.position}/{question.total}
+              </span>
+              <span className="text-scoreboard">KITTY {formatFee(kitty)}</span>
+            </p>
+            <h1 className="text-2xl leading-tight">{question.prompt}</h1>
+          </div>
+
+          {view.kind === "question" ? (
+            <>
+              <TimerBar
+                key={`timer-${question.position}`}
+                deadline={view.deadline}
+                msTotal={GAME_RULES.answerSeconds * 1000}
+                onExpire={onExpire}
+              />
+              <AnswerInput
+                key={`answer-${question.position}`}
+                disabled={false}
+                onPick={onPick}
+                onDraftChange={onDraftChange}
+              />
+            </>
+          ) : null}
         </div>
 
-        {view.kind === "question" ? (
+        {view.kind !== "question" ? (
           <>
-            <TimerBar
-              key={`timer-${question.position}`}
-              deadline={view.deadline}
-              msTotal={GAME_RULES.answerSeconds * 1000}
-              onExpire={onExpire}
-            />
-            <AnswerInput
-              key={`answer-${question.position}`}
-              disabled={false}
-              onPick={onPick}
-              onDraftChange={onDraftChange}
-            />
+            <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 items-center">
+              <KickStage key={question.position} tier={feedback?.tier ?? null} onLanded={land} />
+            </div>
+            <div className="mx-auto w-full max-w-2xl">
+              <AnswerReveal
+                answer={view.answer}
+                feedback={feedback}
+                landed={landed}
+                isLast={question.position === question.total}
+                onContinue={onContinue}
+              />
+            </div>
           </>
         ) : null}
-      </div>
-
-      {view.kind !== "question" ? (
-        <>
-          <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 items-center">
-            <KickStage key={question.position} tier={feedback?.tier ?? null} onLanded={land} />
-          </div>
-          <div className="mx-auto w-full max-w-2xl">
-            <AnswerReveal
-              answer={view.answer}
-              feedback={feedback}
-              landed={landed}
-              isLast={question.position === question.total}
-              onContinue={onContinue}
-            />
-          </div>
-        </>
-      ) : null}
-    </section>
+      </section>
+    </FullScreenScene>
   );
 }
 
