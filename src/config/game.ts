@@ -61,4 +61,6 @@ export const DAILY_CLUBS = {
   narrowRank: 30,
   broadRank: 60,
   narrowTemplates: ["club-season", "club-cup", "club-scorer", "nationality-club", "club-manager"],
+  /** Questions about one final's line-ups are only fair for the finals most fans watch. */
+  finalCompetitions: ["CL", "EL", "FAC"],
 } as const;

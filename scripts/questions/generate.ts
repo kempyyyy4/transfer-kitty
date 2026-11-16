@@ -38,6 +38,18 @@ const clubRank = new Map(
     .map((row, index) => [row.club_id, index + 1]),
 );
 
+/**
+ * Whether a question is fair for the daily: every club it names is well known, and a
+ * question about one final's line-ups is about a final most fans watch.
+ */
+function fairForDaily(draft: DraftQuestion): boolean {
+  const finals = DAILY_CLUBS.finalCompetitions as readonly string[];
+  if (draft.templateKey === "cup-final" && !finals.includes(String(draft.params.competitionId))) {
+    return false;
+  }
+  return clubsWellKnown(draft);
+}
+
 /** Whether every club a question names is famous enough for the daily puzzle. */
 function clubsWellKnown(draft: DraftQuestion): boolean {
   const narrow = (DAILY_CLUBS.narrowTemplates as readonly string[]).includes(draft.templateKey);
@@ -58,8 +70,8 @@ function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion 
   return {
     ...draft,
     dataSource,
-    // A question about a lesser-known club never reaches the daily, so its prominence is 0.
-    prominence: clubsWellKnown(draft)
+    // A question that is unfair for the daily never reaches it, so its prominence is 0.
+    prominence: fairForDaily(draft)
       ? (tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0)
       : 0,
     answers: tiered.map(({ entityId, popularity, tier }) => ({
