@@ -193,6 +193,8 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Never use: purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes, or over-the-top scroll animations.
 - Hover styles only apply on devices that hover (`@media (hover: hover)`), so tapped buttons never stay lit on phones. Menus never keep the current page highlighted.
 - The game screen has its own scene (`src/components/scene/GameScene.tsx`) instead of the stadium.
+- Each tier has a colour in `src/config/tiers.ts`, matching its share square. Show tiers in their colour; answer lists are grouped by tier, rarest first.
+- Waiting messages use `Loader`, which stays invisible for the first half-second, so fast loads show nothing. Prefer starting work early (as KICK OFF does) over showing a loader.
 - Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
 - Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top left for the menu button and the top right for the sound button.
 - The animated stadium (`src/components/scene`) sits behind every screen, dimmed except on the home screen. Inner screens are opened from the menu (`src/components/SiteMenu.tsx`); keep the home screen to the title, line-up, kick-off button, description and policy links.
