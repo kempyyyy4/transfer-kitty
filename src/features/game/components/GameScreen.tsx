@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader } from "@/components/Loader";
+import { GameScene } from "@/components/scene/GameScene";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
 import { gameApi, GameApiError } from "../api-client";
 import { takeDailyStart } from "../start-early";
@@ -15,7 +15,6 @@ import type {
   PracticeRound,
 } from "../types";
 import type { AnswerDraft } from "./AnswerInput";
-import { ClimbWorld } from "./climb/ClimbWorld";
 import { PlayingView } from "./PlayingView";
 import { SummaryPanel } from "./SummaryPanel";
 
@@ -132,11 +131,16 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   }
 
   if (view.kind === "loading") {
+    // The round's own scene with an empty question card, filled in the moment it arrives.
     return (
-      <>
-        <ClimbWorld height={0} moving={false} />
-        <Loader />
-      </>
+      <section className="fixed inset-0 z-20 flex h-[100dvh] flex-col px-4 pt-16 pb-4">
+        <GameScene />
+        <div className="pixel-panel mx-auto flex h-28 w-full max-w-2xl flex-col gap-3 p-3">
+          <span className="h-2 w-12 animate-pulse bg-chalk-dim/40" />
+          <span className="h-4 w-4/5 animate-pulse bg-chalk-dim/30" />
+          <span className="h-4 w-2/3 animate-pulse bg-chalk-dim/30" />
+        </div>
+      </section>
     );
   }
   if (view.kind === "completed") {

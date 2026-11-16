@@ -23,7 +23,7 @@ export function KittyLineup() {
   return (
     <div className="flex flex-col items-center" aria-label="The Transfer Kitty team" role="img">
       <Row members={back} size="w-[min(16vw,10vh)] max-w-[110px]" juggler={JUGGLER} />
-      <Row members={front} size="w-[min(18vw,11.5vh)] max-w-[124px]" className="-mt-[1.5vh]" />
+      <Row members={front} size="w-[min(17vw,11.5vh)] max-w-[124px]" className="-mt-[1.5vh]" />
     </div>
   );
 }
@@ -40,7 +40,7 @@ function Row({
   className?: string;
 }) {
   return (
-    <div className={`flex items-end justify-center gap-[2.5vw] ${className}`}>
+    <div className={`flex items-end justify-center gap-[2vw] ${className}`}>
       {members.map((member, index) => (
         <div
           key={member.label}

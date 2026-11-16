@@ -297,17 +297,6 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-@keyframes speed-line {
-  from {
-    transform: translateY(-20px);
-    opacity: 0.9;
-  }
-  to {
-    transform: translateY(40px);
-    opacity: 0;
-  }
-}
-
 @keyframes gold-flash {
   0% {
     opacity: 0.7;
@@ -326,25 +315,6 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-/* A fee bursts out above Kit and drifts up as it fades. */
-@keyframes fee-float {
-  0% {
-    opacity: 0;
-    transform: translateY(20px) scale(0.6);
-  }
-  15% {
-    opacity: 1;
-    transform: translateY(0) scale(1.25);
-  }
-  30% {
-    transform: translateY(-10px) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-120px) scale(1);
-  }
-}
-
 /* Each screen settles in as it opens. */
 @keyframes page-in {
   from {
@@ -354,6 +324,21 @@ svg[shape-rendering="crispEdges"],
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* Dust drifting up through the floodlight on the game screen. */
+@keyframes speck-rise {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-95vh);
+    opacity: 0;
   }
 }
 
@@ -475,8 +460,8 @@ svg[shape-rendering="crispEdges"],
 .appear-if-slow {
   animation: fade-in 200ms ease-out 450ms both;
 }
-.animate-fee-float {
-  animation: fee-float 2400ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+.animate-speck {
+  animation: speck-rise 11s infinite linear;
 }
 .animate-page-in {
   animation: page-in 280ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
@@ -486,9 +471,6 @@ svg[shape-rendering="crispEdges"],
 }
 .animate-shake {
   animation: shake 420ms ease-in-out 1;
-}
-.animate-speed-line {
-  animation: speed-line 260ms linear infinite;
 }
 .animate-gold-flash {
   animation: gold-flash 900ms ease-out both;
@@ -536,9 +518,8 @@ svg[shape-rendering="crispEdges"],
   .animate-kickoff,
   .animate-reveal-in,
   .animate-page-in,
-  .animate-fee-float,
+  .animate-speck,
   .animate-shake,
-  .animate-speed-line,
   .animate-gold-flash,
   .animate-confetti,
   .animate-menu-in,

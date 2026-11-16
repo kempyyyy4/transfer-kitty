@@ -85,26 +85,24 @@ export function SiteMenu() {
       {open ? (
         <nav
           aria-label="Menu"
-          className="animate-menu-in fixed inset-0 z-40 flex h-[100dvh] flex-col bg-night-deep/95 p-3"
+          className="animate-menu-in fixed inset-0 z-40 flex h-[100dvh] flex-col bg-night-deep/95 px-3 pt-16 pb-3"
         >
-          {/* The Home bar shares the top row with the close and sound buttons. */}
-          <div className="flex h-10 shrink-0 pr-[8.5rem] pl-14">
-            <Link
-              href="/"
-              onClick={close}
-              className="pixel-button flex w-full items-center justify-center gap-3 text-xs"
-            >
-              <HomeIcon />
-              HOME
-            </Link>
-          </div>
-          <div className="mx-auto mt-3 flex min-h-0 w-full max-w-lg flex-1 flex-col gap-3">
+          {/* Everything in one column of equal width, filling the screen below the top buttons. */}
+          <div className="mx-auto flex min-h-0 w-full max-w-lg flex-1 flex-col gap-3">
             <MenuTile tile={FEATURED} featured onPick={close} />
             <div className="grid min-h-0 flex-[2] grid-cols-2 grid-rows-2 gap-3">
               {TILES.map((tile) => (
                 <MenuTile key={tile.href} tile={tile} onPick={close} />
               ))}
             </div>
+            <Link
+              href="/"
+              onClick={close}
+              className="pixel-button flex w-full shrink-0 items-center justify-center gap-3 py-3 text-xs"
+            >
+              <HomeIcon />
+              HOME
+            </Link>
             <div className="flex shrink-0 justify-center font-pixel text-[10px]">
               <Link href="/account" onClick={close} className="text-chalk-dim hover:text-chalk">
                 ACCOUNT
