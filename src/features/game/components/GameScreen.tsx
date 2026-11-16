@@ -2,10 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader } from "@/components/Loader";
-import { GameScene } from "@/components/scene/GameScene";
-import { GAME_RULES } from "@/config/game";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
-import { formatFee } from "@/features/scoring";
 import { gameApi, GameApiError } from "../api-client";
 import { takeDailyStart } from "../start-early";
 import { bestMatch, confidentMatch } from "../best-match";
@@ -17,10 +14,10 @@ import type {
   PlayState,
   PracticeRound,
 } from "../types";
-import { AnswerInput, type AnswerDraft } from "./AnswerInput";
-import { FeedbackPanel } from "./FeedbackPanel";
+import type { AnswerDraft } from "./AnswerInput";
+import { ClimbWorld } from "./climb/ClimbWorld";
+import { PlayingView } from "./PlayingView";
 import { SummaryPanel } from "./SummaryPanel";
-import { TimerBar } from "./TimerBar";
 
 /** The last-moment name lookup must leave time inside the server's grace period. */
 const TIMEOUT_LOOKUP_MS = 800;
@@ -137,7 +134,7 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   if (view.kind === "loading") {
     return (
       <>
-        <GameScene />
+        <ClimbWorld height={0} moving={false} />
         <Loader />
       </>
     );
@@ -163,47 +160,13 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   }
 
   const { question } = view;
-  const kitty = kittyShown(view);
   return (
-    <section className="flex flex-col gap-4">
-      <GameScene />
-      <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
-        <span>
-          {question.position}/{question.total}
-        </span>
-        <span className="text-floodlight">KITTY {formatFee(kitty)}</span>
-      </p>
-      <h1 className="text-2xl leading-tight">{question.prompt}</h1>
-
-      {view.kind === "question" ? (
-        <>
-          <TimerBar
-            key={`timer-${question.position}`}
-            deadline={view.deadline}
-            msTotal={GAME_RULES.answerSeconds * 1000}
-            onExpire={() => void submitTyped(question)}
-          />
-          <AnswerInput
-            key={`answer-${question.position}`}
-            disabled={false}
-            onPick={(player) => void submit(question, player)}
-            onDraftChange={rememberDraft}
-          />
-        </>
-      ) : (
-        <FeedbackPanel
-          answer={view.answer}
-          feedback={view.feedback}
-          isLast={question.position === question.total}
-          onContinue={() => void showNext()}
-        />
-      )}
-    </section>
+    <PlayingView
+      view={view}
+      onPick={(player) => void submit(question, player)}
+      onExpire={() => void submitTyped(question)}
+      onDraftChange={rememberDraft}
+      onContinue={() => void showNext()}
+    />
   );
-}
-
-/** The kitty counts the answer just judged as soon as its feedback is on screen. */
-function kittyShown(view: Extract<View, { kind: "question" | "feedback" }>): number {
-  const earnedNow = view.kind === "feedback" ? view.feedback.fee : 0;
-  return view.question.kittySoFar + earnedNow;
 }

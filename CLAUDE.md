@@ -192,7 +192,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Animations respect `prefers-reduced-motion` (see the end of `globals.css`). They ease smoothly; only the crowd swap and the old-TV flicker use steps.
 - Never use: purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes, or over-the-top scroll animations.
 - Hover styles only apply on devices that hover (`@media (hover: hover)`), so tapped buttons never stay lit on phones. Menus never keep the current page highlighted.
-- The game screen has its own scene (`src/components/scene/GameScene.tsx`) instead of the stadium.
+- The game screen is one screen with no scrolling (`PlayingView`). Behind it is the climb (`src/features/game/components/climb`): the kitty total is the height, and each answer eases the world down past zone signs and asides, Krillion-style. Zones and asides are scenery, not football facts. Galacticats get a gold flash and confetti; Strays shake.
 - Each tier has a colour in `src/config/tiers.ts`, matching its share square. Show tiers in their colour; answer lists are grouped by tier, rarest first.
 - Waiting messages use `Loader`, which stays invisible for the first half-second, so fast loads show nothing. Prefer starting work early (as KICK OFF does) over showing a loader.
 - Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.

@@ -85,24 +85,27 @@ export function SiteMenu() {
       {open ? (
         <nav
           aria-label="Menu"
-          className="animate-menu-in fixed inset-0 z-40 flex flex-col overflow-y-auto bg-night-deep/95 px-4 pt-16 pb-6"
+          className="animate-menu-in fixed inset-0 z-40 flex h-[100dvh] flex-col bg-night-deep/95 p-3"
         >
-          <div className="mx-auto flex w-full max-w-lg flex-col gap-3">
+          {/* The Home bar shares the top row with the close and sound buttons. */}
+          <div className="flex h-10 shrink-0 pr-[8.5rem] pl-14">
             <Link
               href="/"
               onClick={close}
-              className="pixel-button flex items-center justify-center gap-3 px-4 py-2 text-xs"
+              className="pixel-button flex w-full items-center justify-center gap-3 text-xs"
             >
               <HomeIcon />
               HOME
             </Link>
+          </div>
+          <div className="mx-auto mt-3 flex min-h-0 w-full max-w-lg flex-1 flex-col gap-3">
             <MenuTile tile={FEATURED} featured onPick={close} />
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid min-h-0 flex-[2] grid-cols-2 grid-rows-2 gap-3">
               {TILES.map((tile) => (
                 <MenuTile key={tile.href} tile={tile} onPick={close} />
               ))}
             </div>
-            <div className="flex justify-center pt-2 font-pixel text-[10px]">
+            <div className="flex shrink-0 justify-center font-pixel text-[10px]">
               <Link href="/account" onClick={close} className="text-chalk-dim hover:text-chalk">
                 ACCOUNT
               </Link>
@@ -127,10 +130,10 @@ function MenuTile({
     <Link
       href={tile.href}
       onClick={onPick}
-      className={`pixel-button relative flex flex-col justify-end overflow-hidden p-3 text-left ${
+      className={`pixel-button relative flex flex-col justify-start overflow-hidden p-3 text-left ${
         featured
-          ? "min-h-36 border-floodlight bg-floodlight text-night-deep hover:text-night-deep"
-          : "min-h-32"
+          ? "min-h-0 flex-1 border-floodlight bg-floodlight text-night-deep hover:text-night-deep"
+          : "min-h-0"
       }`}
     >
       <MenuArt
