@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { CountUp } from "@/components/CountUp";
 import { TIERS } from "@/config/tiers";
 import { TierSprite } from "@/features/avatar";
 import { AdSlot } from "@/features/ads";
@@ -19,9 +20,9 @@ interface Props {
 }
 
 /**
- * The Results screen: each answer with its tier, fee and share of players, the day's
- * kitty, and every valid answer once the round is over. Rank, coins and sharing join in
- * later stages.
+ * The Results screen: the kitty rolling up on the scoreboard, the round as a row of tier
+ * colours, rank, coins and sharing, then each answer in its tier's colour with every valid
+ * answer underneath.
  */
 export function SummaryPanel({ sessionId, summary }: Props) {
   const [lists, setLists] = useState<QuestionAnswers[] | null>(null);
@@ -38,21 +39,20 @@ export function SummaryPanel({ sessionId, summary }: Props) {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">{titleOf(summary)}</h1>
-      <div className="flex flex-col items-center gap-2">
-        <p className="font-pixel text-[10px] text-chalk-dim">YOUR KITTY</p>
+      <h1 className="page-title">{titleOf(summary)}</h1>
+      <div className="pixel-panel flex flex-col items-center gap-3 p-4">
+        <p className="font-pixel text-[10px] tracking-widest text-chalk-dim">YOUR KITTY</p>
         <p
-          className="border-4 border-stand bg-black px-6 py-3 font-pixel text-3xl text-scoreboard"
-          style={{ textShadow: "0 0 6px #ffb000" }}
+          className="w-full border-4 border-black bg-black px-4 py-3 text-center font-pixel text-4xl text-scoreboard"
+          style={{ textShadow: "0 0 10px #ffb000" }}
         >
-          {formatFee(summary.totalFee)}
+          <CountUp value={summary.totalFee} format={formatFee} />
         </p>
+        <TierRow tiers={summary.answers.map((answer) => answer.tier)} />
+        {daily && summary.coinsEarned > 0 ? (
+          <p className="font-pixel text-xs text-scoreboard">+{summary.coinsEarned} COINS</p>
+        ) : null}
       </div>
-      {daily && summary.coinsEarned > 0 ? (
-        <p className="text-center font-pixel text-xs text-scoreboard">
-          +{summary.coinsEarned} COINS
-        </p>
-      ) : null}
       {daily ? <YourRank /> : null}
       {daily && summary.puzzleNumber && summary.completed ? (
         <ShareButton
@@ -62,31 +62,38 @@ export function SummaryPanel({ sessionId, summary }: Props) {
         />
       ) : null}
 
-      <ol className="flex flex-col gap-4">
+      <ol className="flex flex-col gap-3">
         {summary.answers.map((answer) => {
           const list = lists?.find((question) => question.position === answer.position);
           const spriteKey = TIERS.find((tier) => tier.level === answer.tier)?.spriteKey;
           return (
-            <li key={answer.position} className="pixel-panel flex flex-col gap-2 p-3">
-              <p className="text-lg text-chalk-dim">
-                {answer.position}. {answer.prompt}
+            <li
+              key={answer.position}
+              className="pixel-panel animate-page-in flex flex-col gap-2 border-l-8 p-3"
+              style={{
+                borderLeftColor: tierColour(answer.tier),
+                animationDelay: `${answer.position * 60}ms`,
+              }}
+            >
+              <p className="text-lg leading-snug text-chalk-dim">
+                <span className="font-pixel text-[10px] text-chalk">{answer.position}</span>{" "}
+                {answer.prompt}
               </p>
               <div className="flex items-center gap-3">
                 {spriteKey ? (
                   <TierSprite spriteKey={spriteKey} label={tierName(answer.tier)} scale={2} />
                 ) : null}
-                <div>
-                  <p className="text-xl">{outcomeLine(answer.outcome, answer.answer)}</p>
-                  <p className="text-lg">
-                    <span
-                      className="font-pixel text-[10px]"
-                      style={{ color: tierColour(answer.tier) }}
-                    >
-                      {tierName(answer.tier).toUpperCase()}
-                    </span>{" "}
-                    · {formatFee(answer.fee)}
+                <div className="min-w-0 flex-1">
+                  <p className="text-xl leading-tight">
+                    {outcomeLine(answer.outcome, answer.answer)}
+                  </p>
+                  <p className="font-pixel text-[10px]" style={{ color: tierColour(answer.tier) }}>
+                    {tierName(answer.tier).toUpperCase()}
                   </p>
                 </div>
+                <p className="shrink-0 font-pixel text-sm text-scoreboard">
+                  {formatFee(answer.fee)}
+                </p>
               </div>
               {list ? <AnswerList sessionId={sessionId} question={list} /> : null}
             </li>
@@ -127,9 +134,6 @@ export function SummaryPanel({ sessionId, summary }: Props) {
           BACK TO THE ARCHIVE
         </Link>
       ) : null}
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }
@@ -139,4 +143,20 @@ function titleOf(summary: GameSummary): string {
   if (summary.mode === "pack") return (summary.packName ?? "PACK").toUpperCase();
   const number = summary.puzzleNumber ? ` #${summary.puzzleNumber}` : "";
   return summary.mode === "archive" ? `ARCHIVE${number}` : `TRANSFER KITTY${number}`;
+}
+
+/** The round at a glance: one square per answer in its tier's colour, like the share text. */
+function TierRow({ tiers }: { tiers: readonly number[] }) {
+  return (
+    <div className="flex gap-1.5" aria-label="Your round, one square per answer">
+      {tiers.map((tier, index) => (
+        <span
+          key={index}
+          title={tierName(tier)}
+          className="animate-sprite-pop h-6 w-6 border-2 border-black"
+          style={{ backgroundColor: tierColour(tier), animationDelay: `${400 + index * 90}ms` }}
+        />
+      ))}
+    </div>
+  );
 }

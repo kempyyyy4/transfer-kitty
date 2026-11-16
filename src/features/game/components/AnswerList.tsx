@@ -32,7 +32,7 @@ export function AnswerList({
         onClick={() => setOpen(true)}
         className="pixel-button self-start px-3 py-2 text-[10px]"
       >
-        Show all {question.answers.length} answers
+        SHOW ALL {question.answers.length} ANSWERS
       </button>
     );
   }

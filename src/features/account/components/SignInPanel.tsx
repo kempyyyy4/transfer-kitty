@@ -52,15 +52,15 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
         />
         <button
           type="submit"
-          className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
+          className="pixel-button border-floodlight px-3 py-3 text-[10px] text-floodlight"
         >
-          Email me a sign-in link
+          EMAIL ME A SIGN-IN LINK
         </button>
       </form>
 
       <p className="text-center text-sm text-chalk-dim">or</p>
       <a href={accountApi.googleSignInPath} className="pixel-button px-4 py-3 text-xs">
-        Sign in with Google
+        SIGN IN WITH GOOGLE
       </a>
 
       {error ? <p role="alert">{error}</p> : null}

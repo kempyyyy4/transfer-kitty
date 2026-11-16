@@ -28,6 +28,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="en" className={`h-full ${pixelFont.variable} ${bodyFont.variable}`}>
       <body className="flex min-h-full flex-col font-mono">
         <StadiumScene />
+        {/* A soft fade behind the menu and sound buttons, so scrolled text slips under cleanly. */}
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-x-0 top-0 z-40 h-16 bg-gradient-to-b from-night-deep to-transparent"
+        />
         <SiteMenu />
         <SoundToggle />
         {children}

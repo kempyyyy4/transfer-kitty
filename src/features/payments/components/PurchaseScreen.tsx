@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader } from "@/components/Loader";
 import { paymentsApi } from "../api-client";
@@ -45,7 +44,7 @@ export function PurchaseScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">THANK YOU</h1>
+      <h1 className="page-title">THANK YOU</h1>
       {state === "checking" ? (
         <>
           <p className="text-xl">Confirming your payment with Stripe...</p>
@@ -66,9 +65,6 @@ export function PurchaseScreen() {
       {state === "missing" ? (
         <p className="pixel-panel p-3 text-xl">That purchase could not be found on this account.</p>
       ) : null}
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

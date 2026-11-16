@@ -43,7 +43,7 @@ export function NamePanel({ current, onSaved }: Props) {
           type="submit"
           className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
         >
-          Save
+          SAVE
         </button>
       </div>
       {message ? <p role="status">{message}</p> : null}

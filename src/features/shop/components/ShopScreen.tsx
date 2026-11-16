@@ -54,7 +54,7 @@ export function ShopScreen() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2 pr-14">
-        <h1 className="font-pixel text-lg leading-relaxed text-floodlight">SHOP</h1>
+        <h1 className="page-title">SHOP</h1>
         {shop ? (
           <p className="border-4 border-stand bg-black px-3 py-1 font-pixel text-xs text-scoreboard">
             {shop.balance.toLocaleString("en-GB")} COINS
@@ -110,10 +110,6 @@ export function ShopScreen() {
       </div>
       <LifetimeCard />
       <CoinPacks />
-
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }
