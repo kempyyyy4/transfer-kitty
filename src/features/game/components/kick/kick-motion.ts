@@ -6,10 +6,19 @@
 
 /** Pixels between one tier kitty and the next along the pitch. */
 export const SPACING = 150;
-/** Kit's run-up before the strike. */
-export const RUN_UP_MS = 420;
+/** Kit steps back the moment an answer is in, and holds there until the verdict arrives. */
+export const WIND_UP_MS = 320;
+/** Kit's run into the ball once the verdict is known. */
+export const RUN_UP_MS = 240;
 /** How long the boot squashes the ball at the moment of the strike. */
 export const STRIKE_MS = 90;
+/** When the ball touches down, as progress of the flight, and how hard each landing is. */
+export const BOUNCES = [
+  { at: 0.72, strength: 1 },
+  { at: 0.9, strength: 0.35 },
+] as const;
+/** When the receiving kitty sees it coming and gets set. */
+export const RECEIVER_READY_AT = 0.68;
 
 /** How hard the kick is, from 0 (a tap to the Stray beside Kit) to 1 (to the Galacticat). */
 export function powerFor(tier: number): number {
@@ -26,6 +35,26 @@ export function distanceFor(tier: number): number {
   return (tier + 1) * SPACING - 26;
 }
 
+/**
+ * A moment of stillness at contact before the ball leaves the boot, longer for a harder
+ * kick, so the strike lands with weight.
+ */
+export function hitStopMs(power: number): number {
+  return Math.round(40 + 90 * power);
+}
+
+/**
+ * The camera pulls back while a hard kick is in the air, so the height reads, and is back
+ * in by the first bounce.
+ */
+export function cameraScaleAt(t: number, power: number): number {
+  const arc = Math.min(1, t / BOUNCES[0].at);
+  return 1 - 0.22 * power * Math.sin(Math.PI * arc);
+}
+
+/** Only kicks this hard leave a trail behind the ball. */
+export const TRAIL_FROM_POWER = 0.45;
+
 /** Fast off the boot, slowing as it arrives. */
 export function easeOutCubic(t: number): number {
   return 1 - Math.pow(1 - t, 3);
@@ -37,15 +66,16 @@ export function easeOutCubic(t: number): number {
  */
 export function heightAt(t: number, power: number): number {
   const peak = 18 + 120 * power;
-  if (t < 0.72) {
-    const v = t / 0.72;
+  const [first, second] = BOUNCES;
+  if (t < first.at) {
+    const v = t / first.at;
     return 4 * peak * v * (1 - v);
   }
-  if (t < 0.9) {
-    const v = (t - 0.72) / 0.18;
+  if (t < second.at) {
+    const v = (t - first.at) / (second.at - first.at);
     return 4 * peak * 0.16 * v * (1 - v);
   }
-  const v = (t - 0.9) / 0.1;
+  const v = (t - second.at) / (1 - second.at);
   return 4 * peak * 0.04 * v * (1 - v);
 }
 

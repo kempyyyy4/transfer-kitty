@@ -14,6 +14,8 @@ import { TimerBar } from "./TimerBar";
 
 export type PlayingState =
   | { kind: "question"; question: OpenQuestion; deadline: number }
+  /** Answered, and waiting for the server's verdict: Kit is already winding up. */
+  | { kind: "checking"; question: OpenQuestion; answer: string | null }
   | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback };
 
 interface Props {
@@ -86,15 +88,15 @@ export function PlayingView({ view, onPick, onExpire, onDraftChange, onContinue 
         ) : null}
       </div>
 
-      {view.kind === "feedback" ? (
+      {view.kind !== "question" ? (
         <>
           <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 items-center">
-            <KickStage key={question.position} tier={view.feedback.tier} onLanded={land} />
+            <KickStage key={question.position} tier={feedback?.tier ?? null} onLanded={land} />
           </div>
           <div className="mx-auto w-full max-w-2xl">
             <AnswerReveal
               answer={view.answer}
-              feedback={view.feedback}
+              feedback={feedback}
               landed={landed}
               isLast={question.position === question.total}
               onContinue={onContinue}

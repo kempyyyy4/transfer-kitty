@@ -143,11 +143,43 @@ export function playTick(level: number): void {
   tone(ctx, "square", 330 + level * 70, ctx.currentTime, 0.05, 0.05);
 }
 
-/** The thump of a boot on the ball. */
-export function playKick(): void {
+/**
+ * The thump of a boot on the ball. `power` (0 to 1) makes it deeper and louder, and a
+ * hard kick adds the rush of the ball through the air.
+ */
+export function playKick(power = 0.5): void {
   const ctx = audio();
   if (!ctx) return;
   const now = ctx.currentTime;
-  const osc = tone(ctx, "sine", 160, now, 0.18, 0.35);
-  osc.frequency.exponentialRampToValueAtTime(50, now + 0.18);
+  const length = 0.16 + 0.12 * power;
+  const osc = tone(ctx, "sine", 190 - 60 * power, now, length, 0.25 + 0.3 * power);
+  osc.frequency.exponentialRampToValueAtTime(42, now + length);
+
+  const smack = noise(ctx, now, 0.04);
+  const smackGain = ctx.createGain();
+  smackGain.gain.setValueAtTime(0.06 + 0.12 * power, now);
+  smackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+  smack.connect(smackGain).connect(ctx.destination);
+
+  if (power < 0.35) return;
+  const rushLength = 0.3 + 0.6 * power;
+  const rush = noise(ctx, now + 0.03, rushLength);
+  const band = ctx.createBiquadFilter();
+  band.type = "bandpass";
+  band.frequency.setValueAtTime(1800, now);
+  band.frequency.exponentialRampToValueAtTime(500, now + rushLength);
+  const rushGain = ctx.createGain();
+  rushGain.gain.setValueAtTime(0.0001, now);
+  rushGain.gain.exponentialRampToValueAtTime(0.05 * power, now + 0.08);
+  rushGain.gain.exponentialRampToValueAtTime(0.0001, now + rushLength);
+  rush.connect(band).connect(rushGain).connect(ctx.destination);
+}
+
+/** The ball landing on the grass: `strength` (0 to 1) for a first bounce or a small one. */
+export function playThud(strength: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const osc = tone(ctx, "sine", 110, now, 0.1, 0.08 + 0.22 * strength);
+  osc.frequency.exponentialRampToValueAtTime(45, now + 0.1);
 }

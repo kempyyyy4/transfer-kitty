@@ -8,7 +8,8 @@ import { outcomeLine, tierColour, tierName } from "./tier-label";
 
 interface Props {
   answer: string | null;
-  feedback: AnswerFeedback;
+  /** Null while the server is still checking the answer. */
+  feedback: AnswerFeedback | null;
   /** True once the receiving kitty has the ball: the tier and fee are kept back until then. */
   landed: boolean;
   isLast: boolean;
@@ -21,9 +22,10 @@ interface Props {
  * anyone who would rather not wait.
  */
 export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: Props) {
-  const tier = TIERS.find((candidate) => candidate.level === feedback.tier);
-  const stray = feedback.tier === STRAY_LEVEL;
-  const colour = tierColour(feedback.tier);
+  const level = feedback?.tier ?? STRAY_LEVEL;
+  const tier = TIERS.find((candidate) => candidate.level === level);
+  const stray = level === STRAY_LEVEL;
+  const colour = tierColour(level);
 
   return (
     <div
@@ -34,16 +36,16 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
       style={{ borderColor: landed ? colour : undefined }}
     >
       <div className="flex min-h-5 items-baseline justify-between gap-3">
-        {landed ? (
+        {landed && feedback ? (
           <>
             <p className="animate-tier-flash min-w-0 font-pixel text-xs" style={{ color: colour }}>
-              {tierName(feedback.tier).toUpperCase()}
+              {tierName(level).toUpperCase()}
             </p>
             <p
               className="animate-tier-flash shrink-0 font-pixel text-sm text-scoreboard"
               style={{ textShadow: "0 0 8px #ffb000" }}
             >
-              {stray ? "£0" : `+${formatFee(feedback.fee)}`}
+              {stray ? "£0" : `+${formatFee(feedback?.fee ?? 0)}`}
             </p>
           </>
         ) : null}
@@ -58,14 +60,17 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
           />
         ) : null}
         <p className="min-w-0 flex-1 text-xl leading-tight">
-          {outcomeLine(feedback.outcome, answer)}
+          {feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
         </p>
       </div>
       <button
         type="button"
         autoFocus
+        aria-disabled={!feedback}
         className="pixel-button w-full border-floodlight px-4 py-3 text-xs text-floodlight"
-        onClick={onContinue}
+        onClick={() => {
+          if (feedback) onContinue();
+        }}
       >
         {isLast ? "SEE YOUR KITTY" : "NEXT QUESTION"}
       </button>

@@ -25,6 +25,7 @@ const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [] };
 type View =
   | { kind: "loading" }
   | { kind: "question"; question: OpenQuestion; deadline: number }
+  | { kind: "checking"; question: OpenQuestion; answer: string | null }
   | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
   | { kind: "completed"; sessionId: string; summary: GameSummary }
   | { kind: "error"; message: string };
@@ -117,6 +118,8 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   async function submit(question: OpenQuestion, player: PlayerSuggestion | null) {
     if (!sessionId.current || answering.current) return;
     answering.current = true;
+    // Kit winds up straight away, so the wait for the verdict is part of the kick.
+    setView({ kind: "checking", question, answer: player?.name ?? null });
     try {
       const feedback = await gameApi.answer(
         sessionId.current,

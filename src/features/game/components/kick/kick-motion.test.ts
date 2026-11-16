@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { distanceFor, flightMs, heightAt, powerFor, touchFor, SPACING } from "./kick-motion";
+import {
+  BOUNCES,
+  cameraScaleAt,
+  distanceFor,
+  flightMs,
+  heightAt,
+  hitStopMs,
+  powerFor,
+  touchFor,
+  SPACING,
+} from "./kick-motion";
 
 describe("the kick", () => {
   it("kicks harder, further and for longer the rarer the tier", () => {
@@ -35,5 +45,18 @@ describe("the kick", () => {
       "trap",
       "showboat",
     ]);
+  });
+});
+
+describe("the kick's weight", () => {
+  it("holds the strike longer and pulls the camera back further on a harder kick", () => {
+    expect(hitStopMs(powerFor(7))).toBeGreaterThan(hitStopMs(powerFor(1)));
+    expect(cameraScaleAt(0.36, powerFor(7))).toBeLessThan(cameraScaleAt(0.36, powerFor(1)));
+  });
+
+  it("has the camera back in by the first bounce", () => {
+    expect(cameraScaleAt(0, 1)).toBe(1);
+    expect(cameraScaleAt(BOUNCES[0].at, 1)).toBeCloseTo(1);
+    expect(cameraScaleAt(1, 1)).toBeCloseTo(1);
   });
 });
