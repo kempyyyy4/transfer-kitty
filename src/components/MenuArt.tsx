@@ -1,7 +1,7 @@
 export type MenuArtKind = "ball" | "trophy" | "kit" | "shirt" | "calendar";
 
 /**
- * Small pixel pictures behind the menu tiles. Rows of characters, one per pixel:
+ * Small pixel pictures on the menu tiles. Rows of characters, one per pixel:
  * # main colour, + second colour, . empty.
  */
 const ART: Record<MenuArtKind, { rows: readonly string[]; main: string; second: string }> = {
@@ -9,16 +9,18 @@ const ART: Record<MenuArtKind, { rows: readonly string[]; main: string; second: 
     main: "#f2f4ff",
     second: "#141414",
     rows: [
-      "...####...",
-      "..##++##..",
-      ".#+####+#.",
-      "##########",
-      "##++##++##",
-      "##++##++##",
-      "##########",
-      ".#+####+#.",
-      "..##++##..",
-      "...####...",
+      "....++++....",
+      "..++#++#++..",
+      ".+###++###+.",
+      ".+########+.",
+      "+####++####+",
+      "+++#++++#+++",
+      "+++#++++#+++",
+      "+####++####+",
+      ".+########+.",
+      ".+#++##++#+.",
+      "..++####++..",
+      "....++++....",
     ],
   },
   trophy: {
@@ -90,7 +92,12 @@ const ART: Record<MenuArtKind, { rows: readonly string[]; main: string; second: 
 export function MenuArt({ kind, className }: { kind: MenuArtKind; className?: string }) {
   const art = ART[kind];
   return (
-    <svg viewBox="0 0 10 10" shapeRendering="crispEdges" aria-hidden className={className}>
+    <svg
+      viewBox={`0 0 ${art.rows[0]?.length ?? 0} ${art.rows.length}`}
+      shapeRendering="crispEdges"
+      aria-hidden
+      className={className}
+    >
       {art.rows.flatMap((row, y) =>
         [...row].map((char, x) =>
           char === "." ? null : (

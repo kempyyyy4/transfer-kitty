@@ -34,7 +34,7 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
 
   return (
     <section className="flex flex-col gap-4">
-      <p>
+      <p className="page-lead">
         Sign in to appear on Top Kitties under your own name and keep your kitty on every device.
         {isGuest ? " Everything you have played so far comes with you." : ""}
       </p>
@@ -52,7 +52,7 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
         />
         <button
           type="submit"
-          className="pixel-button border-floodlight px-3 py-3 text-[10px] text-floodlight"
+          className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
         >
           EMAIL ME A SIGN-IN LINK
         </button>

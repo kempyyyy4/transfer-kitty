@@ -23,6 +23,8 @@ export {
   type ItemSlot,
 } from "./avatar-choice";
 export { KIT_MASCOT, LINEUP, TIER_SPRITES } from "./cast";
+export { buildCat } from "./cat/build-cat";
+export { toRuns, type Grid } from "./pixel/grid";
 export { KittyLineup } from "./components/KittyLineup";
 export { CatSprite, KitMascot, TierSprite } from "./components/CatSprite";
 export { PixelSprite } from "./components/PixelSprite";

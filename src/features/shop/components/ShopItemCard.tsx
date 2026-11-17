@@ -57,9 +57,9 @@ export function ShopItemCard({ item, canBuy, affordable, onBuy }: Props) {
           type="button"
           disabled={!canBuy || !affordable}
           onClick={() => setConfirming(true)}
-          className="pixel-button px-2 py-1 text-[10px]"
+          className="pixel-button mt-auto w-full px-2 py-2 text-[10px] whitespace-nowrap"
         >
-          {affordable ? "BUY" : "NOT ENOUGH COINS"}
+          {affordable ? "BUY" : "NEED MORE"}
         </button>
       )}
     </li>

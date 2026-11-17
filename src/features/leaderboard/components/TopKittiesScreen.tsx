@@ -59,7 +59,7 @@ export function TopKittiesScreen() {
     <section className="flex flex-col gap-4">
       <div>
         <h1 className="page-title">TOP KITTIES</h1>
-        <p className="text-lg text-chalk-dim">
+        <p className="page-lead">
           The biggest kitties today, this week and of all time. Start a league to take on your
           friends.
         </p>

@@ -19,6 +19,12 @@
   --color-claret: #e23d3d;
   --color-sky: #4fc3f7;
   --color-scoreboard: #ffb000;
+
+  /* VT323 is tall and narrow, so body text sits tighter than Tailwind's defaults. */
+  --text-base--line-height: 1.35;
+  --text-lg--line-height: 1.3;
+  --text-xl--line-height: 1.3;
+  --text-2xl--line-height: 1.25;
 }
 
 html {
@@ -94,13 +100,19 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
-@utility pixel-panel {
-  border: 4px solid color-mix(in srgb, var(--color-chalk-dim) 75%, transparent);
-  background-color: color-mix(in srgb, var(--color-night-deep) 90%, transparent);
-  box-shadow:
-    6px 6px 0 0 #000,
-    inset 0 3px 0 0 rgb(255 255 255 / 0.05);
-  backdrop-filter: blur(2px);
+/*
+ * A box. It sits in the components layer, beneath the utilities, so a panel given a
+ * colour class (border-floodlight, a background) really takes that colour.
+ */
+@layer components {
+  .pixel-panel {
+    border: 4px solid color-mix(in srgb, var(--color-chalk-dim) 75%, transparent);
+    background-color: color-mix(in srgb, var(--color-night-deep) 90%, transparent);
+    box-shadow:
+      6px 6px 0 0 #000,
+      inset 0 3px 0 0 rgb(255 255 255 / 0.05);
+    backdrop-filter: blur(2px);
+  }
 }
 
 /* The big title at the top of each screen. */
@@ -110,6 +122,13 @@ svg[shape-rendering="crispEdges"],
   line-height: 1.5;
   color: var(--color-floodlight);
   text-shadow: 3px 3px 0 #000;
+}
+
+/* The line or two under a page title saying what the page is for. */
+@utility page-lead {
+  font-size: 1.15rem;
+  line-height: 1.3;
+  color: var(--color-chalk-dim);
 }
 
 /* A dropdown that matches the text boxes, with a pixel arrow. */
@@ -271,6 +290,18 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
+/* Each new question slides in from the right. */
+@keyframes question-in {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 /* A wrong answer shakes its card. */
 @keyframes shake {
   0%,
@@ -386,6 +417,17 @@ svg[shape-rendering="crispEdges"],
   }
 }
 
+/* The Unlimited tile's ball, bobbing and turning gently. */
+@keyframes ball-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12%) rotate(14deg);
+  }
+}
+
 @keyframes keepy-up {
   0%,
   100% {
@@ -440,6 +482,9 @@ svg[shape-rendering="crispEdges"],
 .animate-kitty-bob {
   animation: kitty-bob 1.6s infinite ease-in-out;
 }
+.animate-ball-bob {
+  animation: ball-bob 1.8s infinite ease-in-out;
+}
 .animate-keepy-up {
   animation: keepy-up 0.75s infinite cubic-bezier(0.33, 0, 0.67, 1);
 }
@@ -458,6 +503,9 @@ svg[shape-rendering="crispEdges"],
 }
 .animate-reveal-in {
   animation: reveal-in 320ms cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+.animate-question-in {
+  animation: question-in 320ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 .animate-shake {
   animation: shake 420ms ease-in-out 1;
@@ -500,8 +548,10 @@ svg[shape-rendering="crispEdges"],
   .animate-pitch-sheen,
   .animate-kitty-bob,
   .animate-keepy-up,
+  .animate-ball-bob,
   .animate-kickoff,
   .animate-reveal-in,
+  .animate-question-in,
   .animate-page-in,
   .animate-speck,
   .animate-shake,

@@ -15,7 +15,7 @@ interface Tile {
 const FEATURED: Tile = {
   href: "/unlimited",
   title: "UNLIMITED",
-  description: "Endless rounds of 7, whenever you like. No waiting for tomorrow.",
+  description: "Endless rounds of 7, whenever you like.",
   art: "ball",
 };
 
@@ -23,25 +23,25 @@ const TILES: readonly Tile[] = [
   {
     href: "/top-kitties",
     title: "TOP KITTIES",
-    description: "Create leagues with your friends and see how you match up.",
+    description: "Create leagues with friends. See how you match up.",
     art: "trophy",
   },
   {
     href: "/profile",
     title: "PROFILE",
-    description: "Build your cat, guard your streak, see every kitty.",
+    description: "Your cat, your streak, every kitty.",
     art: "kit",
   },
   {
     href: "/shop",
     title: "SHOP",
-    description: "Today's kits and gear, plus themed packs.",
+    description: "New kits every day, plus packs.",
     art: "shirt",
   },
   {
     href: "/archive",
     title: "ARCHIVE",
-    description: "Replay any day's puzzle you missed.",
+    description: "Replay any day you missed.",
     art: "calendar",
   },
 ];
@@ -68,7 +68,7 @@ export function SiteMenu() {
         aria-label={open ? "Close the menu" : "Open the menu"}
         aria-expanded={open}
         onClick={() => setOpen(!open)}
-        className="pixel-button fixed top-3 left-3 z-50 flex h-10 w-12 flex-col items-center justify-center gap-1"
+        className="pixel-button fixed top-[max(0.75rem,env(safe-area-inset-top))] left-[max(0.75rem,env(safe-area-inset-left))] z-50 flex h-10 w-12 flex-col items-center justify-center gap-1"
       >
         {[0, 1, 2].map((bar) => (
           <span
@@ -134,16 +134,24 @@ function MenuTile({
           : "min-h-0"
       }`}
     >
-      <MenuArt
-        kind={tile.art}
-        className={`absolute -top-2 -right-2 h-24 w-24 ${featured ? "opacity-40" : "opacity-25"}`}
-      />
-      <span className={`relative font-pixel ${featured ? "text-xl" : "text-xs"}`}>
+      {featured ? (
+        // The feature tile's ball does keepy-ups, in full colour, clear of the words.
+        <MenuArt
+          kind={tile.art}
+          className="animate-ball-bob absolute top-1/2 right-4 aspect-square h-[min(5.5rem,40%)] w-auto -translate-y-1/2 drop-shadow-[4px_4px_0_rgb(0_0_0/0.35)]"
+        />
+      ) : (
+        <MenuArt
+          kind={tile.art}
+          className="absolute -right-2 -bottom-2 aspect-square h-[min(5rem,60%)] w-auto opacity-30"
+        />
+      )}
+      <span className={`relative font-pixel ${featured ? "pr-24 text-xl" : "text-xs"}`}>
         {tile.title}
       </span>
       <span
         className={`relative mt-1 font-mono leading-tight ${
-          featured ? "text-xl text-night-deep" : "text-lg text-chalk-dim"
+          featured ? "pr-24 text-xl text-night-deep" : "text-lg text-chalk-dim"
         }`}
       >
         {tile.description}

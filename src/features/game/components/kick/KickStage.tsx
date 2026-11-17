@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TIERS } from "@/config/tiers";
 import { KitMascot, TierSprite } from "@/features/avatar";
-import { playKick, playThud, playTick } from "@/features/audio";
+import { buzz, playKick, playThud, playTick } from "@/features/audio";
 import { formatFee } from "@/features/scoring";
 import { grassPuff, strikeSparks } from "./kick-effects";
 import {
@@ -213,6 +213,7 @@ export function KickStage({ tier, onLanded }: Props) {
 
     function strike() {
       playKick(power);
+      buzz(Math.round(10 + 30 * power));
       strikeSparks(track.current, BALL_START, power);
       // Contact: the ball flattens against the boot and everything holds for a beat.
       const hold = hitStopMs(power);
@@ -310,7 +311,8 @@ export function KickStage({ tier, onLanded }: Props) {
         land();
       }}
       aria-label="Skip the kick"
-      className="relative block h-full max-h-[260px] min-h-[180px] w-full overflow-hidden"
+      // The pitch fades out at the sides rather than ending in a hard edge.
+      className="relative block h-full max-h-[260px] min-h-[180px] w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
     >
       <div
         ref={camera}

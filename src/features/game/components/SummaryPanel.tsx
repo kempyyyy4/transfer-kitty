@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Countdown } from "@/components/Countdown";
 import { CountUp } from "@/components/CountUp";
 import { TIERS } from "@/config/tiers";
+import { playCashRegister } from "@/features/audio";
 import { TierSprite } from "@/features/avatar";
 import { AdSlot } from "@/features/ads";
 import { YourRank } from "@/features/leaderboard";
@@ -18,6 +20,9 @@ interface Props {
   sessionId: string;
   summary: GameSummary;
 }
+
+/** How long the kitty takes to roll up on the scoreboard. */
+const ROLL_MS = 1400;
 
 /**
  * The Results screen: the kitty rolling up on the scoreboard, the round as a row of tier
@@ -37,6 +42,13 @@ export function SummaryPanel({ sessionId, summary }: Props) {
 
   const daily = summary.mode === "daily";
 
+  // Ka-ching as the scoreboard settles on the total.
+  useEffect(() => {
+    if (summary.totalFee <= 0) return;
+    const ring = setTimeout(playCashRegister, ROLL_MS - 100);
+    return () => clearTimeout(ring);
+  }, [summary.totalFee]);
+
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">{titleOf(summary)}</h1>
@@ -46,7 +58,7 @@ export function SummaryPanel({ sessionId, summary }: Props) {
           className="w-full border-4 border-black bg-black px-4 py-3 text-center font-pixel text-4xl text-scoreboard"
           style={{ textShadow: "0 0 10px #ffb000" }}
         >
-          <CountUp value={summary.totalFee} format={formatFee} />
+          <CountUp value={summary.totalFee} format={formatFee} durationMs={ROLL_MS} />
         </p>
         <TierRow tiers={summary.answers.map((answer) => answer.tier)} />
         {daily && summary.coinsEarned > 0 ? (
@@ -112,8 +124,11 @@ export function SummaryPanel({ sessionId, summary }: Props) {
       ) : null}
       <AdSlot />
       {daily ? (
-        <p className="text-xl">
-          That is today&apos;s game done. A new one starts at midnight UK time.
+        <p className="text-center text-xl">
+          Today&apos;s game is done. The next one kicks off in{" "}
+          <span className="font-pixel text-sm text-floodlight">
+            <Countdown />
+          </span>
         </p>
       ) : (
         <p className="text-xl text-chalk-dim">

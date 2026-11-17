@@ -11,7 +11,7 @@ export function SoundToggle() {
       onClick={() => setSoundOn(!on)}
       aria-pressed={on}
       aria-label={on ? "Sound is on. Turn sound off" : "Sound is off. Turn sound on"}
-      className="pixel-button fixed top-3 right-3 z-50 px-3 py-2 text-[10px]"
+      className="pixel-button fixed top-[max(0.75rem,env(safe-area-inset-top))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 px-3 py-2 text-[10px]"
     >
       {on ? "SOUND ON" : "SOUND OFF"}
     </button>

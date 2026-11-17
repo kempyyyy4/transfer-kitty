@@ -16,9 +16,9 @@ interface Props {
 }
 
 /**
- * The card under the kick. Your answer shows straight away; the tier and its fee pop in
- * once the kitty has the ball, so the kick keeps its suspense. NEXT is always there, for
- * anyone who would rather not wait.
+ * The card under the kick. Your answer shows straight away, but whether it was right, its
+ * tier and its fee only appear once the kitty has the ball, so the kick keeps its
+ * suspense. NEXT is always there, for anyone who would rather not wait.
  */
 export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: Props) {
   const level = feedback?.tier ?? STRAY_LEVEL;
@@ -31,7 +31,14 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
       className={`pixel-panel flex flex-col gap-3 p-3 transition-colors duration-300 ${
         landed && stray ? "animate-shake" : "animate-reveal-in"
       }`}
-      style={{ borderColor: landed ? colour : undefined }}
+      style={
+        landed
+          ? {
+              borderColor: colour,
+              backgroundColor: `color-mix(in srgb, ${colour} 12%, var(--color-night-deep))`,
+            }
+          : undefined
+      }
     >
       <div className="flex min-h-5 items-baseline justify-between gap-3">
         {landed && feedback ? (
@@ -46,16 +53,21 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
               {stray ? "£0" : `+${formatFee(feedback?.fee ?? 0)}`}
             </p>
           </>
-        ) : null}
+        ) : (
+          <p className="font-pixel text-[10px] text-chalk-dim">YOUR ANSWER</p>
+        )}
       </div>
       <p className="text-xl leading-tight">
-        {feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
+        {landed && feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
       </p>
       <button
         type="button"
         autoFocus
         aria-disabled={!feedback}
-        className="pixel-button w-full border-floodlight px-4 py-3 text-xs text-floodlight"
+        // Focused for the Enter key, but its own bright border is the only highlight it needs.
+        className={`pixel-button w-full border-floodlight px-4 py-3 text-xs text-floodlight transition-opacity focus-visible:outline-none ${
+          feedback ? "" : "opacity-60"
+        }`}
         onClick={() => {
           if (feedback) onContinue();
         }}

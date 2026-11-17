@@ -31,11 +31,11 @@ export function HomePanel() {
       <Link
         href="/play"
         onClick={startDailyEarly}
-        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-6 py-[2.4vh] text-[clamp(1.6rem,8vw,2.4rem)] text-floodlight"
+        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-4 py-[2.4vh] text-[clamp(1.3rem,8vw,2.4rem)] whitespace-nowrap text-floodlight"
       >
         KICK OFF
         {today && STATUS_LINES[today.played] ? (
-          <span className="font-mono text-xl text-chalk">
+          <span className="font-mono text-xl whitespace-normal text-chalk">
             {STATUS_LINES[today.played]}
             {today.played === "completed" ? (
               <>

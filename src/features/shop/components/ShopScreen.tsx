@@ -61,7 +61,7 @@ export function ShopScreen() {
           </p>
         ) : null}
       </div>
-      <p className="text-chalk-dim">
+      <p className="page-lead">
         Earn coins every day: {COIN_REWARDS.dailyComplete} for finishing the puzzle,{" "}
         {COIN_REWARDS.perGalacticat} for each Galacticat and {COIN_REWARDS.streak.coins} for every{" "}
         {COIN_REWARDS.streak.everyDays} days in a row.

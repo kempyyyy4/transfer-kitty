@@ -36,7 +36,7 @@ export function ArchiveScreen() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">ARCHIVE</h1>
-      <p className="text-xl">
+      <p className="page-lead">
         Every past day&apos;s puzzle. Replays are just for fun: no Top Kitties, no coins.
       </p>
       {access && !unlocked ? <LifetimeCard /> : null}

@@ -15,7 +15,7 @@ export function UnlimitedScreen() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">UNLIMITED</h1>
-      <p className="text-xl">
+      <p className="page-lead">
         Round after round of 7, from the whole question bank. Questions you have not seen come
         first. Just for fun: no Top Kitties, no coins.
       </p>

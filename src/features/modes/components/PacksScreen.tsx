@@ -14,7 +14,7 @@ export function PacksScreen() {
   return (
     <section className="flex flex-col gap-4">
       <h1 className="page-title">THEMED PACKS</h1>
-      <p className="text-xl">
+      <p className="page-lead">
         {formatPrice(PACK_PRICE_PENCE)} each, yours to keep. Rounds of 7 from the pack, new
         questions first. Just for fun: no Top Kitties, no coins.
       </p>

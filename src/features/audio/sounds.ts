@@ -183,3 +183,30 @@ export function playThud(strength: number): void {
   const osc = tone(ctx, "sine", 110, now, 0.1, 0.08 + 0.22 * strength);
   osc.frequency.exponentialRampToValueAtTime(45, now + 0.1);
 }
+
+/** A clock tick for the last seconds of a question: a tock that rises as time runs out. */
+export function playClockTick(secondsLeft: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tone(ctx, "square", 1400 - secondsLeft * 120, now, 0.035, 0.05);
+  tone(ctx, "triangle", 220, now, 0.06, 0.08);
+}
+
+/** A soft blip when an answer is picked from the list. */
+export function playSelect(): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tone(ctx, "square", 660, now, 0.05, 0.05);
+  tone(ctx, "square", 990, now + 0.045, 0.07, 0.045);
+}
+
+/**
+ * A short buzz on phones that can (most Android phones; iPhones ignore it). It goes with
+ * the sound switch, so a player who wants quiet gets no buzzing either.
+ */
+export function buzz(pattern: number | number[]): void {
+  if (!isSoundOn() || typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+  navigator.vibrate(pattern);
+}
