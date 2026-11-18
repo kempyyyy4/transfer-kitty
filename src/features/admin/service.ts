@@ -70,8 +70,8 @@ export async function createQuestion(draft: ManualQuestionDraft): Promise<Create
 export const listReports = () => getOpenReports(ADMIN.reportsShown);
 export const dismissReport = dismissReports;
 
-/** A player's report of a missing answer. Only possible once their round is finished. */
-export const reportMissingAnswer = saveAnswerReport;
+/** A player's report of a missing or wrong answer. Only possible once their round is finished. */
+export const reportAnswer = saveAnswerReport;
 
 export const getSchedule = () => getUpcomingPuzzles(today(), ADMIN.upcomingPuzzleDays);
 

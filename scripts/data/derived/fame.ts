@@ -97,8 +97,8 @@ function countAtOrBelow(sorted: readonly number[], limit: number): number {
 
 /**
  * Builds player_fame for every player. Older players and players with no match data get
- * the higher of their match fame and their Wikipedia fame; everyone else keeps match
- * fame alone.
+ * the higher of their match fame and their Wikipedia fame. Everyone else blends the two,
+ * mostly Wikipedia renown (the hype score), when their Wikipedia page is matched.
  */
 export function buildPlayerFame(warehouse: Warehouse): void {
   buildMatchFame(warehouse);
@@ -110,6 +110,10 @@ export function buildPlayerFame(warehouse: Warehouse): void {
     select
       a.player_id,
       case
+        when a.birth_year >= ${WIKIPEDIA_FAME.appliesToPlayersBornBefore}
+             and coalesce(m.fame, 0) > 0 and coalesce(a.sitelinks, 0) > 0
+          then (1 - ${WIKIPEDIA_FAME.renownShare}) * m.fame
+               + ${WIKIPEDIA_FAME.renownShare} * coalesce(e.fame, 0)
         when a.birth_year >= ${WIKIPEDIA_FAME.appliesToPlayersBornBefore}
              and coalesce(m.fame, 0) > 0
           then m.fame

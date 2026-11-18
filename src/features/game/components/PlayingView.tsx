@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CountUp } from "@/components/CountUp";
 import { FullScreenScene } from "@/components/scene/FullScreenScene";
 import { GameScene } from "@/components/scene/GameScene";
@@ -15,7 +15,7 @@ import {
 } from "@/features/audio";
 import { formatFee } from "@/features/scoring";
 import type { AnswerFeedback, OpenQuestion, PlayerSuggestion } from "../types";
-import { AnswerInput, type AnswerDraft } from "./AnswerInput";
+import { AnswerInput, type AnswerDraft, type WrongGuess } from "./AnswerInput";
 import { AnswerReveal } from "./AnswerReveal";
 import { KickStage } from "./kick/KickStage";
 import { tierColour } from "./tier-label";
@@ -23,13 +23,30 @@ import { TimerBar } from "./TimerBar";
 
 export type PlayingState =
   | { kind: "question"; question: OpenQuestion; deadline: number }
-  /** Answered, and waiting for the server's verdict: Kit is already winding up. */
-  | { kind: "checking"; question: OpenQuestion; answer: string | null }
-  | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback };
+  | {
+      kind: "feedback";
+      question: OpenQuestion;
+      answer: string | null;
+      feedback: AnswerFeedback;
+      /** The player gave up on the question with SKIP. */
+      skipped?: boolean;
+    };
+
+/** For rounds that count for nothing: the player may pause, quit, or play without a timer. */
+export interface PracticeControls {
+  timed: boolean;
+  onQuit: () => void;
+}
 
 interface Props {
   view: PlayingState;
-  onPick: (player: PlayerSuggestion) => void;
+  checking: boolean;
+  wrongGuess: WrongGuess | null;
+  wrongSoFar: readonly PlayerSuggestion[];
+  practice?: PracticeControls;
+  onSubmit: (player: PlayerSuggestion) => void;
+  /** Gives up the question: it counts as out of time. */
+  onSkip: () => void;
   onExpire: () => void;
   onDraftChange: (draft: AnswerDraft) => void;
   onContinue: () => void;
@@ -40,8 +57,27 @@ interface Props {
  * box at the top; after answering, Kit's kick down the line of tier kitties in the middle
  * and the result card at the bottom.
  */
-export function PlayingView({ view, onPick, onExpire, onDraftChange, onContinue }: Props) {
+export function PlayingView({
+  view,
+  checking,
+  wrongGuess,
+  wrongSoFar,
+  practice,
+  onSubmit,
+  onSkip,
+  onExpire,
+  onDraftChange,
+  onContinue,
+}: Props) {
   const { question } = view;
+  /** When the pause began, or null while playing. Practice rounds only. */
+  const [pausedAt, setPausedAt] = useState<number | null>(null);
+  /** Time spent paused on this question, which pushes the deadline back. */
+  const [pausedMs, setPausedMs] = useState<{ position: number; ms: number }>({
+    position: 0,
+    ms: 0,
+  });
+  const extraMs = pausedMs.position === question.position ? pausedMs.ms : 0;
   const feedback = view.kind === "feedback" ? view.feedback : null;
   const [landedFor, setLandedFor] = useState<number | null>(null);
   const [celebrating, setCelebrating] = useState(false);
@@ -102,27 +138,62 @@ export function PlayingView({ view, onPick, onExpire, onDraftChange, onContinue 
                 leaving ? "opacity-40" : ""
               }`}
             >
-              {question.prompt}
+              {pausedAt === null ? question.prompt : "Paused. The question is hidden."}
             </h1>
           </div>
 
-          {view.kind === "question" ? (
+          {view.kind === "question" && pausedAt !== null ? (
+            <PausedPanel
+              onResume={() => {
+                setPausedMs({
+                  position: question.position,
+                  ms: extraMs + performance.now() - pausedAt,
+                });
+                setPausedAt(null);
+              }}
+              onQuit={() => practice?.onQuit()}
+            />
+          ) : null}
+          {view.kind === "question" && pausedAt === null ? (
             <>
-              <TimerBar
-                key={`timer-${question.position}`}
-                deadline={view.deadline}
-                msTotal={GAME_RULES.answerSeconds * 1000}
-                onExpire={onExpire}
-              />
+              {practice ? (
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPausedAt(performance.now())}
+                    className="pixel-button px-3 py-2 text-[10px]"
+                  >
+                    PAUSE
+                  </button>
+                  <button
+                    type="button"
+                    onClick={practice.onQuit}
+                    className="pixel-button px-3 py-2 text-[10px]"
+                  >
+                    QUIT
+                  </button>
+                </div>
+              ) : null}
+              {practice?.timed === false ? null : (
+                <TimerBar
+                  key={`timer-${question.position}-${extraMs}`}
+                  deadline={view.deadline + extraMs}
+                  msTotal={GAME_RULES.answerSeconds * 1000}
+                  onExpire={onExpire}
+                />
+              )}
               <AnswerInput
                 key={`answer-${question.position}`}
-                disabled={false}
-                onPick={(player) => {
+                checking={checking}
+                wrongGuess={wrongGuess}
+                wrongSoFar={wrongSoFar}
+                onSubmit={(player) => {
                   playSelect();
-                  onPick(player);
+                  onSubmit(player);
                 }}
                 onDraftChange={onDraftChange}
               />
+              <SkipButton key={`skip-${question.position}`} disabled={checking} onSkip={onSkip} />
             </>
           ) : null}
         </div>
@@ -139,6 +210,7 @@ export function PlayingView({ view, onPick, onExpire, onDraftChange, onContinue 
             <div className="mx-auto w-full max-w-2xl">
               <AnswerReveal
                 answer={view.answer}
+                skipped={view.kind === "feedback" && view.skipped === true}
                 feedback={feedback}
                 landed={landed}
                 isLast={question.position === question.total}
@@ -189,6 +261,54 @@ function Pips({
           />
         );
       })}
+    </div>
+  );
+}
+
+/** How long SKIP waits for the second tap that confirms it. */
+const SKIP_CONFIRM_MS = 2500;
+
+/** Gives up the question. The first tap asks for a second, so a stray tap costs nothing. */
+function SkipButton({ disabled, onSkip }: { disabled: boolean; onSkip: () => void }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return;
+    const disarm = setTimeout(() => setArmed(false), SKIP_CONFIRM_MS);
+    return () => clearTimeout(disarm);
+  }, [armed]);
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => (armed ? onSkip() : setArmed(true))}
+      className={`pixel-button self-end px-3 py-2 text-[10px] transition-colors ${
+        armed ? "border-claret text-claret" : "text-chalk-dim"
+      }`}
+    >
+      {armed ? "TAP AGAIN TO SKIP" : "SKIP"}
+    </button>
+  );
+}
+
+/** Shown while a practice round is paused: the question stays hidden until it resumes. */
+function PausedPanel({ onResume, onQuit }: { onResume: () => void; onQuit: () => void }) {
+  return (
+    <div className="pixel-panel animate-reveal-in flex flex-col items-center gap-3 p-5 text-center">
+      <p className="font-pixel text-base text-floodlight">PAUSED</p>
+      <p className="text-lg text-chalk-dim">The clock has stopped. Take your time.</p>
+      <div className="flex w-full flex-col gap-2 sm:flex-row">
+        <button
+          type="button"
+          autoFocus
+          onClick={onResume}
+          className="pixel-button flex-1 border-floodlight bg-floodlight px-4 py-3 text-xs text-night-deep hover:text-night-deep"
+        >
+          RESUME
+        </button>
+        <button type="button" onClick={onQuit} className="pixel-button flex-1 px-4 py-3 text-xs">
+          QUIT ROUND
+        </button>
+      </div>
     </div>
   );
 }

@@ -11,10 +11,21 @@ export const GAME_RULES = {
   maxAnswersPerQuestion: 400,
   /** Tiers switch from data-based to crowd-based once a question has this many plays. */
   tierRecalculationThreshold: 200,
+  /**
+   * A wrong guess no longer ends a question (Tom, 18 November 2026): players keep guessing
+   * until they are right or time runs out. This cap only stops a script trying every name.
+   */
+  maxWrongGuesses: 15,
 } as const;
 
 /** The time the server allows for an answer: what the player sees, plus the network grace. */
 export const ANSWER_TIME_LIMIT_MS = GAME_RULES.answerSeconds * 1000 + GAME_RULES.answerGraceMs;
+
+/**
+ * The server's limit for rounds that count for nothing (Archive, Unlimited, packs), so they
+ * can be paused or played untimed. Their timer is the player's own choice.
+ */
+export const PRACTICE_TIME_LIMIT_MS = 60 * 60 * 1000;
 
 /** How each day's puzzle is put together. */
 export const DAILY_PUZZLE = {
@@ -32,6 +43,15 @@ export const DAILY_PUZZLE = {
    * answerable by most fans. Unfair questions (lesser-known clubs) have prominence 0.
    */
   unlimitedMinProminence: 150,
+  /**
+   * Unlimited's difficulty levels (Tom, 18 November 2026), as bands of prominence within
+   * Unlimited's pool. Easy also gets past dailies, whose prominence is higher still.
+   */
+  unlimitedDifficulty: {
+    easy: { floor: 300, ceiling: null },
+    medium: { floor: 150, ceiling: null },
+    hard: { floor: 150, ceiling: 300 },
+  },
   /** Which answer prominence is read from, counting from 0 for the most popular. */
   prominenceAnswerRank: 2,
   /** At most this many of a day's questions may come from the same template. Tom chose 1. */

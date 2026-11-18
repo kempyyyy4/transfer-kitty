@@ -94,14 +94,21 @@ async function liveQuestionIds(): Promise<Set<string>> {
 
 async function checkUnlimited(userId: string): Promise<void> {
   const free = await createAccount();
-  assert.deepEqual(await startPracticeGame(free, { mode: "unlimited" }, new Date()), {
-    status: "locked",
-  });
+  assert.deepEqual(
+    await startPracticeGame(free, { mode: "unlimited", difficulty: "medium" }, new Date()),
+    {
+      status: "locked",
+    },
+  );
   passed("Unlimited and Archive stay locked without the lifetime unlock");
 
   const live = await liveQuestionIds();
   for (let round = 0; round < 3; round++) {
-    const started = await startPracticeGame(userId, { mode: "unlimited" }, new Date());
+    const started = await startPracticeGame(
+      userId,
+      { mode: "unlimited", difficulty: "medium" },
+      new Date(),
+    );
     assert.equal(started.status, "started");
     if (started.status !== "started") return;
     const { data } = await db
@@ -119,7 +126,11 @@ async function checkUnlimited(userId: string): Promise<void> {
   }
   passed("Unlimited never serves a question from today's or a coming daily puzzle");
 
-  const round = await startPracticeGame(userId, { mode: "unlimited" }, new Date());
+  const round = await startPracticeGame(
+    userId,
+    { mode: "unlimited", difficulty: "medium" },
+    new Date(),
+  );
   if (round.status !== "started") throw new Error("Unlimited round did not start");
   const sessionId = round.game.sessionId;
   const { data: first } = await db

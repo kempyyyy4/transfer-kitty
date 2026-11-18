@@ -1,3 +1,4 @@
+import { canonicalCountry } from "../../data/derived/nationality";
 import { FULL_INVOLVEMENT } from "@/config/fame";
 import { groupIntoQuestions, slugify } from "../build";
 import type { AnswerRow, Template } from "../types";
@@ -29,11 +30,11 @@ export const worldCup2026: Template = {
     return groupIntoQuestions(rows, FULL_INVOLVEMENT.tournamentMatches, (row) => ({
       dedupeKey: `world-cup-2026-group-stage:${row.team_id}`,
       templateKey: this.key,
-      prompt: `Name a player who played for ${row.team} in the group stage of the 2026 World Cup.`,
+      prompt: `Name a player who played for ${canonicalCountry(row.team)} in the group stage of the 2026 World Cup.`,
       params: { teamId: row.team_id },
       tags: [
         { type: "tournament", value: "world-cup-2026" },
-        { type: "nationality", value: slugify(row.team) },
+        { type: "nationality", value: slugify(canonicalCountry(row.team)) },
         { type: "decade", value: "2020s" },
       ],
     }));

@@ -210,3 +210,12 @@ export function buzz(pattern: number | number[]): void {
   if (!isSoundOn() || typeof navigator === "undefined" || !("vibrate" in navigator)) return;
   navigator.vibrate(pattern);
 }
+
+/** A low double buzz for a wrong guess: not right, keep going. */
+export function playWrongGuess(): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tone(ctx, "square", 150, now, 0.09, 0.06);
+  tone(ctx, "square", 120, now + 0.11, 0.12, 0.06);
+}

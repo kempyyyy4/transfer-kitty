@@ -1,5 +1,6 @@
 "use client";
 
+import { track as trackEvent } from "@/features/analytics";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { TIERS } from "@/config/tiers";
 import { KitMascot, TierSprite } from "@/features/avatar";
@@ -307,6 +308,7 @@ export function KickStage({ tier, onLanded }: Props) {
       type="button"
       onClick={() => {
         if (tier === null) return;
+        if (!landed.current) trackEvent("kick_skipped");
         finish(tier);
         land();
       }}

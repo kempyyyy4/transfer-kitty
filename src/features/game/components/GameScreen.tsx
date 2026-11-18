@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { FullScreenScene } from "@/components/scene/FullScreenScene";
 import { GameScene } from "@/components/scene/GameScene";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
+import { playWrongGuess } from "@/features/audio";
 import { gameApi, GameApiError } from "../api-client";
 import { takeDailyStart } from "../start-early";
 import { bestMatch, confidentMatch } from "../best-match";
@@ -15,19 +16,25 @@ import type {
   PlayState,
   PracticeRound,
 } from "../types";
-import type { AnswerDraft } from "./AnswerInput";
-import { PlayingView } from "./PlayingView";
+import type { AnswerDraft, WrongGuess } from "./AnswerInput";
+import { PlayingView, type PracticeControls } from "./PlayingView";
 import { SummaryPanel } from "./SummaryPanel";
 
 /** The last-moment name lookup must leave time inside the server's grace period. */
 const TIMEOUT_LOOKUP_MS = 800;
-const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [] };
+const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [], chosen: null };
 
 type View =
   | { kind: "loading" }
   | { kind: "question"; question: OpenQuestion; deadline: number }
-  | { kind: "checking"; question: OpenQuestion; answer: string | null }
-  | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
+  | {
+      kind: "feedback";
+      question: OpenQuestion;
+      answer: string | null;
+      feedback: AnswerFeedback;
+      /** The player gave up on the question with SKIP. */
+      skipped?: boolean;
+    }
   | { kind: "completed"; sessionId: string; summary: GameSummary }
   | { kind: "error"; message: string };
 
@@ -41,13 +48,27 @@ function errorView(error: unknown): View {
  * Plays a round: today's daily, or an Archive, Unlimited or pack round when `round` is given.
  * One question at a time, each judged by the server.
  */
-export function GameScreen({ round }: { round?: PracticeRound }) {
+export function GameScreen({
+  round,
+  practice,
+  onPlayAgain,
+}: {
+  round?: PracticeRound;
+  /** Pause, quit and the timer switch, for rounds that count for nothing. */
+  practice?: PracticeControls;
+  onPlayAgain?: () => void;
+}) {
   const [view, setView] = useState<View>({ kind: "loading" });
   const sessionId = useRef<string | null>(null);
   // Stops the timer running out and a click landing together from sending two answers.
   const answering = useRef(false);
   // What is in the answer box and listed under it, so it can still be sent if time runs out.
   const draft = useRef<AnswerDraft>(EMPTY_DRAFT);
+  // Time ran out while a guess was with the server: close the question once it replies.
+  const expiredWhileChecking = useRef(false);
+  const [checking, setChecking] = useState(false);
+  const [wrongGuess, setWrongGuess] = useState<WrongGuess | null>(null);
+  const [wrongSoFar, setWrongSoFar] = useState<PlayerSuggestion[]>([]);
 
   /**
    * Shows a question or the summary. The server starts its clock somewhere between asking
@@ -56,7 +77,11 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
    */
   const show = useCallback((id: string, state: PlayState, askedAt: number) => {
     answering.current = false;
+    expiredWhileChecking.current = false;
     draft.current = EMPTY_DRAFT;
+    setChecking(false);
+    setWrongGuess(null);
+    setWrongSoFar([]);
     setView(
       state.status === "completed"
         ? { kind: "completed", sessionId: id, summary: state.summary }
@@ -97,37 +122,73 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   }, [show, round]);
 
   /**
-   * Time is up: send whatever name is in the box rather than nothing. The suggestions
-   * already on screen are used when there are any; otherwise the name is looked up once
-   * more, inside the moment's grace the server allows for exactly this.
+   * Time is up: send the name in the box rather than nothing, chosen or just typed. The
+   * suggestions already on screen are used when there are any; otherwise the name is looked
+   * up once more, inside the moment's grace the server allows for exactly this. If that last
+   * guess is wrong too, the question closes as out of time.
    */
   async function submitTyped(question: OpenQuestion) {
-    if (answering.current) return;
-    const { text, suggestions } = draft.current;
-    if (text.trim().length < PLAYER_SEARCH.minQueryLength) return submit(question, null);
+    if (answering.current) {
+      expiredWhileChecking.current = true;
+      return;
+    }
+    const { text, suggestions, chosen } = draft.current;
+    if (chosen) return submit(question, chosen, true);
+    if (text.trim().length < PLAYER_SEARCH.minQueryLength) return submit(question, null, true);
 
     // The list on screen can lag a keystroke behind, so it is only trusted for a clear fit.
     const shown = confidentMatch(text, suggestions);
-    if (shown) return submit(question, shown);
+    if (shown) return submit(question, shown, true);
 
     const looked = await gameApi
       .searchPlayers(text.trim(), AbortSignal.timeout(TIMEOUT_LOOKUP_MS))
       .catch(() => []);
-    return submit(question, bestMatch(text, looked));
+    return submit(question, bestMatch(text, looked), true);
   }
 
-  async function submit(question: OpenQuestion, player: PlayerSuggestion | null) {
-    if (!sessionId.current || answering.current) return;
+  /**
+   * Sends one guess. A right answer, or time running out, moves on to the kick; a wrong
+   * guess shakes the box and the player keeps going. `timeUp` marks the last-moment guess
+   * sent as the timer ends: if it is wrong, the question closes as out of time.
+   */
+  async function submit(
+    question: OpenQuestion,
+    player: PlayerSuggestion | null,
+    timeUp = false,
+    skipped = false,
+  ) {
+    const id = sessionId.current;
+    if (!id || answering.current) return;
     answering.current = true;
-    // Kit winds up straight away, so the wait for the verdict is part of the kick.
-    setView({ kind: "checking", question, answer: player?.name ?? null });
+    setChecking(true);
     try {
-      const feedback = await gameApi.answer(
-        sessionId.current,
-        question.position,
-        player?.id ?? null,
-      );
-      setView({ kind: "feedback", question, answer: player?.name ?? null, feedback });
+      const reply = await gameApi.answer(id, question.position, player?.id ?? null);
+      if (reply.status === "answered") {
+        const { outcome, tier, fee } = reply;
+        setView({
+          kind: "feedback",
+          question,
+          answer: player?.name ?? null,
+          feedback: { outcome, tier, fee },
+          skipped,
+        });
+        return;
+      }
+      answering.current = false;
+      setChecking(false);
+      if (player) {
+        playWrongGuess();
+        setWrongGuess((last) => ({
+          id: (last?.id ?? 0) + 1,
+          player,
+          guessesLeft: reply.guessesLeft,
+        }));
+        setWrongSoFar((sofar) => [...sofar, player]);
+      }
+      if (timeUp || expiredWhileChecking.current) {
+        expiredWhileChecking.current = false;
+        return submit(question, null);
+      }
     } catch {
       // The server no longer has this question open, so show whatever comes next.
       await showNext();
@@ -150,7 +211,9 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
     );
   }
   if (view.kind === "completed") {
-    return <SummaryPanel sessionId={view.sessionId} summary={view.summary} />;
+    return (
+      <SummaryPanel sessionId={view.sessionId} summary={view.summary} onPlayAgain={onPlayAgain} />
+    );
   }
   if (view.kind === "error") {
     return (
@@ -173,7 +236,12 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   return (
     <PlayingView
       view={view}
-      onPick={(player) => void submit(question, player)}
+      practice={practice}
+      checking={checking}
+      wrongGuess={wrongGuess}
+      wrongSoFar={wrongSoFar}
+      onSubmit={(player) => void submit(question, player)}
+      onSkip={() => void submit(question, null, false, true)}
       onExpire={() => void submitTyped(question)}
       onDraftChange={rememberDraft}
       onContinue={() => void showNext()}

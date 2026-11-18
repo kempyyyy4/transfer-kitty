@@ -19,7 +19,7 @@ import {
   getQuestion,
   listReports,
   removeAnswer,
-  reportMissingAnswer,
+  reportAnswer,
   setTierOverride,
 } from "@/features/admin/service";
 import { getServiceClient } from "@/lib/supabase/server";
@@ -131,6 +131,15 @@ async function checkLiveToday(): Promise<void> {
   passed("today's questions are frozen: no tier or answer changes");
 }
 
+const reportMissingAnswer = (
+  userId: string,
+  sessionId: string,
+  position: number,
+  playerId: number,
+) => reportAnswer("missing", userId, sessionId, position, playerId);
+const reportWrongAnswer = (userId: string, sessionId: string, position: number, playerId: number) =>
+  reportAnswer("wrong", userId, sessionId, position, playerId);
+
 async function checkReports(questionId: string, players: number[]): Promise<void> {
   const userId = await createAccount();
   const unfinished = await playedSession(userId, questionId, false);
@@ -158,6 +167,22 @@ async function checkReports(questionId: string, players: number[]): Promise<void
   assert.equal(await dismissReport(questionId, other), 1);
   assert.ok(!(await isOpen(other)));
   passed("a report can be dismissed");
+
+  const listed = players[1] ?? 0;
+  assert.equal(await reportWrongAnswer(userId, unfinished, 1, listed), "not_found");
+  assert.equal(await reportWrongAnswer(userId, finished, 1, other), "not_listed");
+  assert.equal(await reportWrongAnswer(userId, finished, 1, listed), "saved");
+  assert.equal(await reportWrongAnswer(userId, finished, 1, listed), "already_reported");
+  assert.ok(
+    (await listReports()).some(
+      (r) => r.questionId === questionId && r.playerId === listed && r.kind === "wrong",
+    ),
+  );
+  passed("a player can report a listed answer as wrong, once, after the round");
+
+  assert.equal(await removeAnswer(questionId, listed), "removed");
+  assert.ok(!(await isOpen(listed)));
+  passed("removing a reported answer closes the report");
 }
 
 async function checkPacks(questionId: string): Promise<void> {

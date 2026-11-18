@@ -134,3 +134,12 @@ The gauge and its transfer-record milestones were removed after Tom's play-test,
 - **The team photo kitties are close likenesses** of nine famous players in national-style kits (Portugal, Norway, Argentina, England, France, Brazil) doing their best-known celebrations, as you chose. They are never named. **The legal check must clear them before launch**; some celebrations are trademarked.
 - **45 seconds per question** makes looking answers up easier. Worth watching once real players arrive.
 - **Future daily puzzles on the dev database** were rebuilt under the new variety rule.
+
+## 16. Second play-test (18 November 2026)
+
+- **Countries spelled two ways** in the dataset are merged (`src/config/countries.ts`): Türkiye becomes Turkey, Neukaledonien becomes New Caledonia. Turkish players were split across two questions before.
+- **Blank nationalities** (about 200 players, Handanović, Quagliarella, Nainggolan among them) are filled from Wikidata's "country for sport", then citizenship, only where Transfermarkt has none and only with countries the dataset already uses. Wikidata names that differ are mapped in the same file.
+- **"Played for X and won Y"** counts a winner as anyone who played in that competition for the winning club that season. Squad players who never got on are not winners here.
+- **The hype score** blends Wikipedia renown (70%) with career volume for players born from 1990 (`WIKIPEDIA_FAME.renownShare`). Players at the named club now count as fully involved; short spells in long careers count for less (`CLUB_ASSOCIATION`).
+- **Wrong guesses** are capped at 15 per question; until then the player keeps guessing. Skipping counts as out of time.
+- **Unlimited difficulty** bands: Easy is prominence 300 and up, Medium 150 and up, Hard 150 to 300 (`DAILY_PUZZLE.unlimitedDifficulty`).

@@ -37,6 +37,7 @@ export const newQuestionSchema = z.object({
 });
 
 export const reportAnswerSchema = z.object({
+  kind: z.enum(["missing", "wrong"]).default("missing"),
   sessionId: z.uuid(),
   position: z.number().int().min(1).max(GAME_RULES.questionsPerRound),
   playerId: entityId,

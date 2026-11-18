@@ -4,6 +4,8 @@ import path from "node:path";
 export const DATA_DIR = path.resolve("data");
 export const TRANSFERMARKT_DIR = path.join(DATA_DIR, "raw", "transfermarkt");
 export const WIKIDATA_DIR = path.join(DATA_DIR, "raw", "wikidata");
+/** Nationalities for players the Transfermarkt dataset leaves blank. */
+export const NATIONALITY_FILE = path.join(WIKIDATA_DIR, "nationality.json");
 export const WAREHOUSE_PATH = path.join(DATA_DIR, "build", "warehouse.sqlite");
 export const WIKIDATA_REPORT_PATH = path.join(DATA_DIR, "build", "wikidata-report.txt");
 

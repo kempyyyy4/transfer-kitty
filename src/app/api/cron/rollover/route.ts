@@ -1,4 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
+import { clearOldAnalytics } from "@/features/analytics/server";
 import { scheduleDailyPuzzles } from "@/features/questions";
 // Server-only, so it is not in the scoring feature's index, which client screens import.
 import { recalculateDueTiers } from "@/features/scoring/recalculation-job";
@@ -10,7 +11,8 @@ import { ukDayOf } from "@/lib/time/uk-day";
  * Daily housekeeping, called by Vercel's scheduler (see vercel.json).
  * The puzzle itself changes at UK midnight without this: each request works out the UK
  * day for itself. This job keeps puzzles scheduled ahead and recalculates tiers from real
- * answers, skipping today's questions so fees never change mid-day. Running it twice, or
+ * answers, skipping today's questions so fees never change mid-day, and deletes analytics
+ * events past their keeping period. Running it twice, or
  * missing a day, does no harm.
  */
 export async function GET(request: Request) {
@@ -21,7 +23,12 @@ export async function GET(request: Request) {
   const today = ukDayOf(new Date());
   const created = await scheduleDailyPuzzles(today);
   const recalculated = await recalculateDueTiers(today);
-  return Response.json({ puzzlesCreated: created, questionsRecalculated: recalculated });
+  const analyticsDeleted = await clearOldAnalytics(today);
+  return Response.json({
+    puzzlesCreated: created,
+    questionsRecalculated: recalculated,
+    analyticsDeleted,
+  });
 }
 
 /** Vercel sends the secret as a bearer token. Compared in constant time. */

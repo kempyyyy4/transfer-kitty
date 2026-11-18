@@ -14,11 +14,14 @@ import { ShareButton } from "@/features/share";
 import { gameApi } from "../api-client";
 import type { GameSummary, QuestionAnswers } from "../types";
 import { AnswerList } from "./AnswerList";
+import { KittyCurve } from "./KittyCurve";
 import { outcomeLine, tierColour, tierName } from "./tier-label";
 
 interface Props {
   sessionId: string;
   summary: GameSummary;
+  /** Starts another round with the same settings. Without it, the page reloads. */
+  onPlayAgain?: () => void;
 }
 
 /** How long the kitty takes to roll up on the scoreboard. */
@@ -29,7 +32,7 @@ const ROLL_MS = 1400;
  * colours, rank, coins and sharing, then each answer in its tier's colour with every valid
  * answer underneath.
  */
-export function SummaryPanel({ sessionId, summary }: Props) {
+export function SummaryPanel({ sessionId, summary, onPlayAgain }: Props) {
   const [lists, setLists] = useState<QuestionAnswers[] | null>(null);
 
   useEffect(() => {
@@ -65,6 +68,7 @@ export function SummaryPanel({ sessionId, summary }: Props) {
           <p className="font-pixel text-xs text-scoreboard">+{summary.coinsEarned} COINS</p>
         ) : null}
       </div>
+      {daily && summary.completed ? <KittyCurve sessionId={sessionId} /> : null}
       {daily ? <YourRank /> : null}
       {daily && summary.puzzleNumber && summary.completed ? (
         <ShareButton
@@ -138,7 +142,7 @@ export function SummaryPanel({ sessionId, summary }: Props) {
       {summary.mode === "unlimited" || summary.mode === "pack" ? (
         <button
           type="button"
-          onClick={() => window.location.reload()}
+          onClick={() => (onPlayAgain ? onPlayAgain() : window.location.reload())}
           className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
         >
           PLAY ANOTHER ROUND

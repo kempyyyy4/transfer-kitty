@@ -28,7 +28,9 @@
     "smoke:accounts": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-accounts.ts",
     "smoke:admin": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-admin.ts",
     "smoke:coins": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-coins.ts",
-    "smoke:payments": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-payments.ts"
+    "smoke:payments": "tsx --conditions=react-server --env-file=.env.local scripts/dev/smoke-payments.ts",
+    "wikidata:nationality": "tsx scripts/data/download-nationality.ts",
+    "data:derive": "tsx scripts/data/derive.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

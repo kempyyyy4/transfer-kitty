@@ -68,12 +68,13 @@ export type ServedState =
 export async function serveNextQuestion(
   sessionId: string,
   userId: string,
-  timeLimitMs: number,
+  limits: { timeLimitMs: number; practiceTimeLimitMs: number },
 ): Promise<ServedState | null> {
   const { data, error } = await getServiceClient().rpc("serve_next_question", {
     p_session_id: sessionId,
     p_user_id: userId,
-    p_time_limit_ms: timeLimitMs,
+    p_time_limit_ms: limits.timeLimitMs,
+    p_practice_time_limit_ms: limits.practiceTimeLimitMs,
   });
   if (error) throw new Error(`Getting the next question failed: ${error.message}`);
   if (data === null) return null;
@@ -92,6 +93,7 @@ export async function serveNextQuestion(
 
 const answeredSchema = z.discriminatedUnion("status", [
   z.object({ status: z.literal("not_open") }),
+  z.object({ status: z.literal("retry"), guesses_left: z.number() }),
   z.object({
     status: z.literal("answered"),
     outcome: outcomeSchema,
@@ -104,6 +106,8 @@ const answeredSchema = z.discriminatedUnion("status", [
 
 export type AnswerResult =
   | { status: "not_open" }
+  /** A wrong guess with guesses to spare: the question stays open. */
+  | { status: "retry"; guessesLeft: number }
   | {
       status: "answered";
       outcome: AnswerOutcome;
@@ -120,8 +124,10 @@ interface AnswerSubmission {
   /** Null when the player gave no answer. */
   entityId: number | null;
   timeLimitMs: number;
+  practiceTimeLimitMs: number;
   /** The fee for each tier level, starting at level 0. */
   feesByTier: readonly number[];
+  maxWrongGuesses: number;
 }
 
 /** Judges an answer on the database clock. Null if the session is not the user's. */
@@ -132,13 +138,16 @@ export async function submitAnswer(submission: AnswerSubmission): Promise<Answer
     p_position: submission.position,
     p_entity_id: submission.entityId,
     p_time_limit_ms: submission.timeLimitMs,
+    p_practice_time_limit_ms: submission.practiceTimeLimitMs,
     p_fees: submission.feesByTier,
+    p_max_wrong_guesses: submission.maxWrongGuesses,
   });
   if (error) throw new Error(`Submitting the answer failed: ${error.message}`);
   if (data === null) return null;
 
   const result = answeredSchema.parse(data);
   if (result.status === "not_open") return result;
+  if (result.status === "retry") return { status: "retry", guessesLeft: result.guesses_left };
   return {
     status: "answered",
     outcome: result.outcome,

@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/features/analytics";
 import { useState } from "react";
 import { shareText, type ShareInput } from "./share-text";
 
@@ -9,6 +10,7 @@ export function ShareButton(props: ShareInput) {
   const text = shareText(props);
 
   async function copy() {
+    track("share");
     try {
       await navigator.clipboard.writeText(text);
       setState("copied");

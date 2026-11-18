@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/features/analytics";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MenuArt, type MenuArtKind } from "./MenuArt";
@@ -67,7 +68,10 @@ export function SiteMenu() {
         type="button"
         aria-label={open ? "Close the menu" : "Open the menu"}
         aria-expanded={open}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          if (!open) track("menu_open");
+          setOpen(!open);
+        }}
         className="pixel-button fixed top-[max(0.75rem,env(safe-area-inset-top))] left-[max(0.75rem,env(safe-area-inset-left))] z-50 flex h-10 w-12 flex-col items-center justify-center gap-1"
       >
         {[0, 1, 2].map((bar) => (

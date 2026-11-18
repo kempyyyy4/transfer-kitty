@@ -7,6 +7,8 @@ import { outcomeLine, tierColour, tierName } from "./tier-label";
 
 interface Props {
   answer: string | null;
+  /** The player gave up on the question with SKIP. */
+  skipped?: boolean;
   /** Null while the server is still checking the answer. */
   feedback: AnswerFeedback | null;
   /** True once the receiving kitty has the ball: the tier and fee are kept back until then. */
@@ -20,7 +22,14 @@ interface Props {
  * tier and its fee only appear once the kitty has the ball, so the kick keeps its
  * suspense. NEXT is always there, for anyone who would rather not wait.
  */
-export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: Props) {
+export function AnswerReveal({
+  answer,
+  skipped = false,
+  feedback,
+  landed,
+  isLast,
+  onContinue,
+}: Props) {
   const level = feedback?.tier ?? STRAY_LEVEL;
   const stray = level === STRAY_LEVEL;
   const colour = tierColour(level);
@@ -58,7 +67,11 @@ export function AnswerReveal({ answer, feedback, landed, isLast, onContinue }: P
         )}
       </div>
       <p className="text-xl leading-tight">
-        {landed && feedback ? outcomeLine(feedback.outcome, answer) : (answer ?? "Out of time")}
+        {skipped
+          ? "Skipped"
+          : landed && feedback
+            ? outcomeLine(feedback.outcome, answer)
+            : (answer ?? "Out of time")}
       </p>
       <button
         type="button"

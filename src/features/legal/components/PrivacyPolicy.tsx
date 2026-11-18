@@ -1,3 +1,4 @@
+import { ANALYTICS } from "@/config/analytics";
 import Link from "next/link";
 import { ACCOUNT } from "@/config/account";
 import { LEGAL } from "@/config/legal";
@@ -30,11 +31,20 @@ export function PrivacyPolicy() {
           card details go to Stripe, never to us.
         </li>
         <li>
-          <strong>When you report a missing answer:</strong> the question and the player you picked.
+          <strong>When you report a missing or wrong answer:</strong> the question and the player
+          you picked.
         </li>
         <li>
           <strong>To keep the game fair and safe:</strong> your IP address, briefly, to stop anyone
           flooding the game with requests.
+        </li>
+        <li>
+          <strong>To count visits, without cookies:</strong> which pages are viewed and for how
+          long, the site that sent you, your country, and the kind of device and browser. We never
+          store your IP address or put anything on your device for this. To tell visitors apart
+          within one day, we make a code from your IP address and browser mixed with a random value
+          that is deleted the next day, so you can&apos;t be followed from one day to another. These
+          records are kept for {ANALYTICS.keepDays} days.
         </li>
       </ul>
 
@@ -42,6 +52,10 @@ export function PrivacyPolicy() {
       <ul>
         <li>To run the game and your account, and deliver what you buy (our contract with you).</li>
         <li>To stop cheating and abuse (our legitimate interest in a fair game).</li>
+        <li>
+          To see how the site is used so we can improve it (our legitimate interest), counted
+          without cookies.
+        </li>
         <li>To keep payment records, as the law requires.</li>
         <li>To show personalised ads to free players, only if you agree.</li>
       </ul>
@@ -68,7 +82,8 @@ export function PrivacyPolicy() {
           site&apos;s own admin.
         </li>
         <li>
-          <strong>Your settings:</strong> whether sound is on, stored on your device.
+          <strong>Your settings:</strong> whether sound is on and your Unlimited choices, stored on
+          your device.
         </li>
         <li>
           <strong>Ads:</strong> free players may see Google ads on the Results and Top Kitties

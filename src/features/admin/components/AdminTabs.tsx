@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { NewQuestionPanel } from "./NewQuestionPanel";
 import { PacksPanel } from "./PacksPanel";
@@ -45,6 +46,12 @@ export function AdminTabs() {
             {item.label}
           </button>
         ))}
+        <Link
+          href="/admin/analytics"
+          className="pixel-button border-sky px-2 py-2 text-[10px] text-sky"
+        >
+          ANALYTICS
+        </Link>
       </nav>
 
       {openQuestion ? (

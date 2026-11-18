@@ -42,8 +42,12 @@ export interface AnsweredQuestion {
 export type GameMode = "daily" | "archive" | "unlimited" | "pack";
 
 /** A round that is not the daily. Archive, Unlimited and packs need the matching purchase. */
+export type Difficulty = "easy" | "medium" | "hard";
+
 export type PracticeRound =
-  { mode: "unlimited" } | { mode: "archive"; date: string } | { mode: "pack"; packId: string };
+  | { mode: "unlimited"; difficulty: Difficulty }
+  | { mode: "archive"; date: string }
+  | { mode: "pack"; packId: string };
 
 export interface GameSummary {
   mode: GameMode;
@@ -65,6 +69,13 @@ export interface AnswerFeedback {
   tier: number;
   fee: number;
 }
+
+/** The reply to a guess: judged, or wrong with guesses to spare and the question still open. */
+export type AnswerReply =
+  ({ status: "answered" } & AnswerFeedback) | { status: "retry"; guessesLeft: number };
+
+/** The spread of everyone's kitty on the day, for the curve on the results screen. */
+export type { KittyDistribution } from "@/lib/db";
 
 /** One valid answer to a question, shown only after the player's round is finished. */
 export interface ValidAnswer {
