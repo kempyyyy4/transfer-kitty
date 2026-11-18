@@ -102,9 +102,16 @@ async function play(userId: string): Promise<void> {
   assert.equal(await answerQuestion(userId, game.sessionId, 2, NOBODY), "not_open");
   passed("a question that has not been served cannot be answered");
 
-  const wrong = await answerQuestion(userId, game.sessionId, 1, NOBODY);
-  assert.deepEqual(wrong, { outcome: "wrong", tier: 0, fee: 0 });
-  passed("a wrong answer is a Stray worth nothing");
+  const firstWrong = await answerQuestion(userId, game.sessionId, 1, NOBODY);
+  assert.deepEqual(firstWrong, { status: "retry", guessesLeft: GAME_RULES.maxWrongGuesses - 1 });
+  passed("a wrong guess keeps the question open, with guesses left");
+
+  let lastGuess: Awaited<ReturnType<typeof answerQuestion>> = firstWrong;
+  for (let guess = 1; guess < GAME_RULES.maxWrongGuesses; guess++) {
+    lastGuess = await answerQuestion(userId, game.sessionId, 1, NOBODY);
+  }
+  assert.deepEqual(lastGuess, { status: "answered", outcome: "wrong", tier: 0, fee: 0 });
+  passed(`using up all ${GAME_RULES.maxWrongGuesses} wrong guesses makes it a Stray worth nothing`);
 
   assert.equal(await answerQuestion(userId, game.sessionId, 1, NOBODY), "not_open");
   passed("a question cannot be answered twice");
@@ -117,7 +124,7 @@ async function play(userId: string): Promise<void> {
     2,
     await validAnswerFor(game.sessionId, 2),
   );
-  assert.ok(correct && correct !== "not_open");
+  assert.ok(correct && correct !== "not_open" && correct.status === "answered");
   assert.equal(correct.outcome, "correct");
   assert.equal(correct.fee, TIERS.find((tier) => tier.level === correct.tier)?.feeGbp);
   assert.ok(correct.fee > 0);
@@ -126,6 +133,7 @@ async function play(userId: string): Promise<void> {
   const third = await openQuestion(userId, game.sessionId);
   assert.equal(third.kittySoFar, correct.fee);
   assert.deepEqual(await answerQuestion(userId, game.sessionId, 3, null), {
+    status: "answered",
     outcome: "timeout",
     tier: 0,
     fee: 0,
@@ -140,7 +148,7 @@ async function play(userId: string): Promise<void> {
     .eq("session_id", game.sessionId)
     .eq("position", 4);
   const late = await answerQuestion(userId, game.sessionId, 4, lateAnswer);
-  assert.ok(late && late !== "not_open");
+  assert.ok(late && late !== "not_open" && late.status === "answered");
   assert.equal(late.outcome, "timeout");
   passed("a valid answer sent after the time limit is still a timeout");
 
@@ -163,7 +171,7 @@ async function play(userId: string): Promise<void> {
       position,
       await validAnswerFor(game.sessionId, position),
     );
-    assert.ok(answer && answer !== "not_open");
+    assert.ok(answer && answer !== "not_open" && answer.status === "answered");
     total += answer.fee;
   }
 

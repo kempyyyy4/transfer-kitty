@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/features/analytics";
 import { useState } from "react";
 import { paymentsApi, PaymentsApiError } from "../api-client";
 
@@ -17,6 +18,7 @@ export function BuyButton({ product, label, wide = false }: Props) {
   const [message, setMessage] = useState<string | null>(null);
 
   async function buy() {
+    track("buy_clicked", { product: product.startsWith("pack:") ? "pack" : product });
     setBusy(true);
     setMessage(null);
     try {

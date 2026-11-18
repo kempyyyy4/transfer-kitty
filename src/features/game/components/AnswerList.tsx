@@ -1,10 +1,11 @@
 "use client";
 
+import { track } from "@/features/analytics";
 import { useState } from "react";
 import { formatFee } from "@/features/scoring";
 import { toSearchName } from "@/lib/search-name";
 import type { QuestionAnswers } from "../types";
-import { ReportMissing } from "./ReportMissing";
+import { ReportAnswer } from "./ReportAnswer";
 import { tierColour, tierName } from "./tier-label";
 
 /**
@@ -29,7 +30,10 @@ export function AnswerList({
     return (
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          track("answers_viewed", { position: question.position });
+          setOpen(true);
+        }}
         className="pixel-button self-start px-3 py-2 text-[10px]"
       >
         SHOW ALL {question.answers.length} ANSWERS
@@ -75,11 +79,7 @@ export function AnswerList({
         ))}
         {shown.length === 0 ? <p className="py-1">No answer matches that name.</p> : null}
       </div>
-      <ReportMissing
-        sessionId={sessionId}
-        position={question.position}
-        answerIds={new Set(question.answers.map((answer) => answer.id))}
-      />
+      <ReportAnswer sessionId={sessionId} position={question.position} answers={question.answers} />
     </div>
   );
 }

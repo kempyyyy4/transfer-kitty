@@ -110,7 +110,10 @@ Ask Tom before any decision that is hard to change later: database schema change
 ## Game integrity rules
 
 - Valid answers and tiers are never sent to the browser until the server has that player's round of 7 marked as finished.
-- The 25-second timer is judged by the database clock, not the client. `serve_next_question` stamps the time a question is handed out and `submit_answer` measures from it, both inside Postgres, so a game step is one atomic call.
+- The daily's 45-second timer is judged by the database clock, not the client. `serve_next_question` stamps the time a question is handed out and `submit_answer` measures from it, both inside Postgres, so a game step is one atomic call. Archive, Unlimited and pack rounds get `PRACTICE_TIME_LIMIT_MS` instead, so they can be paused or untimed; their timer is the player's choice.
+- A wrong guess does not end a question: `submit_answer` returns `retry` and the player keeps guessing until right or out of time. Wrong guesses are capped by `GAME_RULES.maxWrongGuesses` so a script cannot try every name. Picking a name only chooses it; Enter or SUBMIT sends it.
+- Re-importing questions (`import_questions`) skips any question in today's puzzle, so a load never changes a live fee.
+- The results curve (`daily_kitty_distribution`) only ever returns counts, never anyone's score or identity.
 - One daily attempt per user is enforced by a database constraint, not just by code.
 - The full answer lists come only from `get_session_answer_lists`, which refuses until the session is completed. Never add another path that returns `question_answers` to the browser.
 - Tiers are recalculated only by the nightly job, never for a question in today's daily puzzle, so a fee never changes during the day it is played.
@@ -145,7 +148,15 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Every admin route starts with `adminGate()` from `src/features/admin/server.ts`. Anyone else gets a plain 404.
 - A question in today's puzzle is frozen: tier overrides and answer changes are refused until midnight, so a fee never changes during its day.
 - Hand-written questions get starting tiers from fame, the same way as generated ones. They follow the question rules below: only checked facts.
-- Players report missing answers by picking a player, never by free text. Reports are only accepted for a round they finished.
+- Players report missing answers, or listed answers that are wrong, by picking a player, never by free text. Reports are only accepted for a round they finished. Removing a reported answer closes its reports.
+- The site dashboard is `/admin/analytics`, behind the same admin lock.
+
+## Analytics
+
+- First-party and cookie-free, so no consent banner: `src/features/analytics`, events to `POST /api/pulse`. Nothing is stored on the visitor's device; no IP address, browser string or account ID is stored with an event. A visitor is a hash with a daily salt that is deleted the next day. Never add a third-party tracker or anything stored on the device for analytics without a consent banner, and ask Tom first.
+- Named events are whitelisted in `src/config/analytics.ts`; send them with `track()`. Props are short labels, never personal data.
+- Figures about play, accounts and money come from the game's own tables in `admin_analytics`, aggregated only.
+- The reusable version for other projects is the `cookieless-analytics` skill in Tom's personal skills folder. Keep it in step when this changes.
 
 ## Coins and the shop
 
@@ -178,6 +189,9 @@ A feature's `service.ts` is server-only. Its client components import from their
 - `README.md` covers setup and launch. Keep it current.
 
 ## Question rules
+
+- Fame is the hype score: for players born from 1990, mostly Wikipedia renown (`WIKIPEDIA_FAME.renownShare`) and the rest career volume, so famous young stars count as the obvious answers they are. In questions that name a club, a player there now is fully involved, and a short spell in a long career counts for less (`CLUB_ASSOCIATION`). Rebuild with `tsx scripts/data/derive.ts` then regenerate.
+- "Played for X and won Y" questions name the seasons the data fully covers, worked out from the data, so a final missing from a download never marks winners wrong.
 
 - Never write football facts from memory. Every generated question and every valid answer comes from a data source approved in `PLAN.md`.
 - Do not add a data source without a licence that allows commercial use, and not without Tom's approval.

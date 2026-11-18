@@ -1,5 +1,6 @@
 "use client";
 
+import { track } from "@/features/analytics";
 import { useState, type FormEvent } from "react";
 import { accountApi, AccountApiError } from "../api-client";
 
@@ -11,6 +12,7 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
 
   async function send(event: FormEvent) {
     event.preventDefault();
+    track("sign_in_started", { method: "email" });
     setError(null);
     try {
       await accountApi.emailLink(email);
@@ -59,7 +61,11 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
       </form>
 
       <p className="text-center text-sm text-chalk-dim">or</p>
-      <a href={accountApi.googleSignInPath} className="pixel-button px-4 py-3 text-xs">
+      <a
+        href={accountApi.googleSignInPath}
+        onClick={() => track("sign_in_started", { method: "google" })}
+        className="pixel-button px-4 py-3 text-xs"
+      >
         SIGN IN WITH GOOGLE
       </a>
 

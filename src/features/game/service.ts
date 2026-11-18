@@ -1,5 +1,5 @@
 import "server-only";
-import { ANSWER_TIME_LIMIT_MS, GAME_RULES } from "@/config/game";
+import { ANSWER_TIME_LIMIT_MS, GAME_RULES, PRACTICE_TIME_LIMIT_MS } from "@/config/game";
 import { TIERS, TOP_LEVEL } from "@/config/tiers";
 import { payRoundCoins } from "@/features/coins/server";
 import { getStreak } from "@/features/profile/server";
@@ -15,7 +15,7 @@ import {
 } from "@/lib/db";
 import { ukDayOf } from "@/lib/time/uk-day";
 import type {
-  AnswerFeedback,
+  AnswerReply,
   GameSummary,
   PlayState,
   QuestionAnswers,
@@ -72,7 +72,10 @@ export async function firstState(userId: string, sessionId: string): Promise<Pla
  * Null if the session is not theirs.
  */
 export async function advanceGame(userId: string, sessionId: string): Promise<PlayState | null> {
-  const state = await serveNextQuestion(sessionId, userId, ANSWER_TIME_LIMIT_MS);
+  const state = await serveNextQuestion(sessionId, userId, {
+    timeLimitMs: ANSWER_TIME_LIMIT_MS,
+    practiceTimeLimitMs: PRACTICE_TIME_LIMIT_MS,
+  });
   if (!state) return null;
 
   if (state.status === "completed") {
@@ -91,28 +94,33 @@ export async function advanceGame(userId: string, sessionId: string): Promise<Pl
 }
 
 /**
- * Judges the player's answer to the open question. `playerId` is null if they ran out
- * of time. Returns "not_open" if that question is not the one waiting for an answer,
- * and null if the session is not theirs.
+ * Judges the player's guess at the open question. `playerId` is null if they ran out of
+ * time. A wrong guess with guesses to spare comes back as a retry and leaves the question
+ * open. Returns "not_open" if that question is not the one waiting for an answer, and null
+ * if the session is not theirs.
  */
 export async function answerQuestion(
   userId: string,
   sessionId: string,
   position: number,
   playerId: number | null,
-): Promise<AnswerFeedback | "not_open" | null> {
+): Promise<AnswerReply | "not_open" | null> {
   const result = await submitAnswer({
     sessionId,
     userId,
     position,
     entityId: playerId,
     timeLimitMs: ANSWER_TIME_LIMIT_MS,
+    practiceTimeLimitMs: PRACTICE_TIME_LIMIT_MS,
     feesByTier: FEES_BY_TIER,
+    maxWrongGuesses: GAME_RULES.maxWrongGuesses,
   });
   if (!result) return null;
   if (result.status === "not_open") return "not_open";
+  if (result.status === "retry") return { status: "retry", guessesLeft: result.guessesLeft };
 
   return {
+    status: "answered",
     outcome: result.outcome,
     tier: result.tier,
     fee: result.fee,

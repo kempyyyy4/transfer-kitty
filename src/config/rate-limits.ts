@@ -24,6 +24,8 @@ export const RATE_LIMITS = {
   shop: { name: "shop", limit: 60, windowSeconds: 60 },
   /** Buying an item with coins. */
   purchase: { name: "purchase", limit: 20, windowSeconds: 600 },
+  /** Page views and events from one visitor. Well above any real browsing. */
+  analytics: { name: "analytics", limit: 120, windowSeconds: 60 },
   /** Reporting a missing answer after a round. */
   answerReport: { name: "answer-report", limit: 20, windowSeconds: 600 },
   /** Typing the admin password. Counted per IP address, and kept very low. */

@@ -9,5 +9,6 @@ export {
   playSelect,
   playThud,
   playTick,
+  playWrongGuess,
 } from "./sounds";
 export { useSoundOn } from "./sound-setting";

@@ -28,4 +28,12 @@ export const WIKIPEDIA_FAME = {
    * is inside the match data, born in these years.
    */
   calibrationBirthYears: { from: 1990, to: 1996 },
+  /**
+   * The hype score (Tom, 18 November 2026). For players born from
+   * `appliesToPlayersBornBefore` on, fame is this share of Wikipedia renown and the rest
+   * from career volume, so a famous young star (Yamal, Gavi) counts as the obvious answer
+   * he is, and a long but quieter career (Laporte, Oyarzabal) earns more. Only players
+   * whose Wikipedia page is matched use it.
+   */
+  renownShare: 0.7,
 } as const;

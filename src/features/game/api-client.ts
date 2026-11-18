@@ -1,5 +1,6 @@
 import type {
-  AnswerFeedback,
+  AnswerReply,
+  KittyDistribution,
   PlayerSuggestion,
   PlayState,
   PracticeRound,
@@ -41,11 +42,17 @@ export const gameApi = {
   practice: (round: PracticeRound) => post<StartedGame>("/api/game/practice", round),
   next: (sessionId: string) => post<PlayState>("/api/game/next", { sessionId }),
   answer: (sessionId: string, position: number, playerId: number | null) =>
-    post<AnswerFeedback>("/api/game/answer", { sessionId, position, playerId }),
+    post<AnswerReply>("/api/game/answer", { sessionId, position, playerId }),
+  distribution: (sessionId: string) =>
+    call<KittyDistribution>(`/api/game/distribution?sessionId=${encodeURIComponent(sessionId)}`),
   answerLists: (sessionId: string) =>
     call<QuestionAnswers[]>(`/api/game/answers?sessionId=${encodeURIComponent(sessionId)}`),
-  reportMissing: (sessionId: string, position: number, playerId: number) =>
-    post<{ message: string }>("/api/game/report", { sessionId, position, playerId }),
+  reportAnswer: (
+    kind: "missing" | "wrong",
+    sessionId: string,
+    position: number,
+    playerId: number,
+  ) => post<{ message: string }>("/api/game/report", { kind, sessionId, position, playerId }),
   searchPlayers: (query: string, signal: AbortSignal) =>
     call<PlayerSuggestion[]>(`/api/players/search?q=${encodeURIComponent(query)}`, { signal }),
 };

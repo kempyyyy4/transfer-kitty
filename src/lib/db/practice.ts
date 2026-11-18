@@ -8,6 +8,8 @@ export async function pickPracticeQuestions(query: {
   packId: string | null;
   today: string;
   floorProminence: number;
+  /** Null for no upper limit. */
+  ceilingProminence: number | null;
   reserveProminence: number;
   count: number;
 }): Promise<string[]> {
@@ -16,6 +18,7 @@ export async function pickPracticeQuestions(query: {
     p_pack_id: query.packId,
     p_today: query.today,
     p_floor: query.floorProminence,
+    p_ceiling: query.ceilingProminence,
     p_reserve: query.reserveProminence,
     p_count: query.count,
   });

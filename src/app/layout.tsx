@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { StadiumScene } from "@/components/scene/StadiumScene";
 import { SiteMenu } from "@/components/SiteMenu";
+import { AnalyticsTracker } from "@/features/analytics";
 import { SoundToggle } from "@/features/audio";
 import { SiteFooter } from "@/features/legal";
 import "./globals.css";
@@ -50,6 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SoundToggle />
         {children}
         <SiteFooter />
+        <AnalyticsTracker />
       </body>
     </html>
   );

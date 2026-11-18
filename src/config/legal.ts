@@ -10,7 +10,7 @@ export const LEGAL = {
   contactEmail: null as string | null,
   /** Set to false once the texts have been checked. */
   isDraft: true,
-  lastUpdated: "14 November 2026",
+  lastUpdated: "18 November 2026",
   /** The UK regulator players can complain to about their data. */
   regulator: { name: "Information Commissioner's Office (ICO)", url: "https://ico.org.uk" },
 } as const;

@@ -5,6 +5,7 @@ import { clubManager } from "./club-manager";
 import { clubScorer } from "./club-scorer";
 import { clubSeason } from "./club-season";
 import { clubSince2012 } from "./club-since-2012";
+import { clubTrophy } from "./club-trophy";
 import { cupFinal } from "./cup-final";
 import { cupFinalist } from "./cup-finalist";
 import { hatTrick } from "./hat-trick";
@@ -25,6 +26,7 @@ export const TEMPLATES: readonly Template[] = [
   clubDecade,
   clubManager,
   clubCup,
+  clubTrophy,
   clubScorer,
   twoClubs,
   twoLeagues,

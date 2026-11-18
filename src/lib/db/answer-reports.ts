@@ -2,17 +2,31 @@ import "server-only";
 import { z } from "zod";
 import { getServiceClient } from "@/lib/supabase/server";
 
-const reportOutcomeSchema = z.enum(["saved", "not_found", "already_valid", "already_reported"]);
+const reportOutcomeSchema = z.enum([
+  "saved",
+  "not_found",
+  "already_valid",
+  "not_listed",
+  "already_reported",
+]);
 export type ReportOutcome = z.infer<typeof reportOutcomeSchema>;
 
-/** See the report_missing_answer database function: only for a round the user finished. */
+/** A missing answer, or a listed answer that should not be there. */
+export type ReportKind = "missing" | "wrong";
+
+/**
+ * See the report_missing_answer and report_wrong_answer database functions: only for a
+ * round the user finished.
+ */
 export async function saveAnswerReport(
+  kind: ReportKind,
   userId: string,
   sessionId: string,
   position: number,
   playerId: number,
 ): Promise<ReportOutcome> {
-  const { data, error } = await getServiceClient().rpc("report_missing_answer", {
+  const fn = kind === "wrong" ? "report_wrong_answer" : "report_missing_answer";
+  const { data, error } = await getServiceClient().rpc(fn, {
     p_user_id: userId,
     p_session_id: sessionId,
     p_position: position,
@@ -30,6 +44,7 @@ const reportsSchema = z.array(
       player_id: z.number(),
       player_name: z.string(),
       birth_year: z.number().nullable(),
+      kind: z.enum(["missing", "wrong"]),
       reports: z.number(),
       first_reported_at: z.string(),
     })
@@ -39,6 +54,7 @@ const reportsSchema = z.array(
       playerId: row.player_id,
       playerName: row.player_name,
       birthYear: row.birth_year,
+      kind: row.kind,
       reports: row.reports,
       firstReportedAt: row.first_reported_at,
     })),
@@ -46,7 +62,7 @@ const reportsSchema = z.array(
 
 export type OpenReport = z.infer<typeof reportsSchema>[number];
 
-/** Open reports, one row per question and reported player, most reported first. */
+/** Open reports, one row per question, reported player and kind, most reported first. */
 export async function getOpenReports(limit: number): Promise<OpenReport[]> {
   const { data, error } = await getServiceClient().rpc("admin_list_reports", { p_limit: limit });
   if (error) throw new Error(`Reading reports failed: ${error.message}`);

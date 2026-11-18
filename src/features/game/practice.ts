@@ -35,7 +35,7 @@ export async function startPracticeGame(
       userId,
       packId: round.mode === "pack" ? round.packId : null,
       today,
-      floorProminence: round.mode === "pack" ? 0 : DAILY_PUZZLE.unlimitedMinProminence,
+      ...prominenceBand(round),
       reserveProminence: DAILY_PUZZLE.minProminence,
       count: GAME_RULES.questionsPerRound,
     });
@@ -53,4 +53,14 @@ export async function startPracticeGame(
     status: "started",
     game: { sessionId, puzzleNumber: null, first: await firstState(userId, sessionId) },
   };
+}
+
+/** Which questions a pack or Unlimited round may draw from, by prominence. */
+function prominenceBand(round: PracticeRound): {
+  floorProminence: number;
+  ceilingProminence: number | null;
+} {
+  if (round.mode !== "unlimited") return { floorProminence: 0, ceilingProminence: null };
+  const band = DAILY_PUZZLE.unlimitedDifficulty[round.difficulty];
+  return { floorProminence: band.floor, ceilingProminence: band.ceiling };
 }

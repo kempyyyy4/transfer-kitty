@@ -25,7 +25,18 @@ export const EUROPA_LEAGUE_ID = "EL";
  * is a rarer answer than their fame suggests. An answer's popularity is the player's fame
  * scaled between `floor` (barely involved) and 1 (fully involved).
  */
-export const INVOLVEMENT_FLOOR = 0.35;
+export const INVOLVEMENT_FLOOR = 0.55;
+
+/**
+ * For questions that name a club (Tom, 18 November 2026). A player at the club now is
+ * fully involved however few games he has played there yet: fans think of a marquee
+ * signing first (Isak at Liverpool). And a spell that was a small part of a long career
+ * counts for less (Ramos at PSG): involvement is scaled down when the club's games are
+ * under `careerShareForFull` of the player's career games.
+ */
+export const CLUB_ASSOCIATION = {
+  careerShareForFull: 0.2,
+} as const;
 
 /** What counts as fully involved, for each kind of thing a question can ask about. */
 export const FULL_INVOLVEMENT = {
