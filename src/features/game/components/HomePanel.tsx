@@ -1,18 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { Countdown } from "@/components/Countdown";
 import { useEffect, useState } from "react";
-import { nextUkMidnight } from "@/lib/time/uk-day";
 import { gameApi } from "../api-client";
+import { startDailyEarly } from "../start-early";
 import type { TodayStatus } from "../types";
 
-const BUTTON_LABELS: Record<TodayStatus["played"], string> = {
-  not_started: "KICK OFF",
-  in_progress: "CARRY ON",
-  completed: "SEE YOUR KITTY",
+/** The button always says KICK OFF; underneath, a line says where today's game stands. */
+const STATUS_LINES: Record<TodayStatus["played"], string | null> = {
+  not_started: null,
+  in_progress: "Carry on where you left off",
+  completed: "See your kitty",
 };
 
-/** The home screen's live part: today's puzzle, the play button and the countdown. */
+/** The big kick-off button, with the streak flame on its corner. */
 export function HomePanel() {
   const [today, setToday] = useState<TodayStatus | null>(null);
 
@@ -25,71 +27,50 @@ export function HomePanel() {
   }, []);
 
   return (
-    <div className="flex w-full max-w-sm flex-col items-center gap-5">
-      <p className="font-pixel text-xs text-chalk-dim">
-        {today ? `PUZZLE #${today.puzzleNumber}` : " "}
-      </p>
+    <div className="relative w-full max-w-sm">
       <Link
         href="/play"
-        className="pixel-button w-full border-floodlight px-6 py-5 text-xl text-floodlight"
+        onClick={startDailyEarly}
+        className="pixel-button animate-kickoff flex w-full flex-col items-center gap-2 border-floodlight px-4 py-[2.4vh] text-[clamp(1.3rem,8vw,2.4rem)] whitespace-nowrap text-floodlight"
       >
-        {BUTTON_LABELS[today?.played ?? "not_started"]}
+        KICK OFF
+        {today && STATUS_LINES[today.played] ? (
+          <span className="font-mono text-xl whitespace-normal text-chalk">
+            {STATUS_LINES[today.played]}
+            {today.played === "completed" ? (
+              <>
+                {" "}
+                · next in <Countdown />
+              </>
+            ) : null}
+          </span>
+        ) : null}
       </Link>
-      <p className="text-xl">
-        Next puzzle in <Countdown />
-      </p>
-
-      <nav aria-label="More" className="grid w-full grid-cols-2 gap-4">
-        <Link href="/top-kitties" className="pixel-button px-2 py-3 text-[10px]">
-          TOP KITTIES
-        </Link>
-        <Link href="/profile" className="pixel-button px-2 py-3 text-[10px]">
-          PROFILE
-        </Link>
-        <Link href="/account" className="pixel-button px-2 py-3 text-[10px]">
-          ACCOUNT
-        </Link>
-        <Link href="/shop" className="pixel-button px-2 py-3 text-[10px]">
-          SHOP
-        </Link>
-        <Link href="/archive" className="pixel-button px-2 py-3 text-[10px]">
-          ARCHIVE
-        </Link>
-        <Link href="/packs" className="pixel-button px-2 py-3 text-[10px]">
-          THEMED PACKS
-        </Link>
-        <Link href="/unlimited" className="pixel-button px-2 py-3 text-[10px]">
-          UNLIMITED
-        </Link>
-      </nav>
+      {today && today.streak > 0 ? <StreakBadge streak={today.streak} /> : null}
     </div>
   );
 }
 
-/** Time until the next UK midnight. Empty until the browser has told us the time. */
-function Countdown() {
-  const [now, setNow] = useState<Date | null>(null);
-
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    const first = setTimeout(tick, 0);
-    const timer = setInterval(tick, 1000);
-    return () => {
-      clearTimeout(first);
-      clearInterval(timer);
-    };
-  }, []);
-
-  if (!now) return <span>--:--:--</span>;
-
-  const secondsLeft = Math.max(
-    0,
-    Math.floor((nextUkMidnight(now).getTime() - now.getTime()) / 1000),
+/** A flame and the streak, sitting on the button's corner like an app's notification. */
+function StreakBadge({ streak }: { streak: number }) {
+  return (
+    <span
+      className="absolute -top-4 -right-3 flex items-center gap-1 border-4 border-black bg-claret px-2 py-1 font-pixel text-xs text-chalk"
+      aria-label={`${streak} day streak`}
+    >
+      <svg
+        viewBox="0 0 5 6"
+        shapeRendering="crispEdges"
+        aria-hidden
+        className="animate-flame h-5 w-4"
+      >
+        <rect x={2} y={0} width={1} height={1} fill="#ffd23f" />
+        <rect x={1} y={1} width={3} height={1} fill="#ffb000" />
+        <rect x={0} y={2} width={5} height={3} fill="#ffb000" />
+        <rect x={1} y={3} width={3} height={2} fill="#ffd23f" />
+        <rect x={1} y={5} width={3} height={1} fill="#e8a21c" />
+      </svg>
+      {streak}
+    </span>
   );
-  const parts = [
-    Math.floor(secondsLeft / 3600),
-    Math.floor((secondsLeft % 3600) / 60),
-    secondsLeft % 60,
-  ];
-  return <span>{parts.map((part) => String(part).padStart(2, "0")).join(":")}</span>;
 }

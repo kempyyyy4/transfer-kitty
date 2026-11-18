@@ -1,4 +1,5 @@
-import { CatSprite, lookFor, type AvatarChoice } from "@/features/avatar";
+import Link from "next/link";
+import { CatSprite, KitMascot, lookFor, type AvatarChoice } from "@/features/avatar";
 import { formatFee } from "@/features/scoring";
 import type { Board } from "../types";
 import { SignInToAppear } from "./SignInToAppear";
@@ -6,7 +7,20 @@ import { SignInToAppear } from "./SignInToAppear";
 /** One leaderboard: the top rows, then your own row if you are further down. */
 export function BoardTable({ board }: { board: Board }) {
   if (board.players === 0) {
-    return <p className="text-xl">Nobody has finished a game in this period yet.</p>;
+    return (
+      <div className="pixel-panel flex items-center gap-4 p-4">
+        <KitMascot scale={5} className="shrink-0" />
+        <div className="flex flex-col gap-2">
+          <p className="text-xl leading-snug">No kitties on the board yet. Be the first.</p>
+          <Link
+            href="/play"
+            className="pixel-button self-start border-floodlight px-3 py-2 text-[10px] text-floodlight"
+          >
+            KICK OFF
+          </Link>
+        </div>
+      </div>
+    );
   }
   if (board.entries.length === 0 && board.signInToAppear) {
     // Only guests have played so far, so the board itself is empty.

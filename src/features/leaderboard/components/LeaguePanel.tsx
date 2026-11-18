@@ -69,7 +69,7 @@ export function LeaguePanel({ selected, onChanged }: Props) {
               })
             }
           >
-            Leave this league
+            LEAVE THIS LEAGUE
           </button>
         </div>
       ) : null}
@@ -91,7 +91,7 @@ export function LeaguePanel({ selected, onChanged }: Props) {
             type="submit"
             className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
           >
-            Join
+            JOIN
           </button>
         </div>
       </form>
@@ -114,7 +114,7 @@ export function LeaguePanel({ selected, onChanged }: Props) {
             type="submit"
             className="pixel-button border-floodlight px-3 text-[10px] text-floodlight"
           >
-            Create
+            CREATE
           </button>
         </div>
       </form>

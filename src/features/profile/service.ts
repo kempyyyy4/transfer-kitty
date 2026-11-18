@@ -66,3 +66,9 @@ export async function setAvatar(choice: AvatarChoice): Promise<AvatarOutcome> {
   const saved = await saveAvatar(visitor.userId, choice);
   return saved === "saved" ? { status: "saved" } : { status: "needs_name" };
 }
+
+/** The player's current streak, counting Nine Lives if they have the lifetime unlock. */
+export async function getStreak(userId: string, now: Date): Promise<number> {
+  const [history, access] = await Promise.all([getPlayerHistory(userId), getAccess(userId)]);
+  return computeStats(history, ukDayOf(now), { nineLives: access.lifetime }).currentStreak;
+}

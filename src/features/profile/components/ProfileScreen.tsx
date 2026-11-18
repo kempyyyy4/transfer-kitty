@@ -27,7 +27,7 @@ export function ProfileScreen() {
 
   return (
     <section className="flex flex-col gap-6">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">
+      <h1 className="page-title">
         {profile.displayName ? profile.displayName.toUpperCase() : "YOUR PROFILE"}
       </h1>
 
@@ -39,10 +39,6 @@ export function ProfileScreen() {
       ) : (
         <AvatarTeaser profile={profile} />
       )}
-
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

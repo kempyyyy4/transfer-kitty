@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Loader } from "@/components/Loader";
 import { useEffect, useState } from "react";
 import { accountApi } from "../api-client";
@@ -34,7 +33,7 @@ export function AccountScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">YOUR ACCOUNT</h1>
+      <h1 className="page-title">YOUR ACCOUNT</h1>
       {notice ? (
         <p role="status" className="pixel-panel border-floodlight p-3">
           {notice}
@@ -57,7 +56,7 @@ export function AccountScreen() {
             onClick={() => void signOut()}
             className="pixel-button self-start px-3 py-2 text-[10px] hover:border-claret hover:text-claret"
           >
-            Sign out
+            SIGN OUT
           </button>
           <DeleteAccountPanel
             onDeleted={() => {
@@ -67,10 +66,6 @@ export function AccountScreen() {
           />
         </>
       ) : null}
-
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

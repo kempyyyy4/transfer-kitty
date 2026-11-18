@@ -36,7 +36,7 @@ During a daily puzzle, an answer is worth the same fee for everyone all day, and
 
 ### 1.4 Leaving mid-game
 
-The server keeps the clock running. The question on screen when the player left times out as a Stray. The remaining questions can be picked up later the same day, each with a fresh 25 seconds. A question is never shown twice.
+The server keeps the clock running. The question on screen when the player left times out as a Stray. The remaining questions can be picked up later the same day, each with a fresh 45 seconds. A question is never shown twice.
 
 ### 1.5 Guests
 
@@ -164,6 +164,35 @@ Git, GitHub CLI and Node.js were installed on 10 November 2026 with Tom's go-ahe
 
 ---
 
+### 2.6 Changes after Tom's first play-test (14 November 2026, agreed)
+
+- **45 seconds per question**, not the brief's 25.
+- **No "% of players said this"** anywhere: with few players it was misleading. Crowd counts still drive tier recalculation behind the scenes.
+- **The kitty gauge and its transfer-record milestones are gone** from the game screen. After each answer, Kit kicks a ball along a line of the tier kitties instead; the kitty for the tier earned controls it, poorly for low tiers and with keepy-ups for the best.
+- **Variety**: at most 1 question per template a day, and at most 3 from the "played for a club" family (`TEMPLATE_FAMILIES` in `src/config/game.ts`).
+- **Decade questions name the years** ("between 2000 and 2009", "since 2020").
+- **The look**: an animated stadium behind every screen with the old-TV lines over the whole scene, a bigger title, a home screen with only the title, a kitty line-up, a big animated KICK OFF button with a streak flame, the description and policy links, and a menu button for everything else.
+- **The line-up kitties are loosely styled on famous players' looks** (hair, kit colours), by Tom's choice and against the brief's original "must not resemble any real footballer". They are never named or copied exactly, and this is on the legal check list.
+- **Speed**: the live site runs in Vercel's Frankfurt region beside the database, and starting a round returns its first question in the same request.
+
+### 2.7 Second play-test (15 November 2026, agreed)
+
+- **The home team photo uses close likenesses of famous players** (nine stars in national-style kits doing their best-known celebrations), by Tom's choice after being told the legal risk. Never named. **They must pass the legal check before launch**, and may need redrawing.
+- **Tiers will be gentler**: exactly one Galacticat per question, with more answers in the expensive tiers below it, studying Krillion's split. To be proposed with numbers before it changes.
+- **One daily**, plus a **round builder** for lifetime players (choose league or competition, decade and difficulty).
+- **Questions to come**: drop obscure clubs from club questions; add manager, team and stadium questions; a bell curve of the day's scores on the results.
+- **Design rules**: never purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes or over-the-top scroll animations. Animations smooth and tactile; buttons lift on hover and press in when tapped.
+- **The game has its own scene**: a single floodlight in the dark, not the stadium. The kick after each answer starts fast and slows to a crawl, ticking past each tier kitty, then the kitty takes a touch that matches its tier.
+
+### 2.8 Third play-test (16 November 2026, agreed)
+
+- **Tier split** (Krillion-style): ranked most to least common, the top ~5% are Copycat (£500k), then 10% Alley Cat, 15% Squad Moggy, 20% Tomcat, 25% Pick of the Litter, the rest Big Cat, and exactly one Galacticat (the rarest) per question. About half of valid answers earn £40m or more. Krillion's own scale is 10 to 100 points; ours stays £500k to £100m.
+- **Fair questions** (tightened the same day): club questions use only clubs that have played in the Premier League since 2012/13, or the 25 best-known clubs elsewhere (ranked by the fame of their best-known players). Final line-up questions only for the Champions League, Europa League and FA Cup. Questions failing this are never served, in the daily or Unlimited; Unlimited also needs prominence 150 or more. Long official club names are shortened to what fans call them.
+- **New question types**: 10 or more league goals in 2025/26 (each league, and 15 or more across the top five), and 100 or 150 or more goals in Europe's top five leagues since 2012/13. Whole-career totals are not possible from the data, which starts in 2012/13.
+- **Shop**: six items a day, the same for everyone, changing at midnight; themed packs are sold in the shop.
+- **The button always reads KICK OFF**; the menu is big tiles with Unlimited featured; the round starts the moment KICK OFF is pressed; loading messages only show when loading is slow; tiers have colours and answer lists are grouped by tier.
+- **Still to build**: manager, team and stadium questions (new kinds of answer), the Unlimited round builder, and the bell curve of the day's scores.
+
 ## 3. Costs and outside checks
 
 Prices read from each company's pricing page on 10 November 2026. They can change.
@@ -223,7 +252,7 @@ I cannot create accounts, sign in, or handle passwords and secret keys for you. 
 
 ### How the main anti-cheat rules work
 
-- **Server-side timer.** The server records the moment it hands out each question. An answer counts only if it arrives within 25 seconds plus a short network allowance (config). The browser's timer bar is only a display.
+- **Server-side timer.** The server records the moment it hands out each question. An answer counts only if it arrives within 45 seconds plus a short network allowance (config). The browser's timer bar is only a display.
 - **Answers stay on the server until the round is over.** The browser gets one question prompt at a time. After answering it gets back only that answer's tier, fee and percentage. The full list of valid answers is sent only once the server has that player's round marked as finished (decision 2.3).
 - **One daily attempt.** A unique database index on user and puzzle date for daily sessions.
 - **Midnight UK rollover.** "Today" is worked out from the clock in the Europe/London time zone on every request, so the puzzle changes at exactly midnight UK time, summer or winter, without depending on a scheduled job. Vercel's scheduler runs in UTC, so the housekeeping job is scheduled once a day at 23:05 UTC and once a day at 00:05 UTC, and does nothing if it has already run for that UK date. Puzzles are scheduled 30 days ahead, so a failed job never leaves a day empty.
@@ -384,7 +413,7 @@ Tiers are stored as a level number from 0 (Stray) to 7 (Galacticat). Names and f
 | `game_sessions`     | `id`, `user_id`, `mode` (daily, archive, unlimited, pack), `puzzle_date`, `pack_id`, `started_at`, `completed_at`, `total_fee`, `total_answer_ms` | **Unique index on `user_id` and `puzzle_date` where mode is daily.** That is the one-attempt rule. Players read their own rows. |
 | `session_questions` | `session_id`, `position`, `question_id`, `served_at`, `answered_at`, `entity_id`, `outcome` (correct, wrong, timeout), `tier`, `fee`              | `served_at` is the server-side timer. Fee is locked here when answered. Players read their own rows.                            |
 
-**As built in stage 4**, these tables are server-only for now: the browser reaches them only through the game API. Each game step is one database function (`start_daily_session`, `serve_next_question`, `submit_answer`), so the timer is measured on the database clock and a step cannot half-happen. The server allows 25 seconds plus 1.5 seconds for the network. A question left open past the limit is forfeited as a timeout the next time the player asks for a question. `rate_limits` landed in this stage; `job_runs` was not needed, because creating a puzzle is safe to repeat.
+**As built in stage 4**, these tables are server-only for now: the browser reaches them only through the game API. Each game step is one database function (`start_daily_session`, `serve_next_question`, `submit_answer`), so the timer is measured on the database clock and a step cannot half-happen. The server allows the answer time (now 45 seconds, see 2.6) plus 1.5 seconds for the network. A question left open past the limit is forfeited as a timeout the next time the player asks for a question. `rate_limits` landed in this stage; `job_runs` was not needed, because creating a puzzle is safe to repeat.
 
 Fees are whole pounds stored as integers. Totals that can grow without limit use 64-bit integers.
 

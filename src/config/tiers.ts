@@ -12,6 +12,8 @@ export interface Tier {
   spriteKey: string;
   /** One per answer in the spoiler-free share text. Rarer tiers are warmer colours. */
   shareEmoji: string;
+  /** The tier's colour on screen, matching its share square. */
+  colour: string;
   meaning: string;
 }
 
@@ -23,6 +25,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 0,
     spriteKey: "stray",
     shareEmoji: "⬛",
+    colour: "#6b6f80",
     meaning: "Wrong answer or timed out",
   },
   {
@@ -32,6 +35,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 500_000,
     spriteKey: "copycat",
     shareEmoji: "⬜",
+    colour: "#e9eef5",
     meaning: "The answer everyone gave",
   },
   {
@@ -41,6 +45,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 2_000_000,
     spriteKey: "alley-cat",
     shareEmoji: "🟫",
+    colour: "#b07a4a",
     meaning: "Very common",
   },
   {
@@ -50,6 +55,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 8_000_000,
     spriteKey: "squad-moggy",
     shareEmoji: "🟩",
+    colour: "#3fd17a",
     meaning: "Common",
   },
   {
@@ -59,6 +65,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 20_000_000,
     spriteKey: "tomcat",
     shareEmoji: "🟦",
+    colour: "#4a8cff",
     meaning: "Decent",
   },
   {
@@ -68,6 +75,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 40_000_000,
     spriteKey: "pick-of-the-litter",
     shareEmoji: "🟪",
+    colour: "#b07cff",
     meaning: "Rare",
   },
   {
@@ -77,6 +85,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 70_000_000,
     spriteKey: "big-cat",
     shareEmoji: "🟧",
+    colour: "#ff8a1f",
     meaning: "Very rare",
   },
   {
@@ -86,6 +95,7 @@ export const TIERS: readonly Tier[] = [
     feeGbp: 100_000_000,
     spriteKey: "galacticat",
     shareEmoji: "🦁",
+    colour: "#ffd23f",
     meaning: "Hardly anyone said it",
   },
 ];
@@ -107,14 +117,16 @@ export interface TierShare {
 }
 
 /**
- * How a question's valid answers are split between tiers, rarest tier first.
- * Answers left over after these shares get MOST_POPULAR_LEVEL.
+ * How a question's valid answers are split between tiers, rarest tier first. Answers left
+ * over after these shares get MOST_POPULAR_LEVEL, and at least one always does.
+ * Tom chose this Krillion-style split on 16 November 2026: exactly one Galacticat, and
+ * about half of all valid answers worth £40m or more. Only the obvious few are cheap.
  */
 export const TIER_SHARES: readonly TierShare[] = [
-  { level: 7, share: 0.02, min: 1, max: 3 },
-  { level: 6, share: 0.05 },
-  { level: 5, share: 0.08 },
-  { level: 4, share: 0.15 },
-  { level: 3, share: 0.2 },
-  { level: 2, share: 0.25 },
+  { level: 7, share: 0, min: 1, max: 1 },
+  { level: 6, share: 0.25 },
+  { level: 5, share: 0.25 },
+  { level: 4, share: 0.2 },
+  { level: 3, share: 0.15 },
+  { level: 2, share: 0.1 },
 ];

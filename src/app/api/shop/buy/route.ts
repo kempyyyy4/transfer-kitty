@@ -6,7 +6,7 @@ import { isWithinRateLimit } from "@/lib/rate-limit";
 
 const MESSAGES = {
   not_signed_in: "Sign in to buy from the shop.",
-  unknown_item: "That item is not on sale.",
+  unknown_item: "That item is not in today's shop.",
   free: "That item is free. Pick it on your profile.",
   owned: "You already own that.",
   too_poor: "You do not have enough coins yet.",

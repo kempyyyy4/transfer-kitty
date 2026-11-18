@@ -19,7 +19,9 @@ export function tierLevelsByRank(answerCount: number): number[] {
   let nextRarest = answerCount - 1;
 
   for (const share of TIER_SHARES) {
-    const size = Math.min(shareSize(share, answerCount), nextRarest + 1);
+    // One answer is always kept back for the most popular tier, so it never empties.
+    const room = Math.max(0, nextRarest + (answerCount > 1 ? 0 : 1));
+    const size = Math.min(shareSize(share, answerCount), room);
     for (let i = 0; i < size; i++) {
       levels[nextRarest] = share.level;
       nextRarest--;

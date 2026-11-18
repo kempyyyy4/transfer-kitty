@@ -181,23 +181,34 @@ A feature's `service.ts` is server-only. Its client components import from their
 
 - Never write football facts from memory. Every generated question and every valid answer comes from a data source approved in `PLAN.md`.
 - Do not add a data source without a licence that allows commercial use, and not without Tom's approval.
-- Any fact that is not from an approved data source goes in `src/config/manual-facts.ts` and is listed in `QUESTIONS_TO_CHECK.md` for Tom to verify.
+- Any fact that is not from an approved data source must be listed in `QUESTIONS_TO_CHECK.md` for Tom to verify, and kept in one file in `src/config`.
 
 ## The look
 
 - Colours and fonts are theme tokens in `src/app/globals.css` (`night`, `chalk`, `floodlight`, `turf`, `claret`, `scoreboard`...; `font-pixel` for headings and labels, `font-mono` for body). Never use raw Tailwind palette colours such as `slate-` or `amber-` on a screen.
-- Buttons use the `pixel-button` utility, boxes `pixel-panel`, text boxes `pixel-input`. Pixel-font button labels are written in capitals.
+- Buttons use the `pixel-button` utility, boxes `pixel-panel`, text boxes `pixel-input`. Pixel-font button labels are written in capitals. `pixel-panel` sits in the components layer, so colour classes on a panel (`border-floodlight`) win. The line under a page title uses `page-lead`.
+- Body text line heights are set tighter in the theme (`--text-*--line-height`), because VT323 reads gappy at Tailwind's defaults.
 - Avatar and kit options live in `src/config/avatar-items.ts` and `src/config/kits.ts`. A player's avatar is stored as item IDs, so never rename an ID once players can pick it. The server checks every item exists and is free or owned before saving (`checkChoice`).
 - Characters are drawn from pixel grids in `src/features/avatar`: `cat/base.ts` is the body, `cat/extras.ts` the markings and accessories, `cast.ts` the mascot and tier characters. Change colours through a `CatLook`, never by editing the body rows.
-- Animations respect `prefers-reduced-motion` (see the end of `globals.css`).
-- Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on.
-- Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top right for the sound button.
+- Animations respect `prefers-reduced-motion` (see the end of `globals.css`). They ease smoothly; only the crowd blink and the old-TV flicker use steps. The crowd's base layer never animates, so the stand is never empty.
+- Never use: purple gradients, vague hero text, fake reviews, pill-shaped buttons, fake metrics, emoji icons, em dashes, or over-the-top scroll animations.
+- Hover styles only apply on devices that hover (`@media (hover: hover)`), so tapped buttons never stay lit on phones. Menus never keep the current page highlighted.
+- A round is its own scene: `PlayingView` covers the whole window at every size (stadium, crowd and footer hidden) with the plain floodlit `GameScene`, one screen with no scrolling. Anything that must replace the whole screen goes through `FullScreenScene`, which draws onto the page body: a fixed layer rendered in place gets boxed into the page column by the page's opening animation. While a round loads it shows a skeleton card, never a loader overlay.
+- The moment an answer is in, Kit winds up (the `checking` view) so the wait for the verdict is part of the kick. Then Kit kicks the ball down a line of tier kitties (`src/features/game/components/kick`). The rarer the tier, the harder the kick: a longer hold at contact, higher, further, longer in the air, with the camera pulling back and a trail (`kick-motion.ts`, `kick-effects.ts`). The kitty of the tier earned controls it with a touch that matches its class, and only then do the verdict, tier and fee appear (until then the card shows only "your answer"). Tap to skip. Galacticats get a gold flash and confetti; Strays shake.
+- In a round: progress pips fill in each answer's tier colour, the kitty rolls up as the ball lands, each question slides in, and NEXT fades the old answer out at once rather than waiting on the server. The timer bar drains as one animation (smooth every frame) and ticks for the last five seconds. The answer box takes arrow keys; the highlighted suggestion is the one Enter picks, and fewer suggestions show on short screens so the list clears the keyboard.
+- Each tier has a colour in `src/config/tiers.ts`, matching its share square. Show tiers in their colour; answer lists are grouped by tier, rarest first.
+- Waiting uses `Loader`: faint placeholder bars, no text, invisible for the first half-second, so fast loads show nothing. Prefer starting work early (as KICK OFF does) over showing a loader.
+- Sounds live in `src/features/audio`, are made in code, and play only when the player has switched sound on. Phone buzzes (`buzz`) follow the same switch.
+- The app icon, home-screen icon, link preview and manifest are made in code (`src/app/icon.tsx`, `apple-icon.tsx`, `opengraph-image.tsx`, `manifest.ts`) from the same pixel grids as the site, via `src/components/brand/image-art.tsx`. Change Kit and they follow.
+- Every screen must work at 375 pixels wide with no sideways scrolling, and leave room at the top left for the menu button and the top right for the sound button.
+- The animated stadium (`src/components/scene`) sits behind every screen, dimmed except on the home screen. Inner screens are opened from the menu (`src/components/SiteMenu.tsx`); keep the home screen to the title, line-up, kick-off button, description and policy links.
 
 ## Content rules
 
 - No real club crests, league logos, sponsor logos, player likenesses or photos.
 - Kits use made-up names and colours only.
 - Kit the mascot and every sprite must be original artwork drawn as code.
+- The home team photo (`LINEUP` in `src/features/avatar/cast.ts`) shows close likenesses of famous players, by Tom's choice (PLAN.md 2.7). It must pass the legal check before launch. Never name them anywhere, and never add a likeness elsewhere without asking.
 - No random packs, loot boxes or mystery items. Direct purchase only.
 
 ## Keeping this file current

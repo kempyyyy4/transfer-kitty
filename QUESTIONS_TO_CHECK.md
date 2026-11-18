@@ -86,18 +86,9 @@ Nothing outstanding.
 - **The share text leaves out the Galacticat count when there are none**, for example `🐱 £8.5m · Transfer Kitty #1`. The emoji row uses ⬛ Stray, ⬜ Copycat, 🟫 Alley Cat, 🟩 Squad Moggy, 🟦 Tomcat, 🟪 Pick of the Litter, 🟧 Big Cat and 🦁 Galacticat. It does not include a link to the site; say if you want one added.
 - **A streak survives until the end of the day after your last game**, so not having played yet today does not break it.
 
-## 9. Transfer records on the kitty gauge (stage 8)
+## 9. Transfer records on the kitty gauge (removed)
 
-These are written from memory, not taken from a data source, so they need checking. They live in `src/config/manual-facts.ts`. Fees are as commonly reported in the UK, in pounds.
-
-| Gauge label | Fact to check                                                                               |
-| ----------- | ------------------------------------------------------------------------------------------- |
-| SHEARER '96 | Alan Shearer, Blackburn Rovers to Newcastle United, 1996, £15m: a world record at the time  |
-| RONALDO '09 | Cristiano Ronaldo, Manchester United to Real Madrid, 2009, £80m: a world record at the time |
-| ISAK '25    | Alexander Isak, Newcastle United to Liverpool, 2025, £125m: the British record              |
-| NEYMAR '17  | Neymar, Barcelona to Paris Saint-Germain, 2017, £198m (€222m): the world record             |
-
-Real names appear only as text labels on the gauge. No likenesses, crests or logos are used.
+The gauge and its transfer-record milestones were removed after Tom's play-test, so nothing here needs checking any more.
 
 ## 10. The look and characters (stage 8)
 
@@ -137,3 +128,9 @@ Real names appear only as text labels on the gauge. No likenesses, crests or log
 - **Ads consent** uses Google's own certified message. Set it up in AdSense under Privacy & messaging when your account is approved.
 - **Name filter**: the obscenity word list (English), with spacing squashed out so "a s s" is caught. That also blocks some real names, for example "Dick Advocaat". Reserved: admin, moderator, Transfer Kitty, Kit the Cat, official, support, staff.
 - **Delete my account** removes everything, including purchases' access, and cannot be undone. Leagues the player created pass to their longest-standing other member.
+
+## 15. After the first play-test
+
+- **The team photo kitties are close likenesses** of nine famous players in national-style kits (Portugal, Norway, Argentina, England, France, Brazil) doing their best-known celebrations, as you chose. They are never named. **The legal check must clear them before launch**; some celebrations are trademarked.
+- **45 seconds per question** makes looking answers up easier. Worth watching once real players arrive.
+- **Future daily puzzles on the dev database** were rebuilt under the new variety rule.

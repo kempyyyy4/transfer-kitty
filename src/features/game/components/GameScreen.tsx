@@ -1,24 +1,23 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader } from "@/components/Loader";
-import { GAME_RULES } from "@/config/game";
+import { FullScreenScene } from "@/components/scene/FullScreenScene";
+import { GameScene } from "@/components/scene/GameScene";
 import { PLAYER_SEARCH } from "@/config/rate-limits";
-import { formatFee } from "@/features/scoring";
 import { gameApi, GameApiError } from "../api-client";
+import { takeDailyStart } from "../start-early";
 import { bestMatch, confidentMatch } from "../best-match";
 import type {
   AnswerFeedback,
   GameSummary,
   OpenQuestion,
   PlayerSuggestion,
+  PlayState,
   PracticeRound,
 } from "../types";
-import { AnswerInput, type AnswerDraft } from "./AnswerInput";
-import { FeedbackPanel } from "./FeedbackPanel";
-import { KittyGauge } from "./KittyGauge";
+import type { AnswerDraft } from "./AnswerInput";
+import { PlayingView } from "./PlayingView";
 import { SummaryPanel } from "./SummaryPanel";
-import { TimerBar } from "./TimerBar";
 
 /** The last-moment name lookup must leave time inside the server's grace period. */
 const TIMEOUT_LOOKUP_MS = 800;
@@ -27,6 +26,7 @@ const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [] };
 type View =
   | { kind: "loading" }
   | { kind: "question"; question: OpenQuestion; deadline: number }
+  | { kind: "checking"; question: OpenQuestion; answer: string | null }
   | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
   | { kind: "completed"; sessionId: string; summary: GameSummary }
   | { kind: "error"; message: string };
@@ -49,25 +49,31 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   // What is in the answer box and listed under it, so it can still be sent if time runs out.
   const draft = useRef<AnswerDraft>(EMPTY_DRAFT);
 
+  /**
+   * Shows a question or the summary. The server starts its clock somewhere between asking
+   * and hearing back, so counting from the moment of asking puts this deadline at or before
+   * the server's, never after.
+   */
+  const show = useCallback((id: string, state: PlayState, askedAt: number) => {
+    answering.current = false;
+    draft.current = EMPTY_DRAFT;
+    setView(
+      state.status === "completed"
+        ? { kind: "completed", sessionId: id, summary: state.summary }
+        : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
+    );
+  }, []);
+
   const showNext = useCallback(async () => {
     const id = sessionId.current;
     if (!id) return;
     try {
-      // The server starts its clock somewhere between asking and hearing back. Counting
-      // from the moment of asking puts this deadline at or before the server's, never after.
       const askedAt = performance.now();
-      const state = await gameApi.next(id);
-      answering.current = false;
-      draft.current = EMPTY_DRAFT;
-      setView(
-        state.status === "completed"
-          ? { kind: "completed", sessionId: id, summary: state.summary }
-          : { kind: "question", question: state, deadline: askedAt + state.msRemaining },
-      );
+      show(id, await gameApi.next(id), askedAt);
     } catch (error) {
       setView(errorView(error));
     }
-  }, []);
+  }, [show]);
 
   const rememberDraft = useCallback((latest: AnswerDraft) => {
     draft.current = latest;
@@ -79,13 +85,16 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   useEffect(() => {
     if (started.current) return;
     started.current = true;
-    (round ? gameApi.practice(round) : gameApi.start())
+    const { started: request, askedAt } = round
+      ? { started: gameApi.practice(round), askedAt: performance.now() }
+      : takeDailyStart();
+    request
       .then((game) => {
         sessionId.current = game.sessionId;
-        return showNext();
+        show(game.sessionId, game.first, askedAt);
       })
       .catch((error: unknown) => setView(errorView(error)));
-  }, [showNext, round]);
+  }, [show, round]);
 
   /**
    * Time is up: send whatever name is in the box rather than nothing. The suggestions
@@ -110,6 +119,8 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   async function submit(question: OpenQuestion, player: PlayerSuggestion | null) {
     if (!sessionId.current || answering.current) return;
     answering.current = true;
+    // Kit winds up straight away, so the wait for the verdict is part of the kick.
+    setView({ kind: "checking", question, answer: player?.name ?? null });
     try {
       const feedback = await gameApi.answer(
         sessionId.current,
@@ -123,7 +134,21 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
     }
   }
 
-  if (view.kind === "loading") return <Loader />;
+  if (view.kind === "loading") {
+    // The round's own scene with an empty question card, filled in the moment it arrives.
+    return (
+      <FullScreenScene>
+        <section className="relative flex h-[100dvh] flex-col px-4 pt-16 pb-4">
+          <GameScene />
+          <div className="pixel-panel mx-auto flex h-28 w-full max-w-2xl flex-col gap-3 p-3">
+            <span className="h-2 w-12 animate-pulse bg-chalk-dim/40" />
+            <span className="h-4 w-4/5 animate-pulse bg-chalk-dim/30" />
+            <span className="h-4 w-2/3 animate-pulse bg-chalk-dim/30" />
+          </div>
+        </section>
+      </FullScreenScene>
+    );
+  }
   if (view.kind === "completed") {
     return <SummaryPanel sessionId={view.sessionId} summary={view.summary} />;
   }
@@ -145,49 +170,13 @@ export function GameScreen({ round }: { round?: PracticeRound }) {
   }
 
   const { question } = view;
-  const kitty = kittyShown(view);
   return (
-    <section className="flex gap-3">
-      <div className="flex min-w-0 flex-1 flex-col gap-4">
-        <p className="flex justify-between font-pixel text-[10px] text-chalk-dim">
-          <span>
-            {question.position}/{question.total}
-          </span>
-          <span className="text-floodlight">KITTY {formatFee(kitty)}</span>
-        </p>
-        <h1 className="text-2xl leading-tight">{question.prompt}</h1>
-
-        {view.kind === "question" ? (
-          <>
-            <TimerBar
-              key={`timer-${question.position}`}
-              deadline={view.deadline}
-              msTotal={GAME_RULES.answerSeconds * 1000}
-              onExpire={() => void submitTyped(question)}
-            />
-            <AnswerInput
-              key={`answer-${question.position}`}
-              disabled={false}
-              onPick={(player) => void submit(question, player)}
-              onDraftChange={rememberDraft}
-            />
-          </>
-        ) : (
-          <FeedbackPanel
-            answer={view.answer}
-            feedback={view.feedback}
-            isLast={question.position === question.total}
-            onContinue={() => void showNext()}
-          />
-        )}
-      </div>
-      <KittyGauge kitty={kitty} />
-    </section>
+    <PlayingView
+      view={view}
+      onPick={(player) => void submit(question, player)}
+      onExpire={() => void submitTyped(question)}
+      onDraftChange={rememberDraft}
+      onContinue={() => void showNext()}
+    />
   );
-}
-
-/** The kitty counts the answer just judged as soon as its feedback is on screen. */
-function kittyShown(view: Extract<View, { kind: "question" | "feedback" }>): number {
-  const earnedNow = view.kind === "feedback" ? view.feedback.fee : 0;
-  return view.question.kittySoFar + earnedNow;
 }

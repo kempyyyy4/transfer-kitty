@@ -5,12 +5,16 @@ export type AnswerOutcome = "correct" | "wrong" | "timeout";
 export interface TodayStatus {
   puzzleNumber: number;
   played: "not_started" | "in_progress" | "completed";
+  /** Days in a row played, for the flame on the kick-off button. */
+  streak: number;
 }
 
 export interface StartedGame {
   sessionId: string;
   /** Null for a round that is not the daily. */
   puzzleNumber: number | null;
+  /** The first question, or the summary if the round is already over, saving a request. */
+  first: PlayState;
 }
 
 export interface OpenQuestion {
@@ -33,8 +37,6 @@ export interface AnsweredQuestion {
   fee: number;
   /** The name the player gave, or null if they gave none. */
   answer: string | null;
-  /** The share of players who gave this answer. */
-  percent: number;
 }
 
 export type GameMode = "daily" | "archive" | "unlimited" | "pack";
@@ -62,7 +64,6 @@ export interface AnswerFeedback {
   outcome: AnswerOutcome;
   tier: number;
   fee: number;
-  percent: number;
 }
 
 /** One valid answer to a question, shown only after the player's round is finished. */
@@ -71,7 +72,6 @@ export interface ValidAnswer {
   name: string;
   tier: number;
   fee: number;
-  percent: number;
 }
 
 export interface QuestionAnswers {

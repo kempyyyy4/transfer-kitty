@@ -1,7 +1,6 @@
 "use client";
 
 import { AdSlot } from "@/features/ads";
-import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { leaderboardApi, LeaderboardApiError } from "../api-client";
 import type { Board, League, Period } from "../types";
@@ -58,14 +57,20 @@ export function TopKittiesScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">TOP KITTIES</h1>
+      <div>
+        <h1 className="page-title">TOP KITTIES</h1>
+        <p className="page-lead">
+          The biggest kitties today, this week and of all time. Start a league to take on your
+          friends.
+        </p>
+      </div>
 
       <label className="flex flex-col gap-1 text-lg text-chalk-dim">
         Showing
         <select
           value={leagueId ?? ""}
           onChange={(event) => setLeagueId(event.target.value || null)}
-          className="pixel-input p-2 text-base"
+          className="pixel-select"
         >
           <option value="">Everyone</option>
           {leagues.map((league) => (
@@ -105,9 +110,6 @@ export function TopKittiesScreen() {
       />
 
       <AdSlot />
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

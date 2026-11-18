@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { Loader } from "@/components/Loader";
 import { GameScreen } from "@/features/game";
@@ -15,8 +14,8 @@ export function UnlimitedScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">UNLIMITED</h1>
-      <p className="text-xl">
+      <h1 className="page-title">UNLIMITED</h1>
+      <p className="page-lead">
         Round after round of 7, from the whole question bank. Questions you have not seen come
         first. Just for fun: no Top Kitties, no coins.
       </p>
@@ -31,9 +30,6 @@ export function UnlimitedScreen() {
         </button>
       ) : null}
       {access && !access.lifetime ? <LifetimeCard /> : null}
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

@@ -2,8 +2,8 @@ import "server-only";
 import { ANSWER_TIME_LIMIT_MS, GAME_RULES } from "@/config/game";
 import { TIERS, TOP_LEVEL } from "@/config/tiers";
 import { payRoundCoins } from "@/features/coins/server";
+import { getStreak } from "@/features/profile/server";
 import { puzzleNumberFor, scheduleDailyPuzzles } from "@/features/questions";
-import { percentOfPlayers } from "@/features/scoring";
 import {
   findDailySession,
   getDailyPuzzle,
@@ -44,10 +44,12 @@ async function createMissingPuzzle(today: string) {
 export async function getTodayStatus(userId: string | null, now: Date): Promise<TodayStatus> {
   const today = ukDayOf(now);
   const puzzleNumber = await todaysPuzzleNumber(today);
-  const session = userId ? await findDailySession(userId, today) : null;
+  const [session, streak] = userId
+    ? await Promise.all([findDailySession(userId, today), getStreak(userId, now)])
+    : [null, 0];
 
-  if (!session) return { puzzleNumber, played: "not_started" };
-  return { puzzleNumber, played: session.completed ? "completed" : "in_progress" };
+  if (!session) return { puzzleNumber, played: "not_started", streak };
+  return { puzzleNumber, played: session.completed ? "completed" : "in_progress", streak };
 }
 
 /** Starts today's game for the user, or picks up the one they already started. */
@@ -55,8 +57,14 @@ export async function startDailyGame(userId: string, now: Date): Promise<Started
   const today = ukDayOf(now);
   const puzzleNumber = await todaysPuzzleNumber(today);
   const sessionId = await startDailySession(userId, today);
+  return { sessionId, puzzleNumber, first: await firstState(userId, sessionId) };
+}
 
-  return { sessionId, puzzleNumber };
+/** The state a newly started round opens on. The session was just made for this user. */
+export async function firstState(userId: string, sessionId: string): Promise<PlayState> {
+  const state = await advanceGame(userId, sessionId);
+  if (!state) throw new Error("A round that was just started could not be found.");
+  return state;
 }
 
 /**
@@ -108,7 +116,6 @@ export async function answerQuestion(
     outcome: result.outcome,
     tier: result.tier,
     fee: result.fee,
-    percent: percentOfPlayers(result.timesGiven, result.timesPlayed),
   };
 }
 
@@ -132,7 +139,6 @@ export async function getAnswerLists(
       name: answer.name,
       tier: answer.tier,
       fee: FEES_BY_TIER[answer.tier] ?? 0,
-      percent: percentOfPlayers(answer.timesGiven, question.timesPlayed),
     })),
   }));
 }
@@ -171,7 +177,6 @@ export async function getGameSummary(
       tier: answer.tier,
       fee: answer.fee,
       answer: answer.answer,
-      percent: percentOfPlayers(answer.timesGiven, answer.timesPlayed),
     })),
   };
 }

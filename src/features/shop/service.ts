@@ -8,7 +8,9 @@ import {
   getPriceChanges,
   savePriceChange,
 } from "@/lib/db";
+import { ukDayOf } from "@/lib/time/uk-day";
 import { canWear, catalogue, priceCatalogue, type PricedItem } from "./catalogue";
+import { itemsForDay } from "./rotation";
 import type { Shop, ShopItem } from "./types";
 
 /** The catalogue at today's prices, including any change made in Admin. */
@@ -20,7 +22,7 @@ function find(items: readonly PricedItem[], slot: ItemSlot, itemId: string) {
   return items.find((item) => item.slot === slot && item.id === itemId);
 }
 
-/** The shop as the visitor sees it: prices, what they own, and their balance. */
+/** Today's items as the visitor sees them, with what they own and their balance. */
 export async function getShop(): Promise<Shop> {
   const visitor = await getVisitor();
   const [items, owned, balance] = await Promise.all([
@@ -29,15 +31,13 @@ export async function getShop(): Promise<Shop> {
     visitor ? getCoinBalance(visitor.userId) : 0,
   ]);
 
-  const shown: ShopItem[] = items
-    .filter((item) => item.onSale || owned.has(itemKey(item.slot, item.id)))
-    .map((item) => ({
-      slot: item.slot,
-      id: item.id,
-      name: item.name,
-      priceCoins: item.priceCoins,
-      owned: owned.has(itemKey(item.slot, item.id)),
-    }));
+  const shown: ShopItem[] = itemsForDay(items, ukDayOf(new Date())).map((item) => ({
+    slot: item.slot,
+    id: item.id,
+    name: item.name,
+    priceCoins: item.priceCoins,
+    owned: owned.has(itemKey(item.slot, item.id)),
+  }));
 
   return {
     status: !visitor ? "none" : visitor.isGuest ? "guest" : "signed_in",
@@ -58,6 +58,9 @@ export async function buy(slot: ItemSlot, itemId: string): Promise<BuyResult> {
   const item = find(await currentCatalogue(), slot, itemId);
   if (!item || !item.onSale) return { status: "unknown_item" };
   if (item.priceCoins === 0) return { status: "free" };
+  // Only today's six can be bought, the same as the shop shows.
+  const today = itemsForDay(await currentCatalogue(), ukDayOf(new Date()));
+  if (!find(today, slot, itemId)) return { status: "unknown_item" };
 
   const outcome = await buyItem(visitor.userId, slot, itemId, item.priceCoins);
   if (outcome !== "bought") return { status: outcome };

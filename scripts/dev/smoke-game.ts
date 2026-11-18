@@ -103,7 +103,7 @@ async function play(userId: string): Promise<void> {
   passed("a question that has not been served cannot be answered");
 
   const wrong = await answerQuestion(userId, game.sessionId, 1, NOBODY);
-  assert.deepEqual(wrong, { outcome: "wrong", tier: 0, fee: 0, percent: 0 });
+  assert.deepEqual(wrong, { outcome: "wrong", tier: 0, fee: 0 });
   passed("a wrong answer is a Stray worth nothing");
 
   assert.equal(await answerQuestion(userId, game.sessionId, 1, NOBODY), "not_open");
@@ -120,7 +120,7 @@ async function play(userId: string): Promise<void> {
   assert.ok(correct && correct !== "not_open");
   assert.equal(correct.outcome, "correct");
   assert.equal(correct.fee, TIERS.find((tier) => tier.level === correct.tier)?.feeGbp);
-  assert.ok(correct.fee > 0 && correct.percent > 0);
+  assert.ok(correct.fee > 0);
   passed(`a valid answer earns its tier's fee (tier ${correct.tier}, £${correct.fee})`);
 
   const third = await openQuestion(userId, game.sessionId);
@@ -129,7 +129,6 @@ async function play(userId: string): Promise<void> {
     outcome: "timeout",
     tier: 0,
     fee: 0,
-    percent: 0,
   });
   passed("giving no answer is a timeout");
 

@@ -15,11 +15,16 @@ describe("tierLevelsByRank", () => {
     }
   });
 
-  it("always has between 1 and 3 Galacticat answers", () => {
-    expect(countOf(tierLevelsByRank(15), GALACTICAT)).toBe(1);
-    expect(countOf(tierLevelsByRank(100), GALACTICAT)).toBe(2);
-    expect(countOf(tierLevelsByRank(400), GALACTICAT)).toBe(3);
-    expect(countOf(tierLevelsByRank(5000), GALACTICAT)).toBe(3);
+  it("always has exactly one Galacticat answer", () => {
+    for (const answerCount of [2, 15, 100, 400, 5000]) {
+      expect(countOf(tierLevelsByRank(answerCount), GALACTICAT)).toBe(1);
+    }
+  });
+
+  it("always keeps at least one cheap Copycat answer", () => {
+    for (const answerCount of [2, 3, 15, 16, 17, 100]) {
+      expect(countOf(tierLevelsByRank(answerCount), COPYCAT)).toBeGreaterThanOrEqual(1);
+    }
   });
 
   it("never gets rarer as answers get more popular", () => {
@@ -34,15 +39,15 @@ describe("tierLevelsByRank", () => {
     const levels = tierLevelsByRank(100);
 
     expect([7, 6, 5, 4, 3, 2, 1].map((level) => countOf(levels, level))).toEqual([
-      2, 5, 8, 15, 20, 25, 25,
+      1, 25, 25, 20, 15, 10, 4,
     ]);
   });
 
-  it("puts most answers in the lower half of the tiers", () => {
+  it("puts about half of the answers at £40m or more", () => {
     const levels = tierLevelsByRank(60);
-    const lowerTiers = levels.filter((level) => level <= 3).length;
+    const expensive = levels.filter((level) => level >= 5).length;
 
-    expect(lowerTiers).toBeGreaterThan(levels.length / 2);
+    expect(expensive / levels.length).toBeGreaterThanOrEqual(0.45);
   });
 
   it("never gives a valid answer the Stray tier", () => {

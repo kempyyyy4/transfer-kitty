@@ -5,7 +5,8 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { DAILY_PUZZLE, GAME_RULES } from "@/config/game";
+import { CLUB_SHORT_NAMES } from "@/config/competitions";
+import { DAILY_CLUBS, DAILY_PUZZLE, GAME_RULES } from "@/config/game";
 import { assignTiers } from "@/features/scoring";
 import { openWarehouse } from "../data/warehouse";
 import { QUESTIONS_PATH, REPORT_PATH } from "./paths";
@@ -22,6 +23,64 @@ const fameByPlayer = new Map(
     .map((row) => [row.player_id, row.fame]),
 );
 
+/** Every club that has played in the Premier League since the match data starts. */
+const premierLeagueClubs = new Set(
+  warehouse
+    .query<{ club_id: number }>(
+      "select distinct club_id from player_seasons where competition_id = 'GB1'",
+    )
+    .map((row) => row.club_id),
+);
+
+/** Other clubs from best known down, by the fame of their 25 best-known players. */
+const otherClubRank = new Map(
+  warehouse
+    .query<{ club_id: number }>(
+      `with ranked as (
+         select cs.club_id, f.fame,
+                row_number() over (partition by cs.club_id order by f.fame desc) as r
+         from (select distinct player_id, club_id from club_spells) cs
+         join player_fame f on f.player_id = cs.player_id
+       )
+       select club_id from ranked where r <= 25
+       group by club_id order by sum(fame) desc`,
+    )
+    .filter((row) => !premierLeagueClubs.has(row.club_id))
+    .map((row, index) => [row.club_id, index + 1]),
+);
+
+/**
+ * Whether a question is fair for the daily: every club it names is well known, and a
+ * question about one final's line-ups is about a final most fans watch.
+ */
+function fairForDaily(draft: DraftQuestion): boolean {
+  const finals = DAILY_CLUBS.finalCompetitions as readonly string[];
+  if (draft.templateKey === "cup-final" && !finals.includes(String(draft.params.competitionId))) {
+    return false;
+  }
+  return clubsWellKnown(draft);
+}
+
+/** Whether every club a question names is one most fans know. */
+function clubsWellKnown(draft: DraftQuestion): boolean {
+  const clubIds = [draft.params.clubId, draft.params.firstClubId, draft.params.secondClubId]
+    .filter((id) => id !== undefined)
+    .map(Number);
+  return clubIds.every(
+    (id) =>
+      premierLeagueClubs.has(id) ||
+      (otherClubRank.get(id) ?? Infinity) <= DAILY_CLUBS.topOtherClubs,
+  );
+}
+
+/** The prompt with long official club names swapped for the names fans use. */
+function withShortClubNames(prompt: string): string {
+  return Object.entries(CLUB_SHORT_NAMES).reduce(
+    (text, [official, short]) => text.replaceAll(official, short),
+    prompt,
+  );
+}
+
 function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion {
   const tiered = assignTiers(
     draft.answers.map((answer) => ({
@@ -31,8 +90,12 @@ function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion 
   );
   return {
     ...draft,
+    prompt: withShortClubNames(draft.prompt),
     dataSource,
-    prominence: tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0,
+    // An unfair question gets prominence 0: never in the daily, and never in Unlimited.
+    prominence: fairForDaily(draft)
+      ? (tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0)
+      : 0,
     answers: tiered.map(({ entityId, popularity, tier }) => ({
       playerId: entityId,
       popularity,

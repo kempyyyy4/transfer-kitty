@@ -1,7 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
   "crons": [
-    { "path": "/api/cron/rollover", "schedule": "5 23 * * *" },
-    { "path": "/api/cron/rollover", "schedule": "5 0 * * *" }
+    {
+      "path": "/api/cron/rollover",
+      "schedule": "5 23 * * *"
+    },
+    {
+      "path": "/api/cron/rollover",
+      "schedule": "5 0 * * *"
+    }
   ]
 }

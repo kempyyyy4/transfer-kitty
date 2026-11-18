@@ -39,9 +39,9 @@ export function HistoryCalendar({ history, today }: { history: HistoryDay[]; tod
               key={day}
               title={future ? undefined : label}
               aria-label={future ? undefined : label}
-              className={`aspect-square border-2 ${
-                day === today ? "border-chalk" : "border-stand"
-              } ${played ? shade(played.totalFee) : future ? "opacity-30" : "bg-night-deep"}`}
+              className={`aspect-square border-2 transition-colors ${
+                day === today ? "border-floodlight" : "border-stand/70"
+              } ${played ? shade(played.totalFee) : future ? "opacity-20" : "bg-night-deep/50"}`}
             />
           );
         })}

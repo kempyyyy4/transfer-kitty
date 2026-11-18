@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader } from "@/components/Loader";
 import { GameScreen } from "@/features/game";
@@ -36,8 +35,8 @@ export function ArchiveScreen() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="font-pixel text-lg leading-relaxed text-floodlight">ARCHIVE</h1>
-      <p className="text-xl">
+      <h1 className="page-title">ARCHIVE</h1>
+      <p className="page-lead">
         Every past day&apos;s puzzle. Replays are just for fun: no Top Kitties, no coins.
       </p>
       {access && !unlocked ? <LifetimeCard /> : null}
@@ -64,9 +63,6 @@ export function ArchiveScreen() {
           ))}
         </ul>
       ) : null}
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

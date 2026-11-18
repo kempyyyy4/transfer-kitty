@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Loader } from "@/components/Loader";
 import { adminApi } from "../api-client";
@@ -27,7 +26,7 @@ export function AdminScreen() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-2 pr-14">
-        <h1 className="font-pixel text-lg leading-relaxed text-floodlight">ADMIN</h1>
+        <h1 className="page-title">ADMIN</h1>
         {access?.status === "admin" ? (
           <button
             type="button"
@@ -49,10 +48,6 @@ export function AdminScreen() {
       {access?.status === "off" || access?.status === "not_admin" ? (
         <ClosedPanel access={access} />
       ) : null}
-
-      <Link href="/" className="pixel-button px-4 py-3 text-xs">
-        BACK TO HOME
-      </Link>
     </section>
   );
 }

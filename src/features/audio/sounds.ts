@@ -135,3 +135,78 @@ export function playLionRoar(): void {
   growl.stop(now + length);
   rasp.stop(now + length);
 }
+
+/** A short click as the ball passes a kitty, higher for each tier further along. */
+export function playTick(level: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  tone(ctx, "square", 330 + level * 70, ctx.currentTime, 0.05, 0.05);
+}
+
+/**
+ * The thump of a boot on the ball. `power` (0 to 1) makes it deeper and louder, and a
+ * hard kick adds the rush of the ball through the air.
+ */
+export function playKick(power = 0.5): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const length = 0.16 + 0.12 * power;
+  const osc = tone(ctx, "sine", 190 - 60 * power, now, length, 0.25 + 0.3 * power);
+  osc.frequency.exponentialRampToValueAtTime(42, now + length);
+
+  const smack = noise(ctx, now, 0.04);
+  const smackGain = ctx.createGain();
+  smackGain.gain.setValueAtTime(0.06 + 0.12 * power, now);
+  smackGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+  smack.connect(smackGain).connect(ctx.destination);
+
+  if (power < 0.35) return;
+  const rushLength = 0.3 + 0.6 * power;
+  const rush = noise(ctx, now + 0.03, rushLength);
+  const band = ctx.createBiquadFilter();
+  band.type = "bandpass";
+  band.frequency.setValueAtTime(1800, now);
+  band.frequency.exponentialRampToValueAtTime(500, now + rushLength);
+  const rushGain = ctx.createGain();
+  rushGain.gain.setValueAtTime(0.0001, now);
+  rushGain.gain.exponentialRampToValueAtTime(0.05 * power, now + 0.08);
+  rushGain.gain.exponentialRampToValueAtTime(0.0001, now + rushLength);
+  rush.connect(band).connect(rushGain).connect(ctx.destination);
+}
+
+/** The ball landing on the grass: `strength` (0 to 1) for a first bounce or a small one. */
+export function playThud(strength: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  const osc = tone(ctx, "sine", 110, now, 0.1, 0.08 + 0.22 * strength);
+  osc.frequency.exponentialRampToValueAtTime(45, now + 0.1);
+}
+
+/** A clock tick for the last seconds of a question: a tock that rises as time runs out. */
+export function playClockTick(secondsLeft: number): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tone(ctx, "square", 1400 - secondsLeft * 120, now, 0.035, 0.05);
+  tone(ctx, "triangle", 220, now, 0.06, 0.08);
+}
+
+/** A soft blip when an answer is picked from the list. */
+export function playSelect(): void {
+  const ctx = audio();
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tone(ctx, "square", 660, now, 0.05, 0.05);
+  tone(ctx, "square", 990, now + 0.045, 0.07, 0.045);
+}
+
+/**
+ * A short buzz on phones that can (most Android phones; iPhones ignore it). It goes with
+ * the sound switch, so a player who wants quiet gets no buzzing either.
+ */
+export function buzz(pattern: number | number[]): void {
+  if (!isSoundOn() || typeof navigator === "undefined" || !("vibrate" in navigator)) return;
+  navigator.vibrate(pattern);
+}
