@@ -27,7 +27,14 @@ const EMPTY_DRAFT: AnswerDraft = { text: "", suggestions: [], chosen: null };
 type View =
   | { kind: "loading" }
   | { kind: "question"; question: OpenQuestion; deadline: number }
-  | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback }
+  | {
+      kind: "feedback";
+      question: OpenQuestion;
+      answer: string | null;
+      feedback: AnswerFeedback;
+      /** The player gave up on the question with SKIP. */
+      skipped?: boolean;
+    }
   | { kind: "completed"; sessionId: string; summary: GameSummary }
   | { kind: "error"; message: string };
 
@@ -144,7 +151,12 @@ export function GameScreen({
    * guess shakes the box and the player keeps going. `timeUp` marks the last-moment guess
    * sent as the timer ends: if it is wrong, the question closes as out of time.
    */
-  async function submit(question: OpenQuestion, player: PlayerSuggestion | null, timeUp = false) {
+  async function submit(
+    question: OpenQuestion,
+    player: PlayerSuggestion | null,
+    timeUp = false,
+    skipped = false,
+  ) {
     const id = sessionId.current;
     if (!id || answering.current) return;
     answering.current = true;
@@ -158,6 +170,7 @@ export function GameScreen({
           question,
           answer: player?.name ?? null,
           feedback: { outcome, tier, fee },
+          skipped,
         });
         return;
       }
@@ -228,6 +241,7 @@ export function GameScreen({
       wrongGuess={wrongGuess}
       wrongSoFar={wrongSoFar}
       onSubmit={(player) => void submit(question, player)}
+      onSkip={() => void submit(question, null, false, true)}
       onExpire={() => void submitTyped(question)}
       onDraftChange={rememberDraft}
       onContinue={() => void showNext()}

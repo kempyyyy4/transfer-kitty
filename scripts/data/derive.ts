@@ -4,6 +4,7 @@
  */
 import { buildClubSpells } from "./derived/club-spells";
 import { buildPlayerFame } from "./derived/fame";
+import { buildPlayerNationality } from "./derived/nationality";
 import { buildPlayerSeasons } from "./derived/player-seasons";
 import { buildAllPlayers } from "./derived/players";
 import { openWarehouse } from "./warehouse";
@@ -12,6 +13,7 @@ const warehouse = openWarehouse();
 
 buildPlayerSeasons(warehouse);
 buildAllPlayers(warehouse);
+buildPlayerNationality(warehouse);
 buildPlayerFame(warehouse);
 buildClubSpells(warehouse);
 

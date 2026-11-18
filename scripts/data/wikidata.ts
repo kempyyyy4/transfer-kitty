@@ -77,3 +77,14 @@ export function profileSliceQuery(slice: string): string {
     }
     GROUP BY ?p ?tm`;
 }
+
+/** One player's nationalities on Wikidata, as English names. */
+export interface WikidataNationality {
+  qid: string;
+  /** Set when the player was found by name, because Wikidata lacks his Transfermarkt ID. */
+  playerId?: number;
+  /** "Country for sport" (P1532): England rather than the United Kingdom. Preferred. */
+  sport: string[];
+  /** Country of citizenship (P27). */
+  citizenship: string[];
+}

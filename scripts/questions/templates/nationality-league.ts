@@ -17,20 +17,20 @@ interface Row extends AnswerRow {
 
 /**
  * "Name a player from Senegal who has played in the Premier League since 2012/13."
- * Nationality is the first citizenship the dataset lists for the player.
+ * Nationality is the first citizenship the dataset lists, under one spelling per country,
+ * or Wikidata's where the dataset is blank (see player_nationality).
  */
 export const nationalityLeague: Template = {
   key: "nationality-league",
-  dataSource: "transfermarkt",
+  dataSource: "transfermarkt+wikidata",
   generate(warehouse) {
     const rows = warehouse.query<Row>(`
-      select s.competition_id, p.country_of_citizenship as country,
+      select s.competition_id, n.country,
              s.player_id, sum(s.appearances) as context
       from player_seasons s
-      join tm_players p on p.player_id = s.player_id
+      join player_nationality n on n.player_id = s.player_id
       where s.competition_id in (${LEAGUE_IDS})
-        and p.country_of_citizenship is not null
-      group by s.competition_id, p.country_of_citizenship, s.player_id
+      group by s.competition_id, n.country, s.player_id
     `);
 
     return groupIntoQuestions(rows, FULL_INVOLVEMENT.careerAppearances, (row) => {

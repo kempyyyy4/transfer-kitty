@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CountUp } from "@/components/CountUp";
 import { FullScreenScene } from "@/components/scene/FullScreenScene";
 import { GameScene } from "@/components/scene/GameScene";
@@ -23,7 +23,14 @@ import { TimerBar } from "./TimerBar";
 
 export type PlayingState =
   | { kind: "question"; question: OpenQuestion; deadline: number }
-  | { kind: "feedback"; question: OpenQuestion; answer: string | null; feedback: AnswerFeedback };
+  | {
+      kind: "feedback";
+      question: OpenQuestion;
+      answer: string | null;
+      feedback: AnswerFeedback;
+      /** The player gave up on the question with SKIP. */
+      skipped?: boolean;
+    };
 
 /** For rounds that count for nothing: the player may pause, quit, or play without a timer. */
 export interface PracticeControls {
@@ -38,6 +45,8 @@ interface Props {
   wrongSoFar: readonly PlayerSuggestion[];
   practice?: PracticeControls;
   onSubmit: (player: PlayerSuggestion) => void;
+  /** Gives up the question: it counts as out of time. */
+  onSkip: () => void;
   onExpire: () => void;
   onDraftChange: (draft: AnswerDraft) => void;
   onContinue: () => void;
@@ -55,6 +64,7 @@ export function PlayingView({
   wrongSoFar,
   practice,
   onSubmit,
+  onSkip,
   onExpire,
   onDraftChange,
   onContinue,
@@ -183,6 +193,7 @@ export function PlayingView({
                 }}
                 onDraftChange={onDraftChange}
               />
+              <SkipButton key={`skip-${question.position}`} disabled={checking} onSkip={onSkip} />
             </>
           ) : null}
         </div>
@@ -199,6 +210,7 @@ export function PlayingView({
             <div className="mx-auto w-full max-w-2xl">
               <AnswerReveal
                 answer={view.answer}
+                skipped={view.kind === "feedback" && view.skipped === true}
                 feedback={feedback}
                 landed={landed}
                 isLast={question.position === question.total}
@@ -250,6 +262,31 @@ function Pips({
         );
       })}
     </div>
+  );
+}
+
+/** How long SKIP waits for the second tap that confirms it. */
+const SKIP_CONFIRM_MS = 2500;
+
+/** Gives up the question. The first tap asks for a second, so a stray tap costs nothing. */
+function SkipButton({ disabled, onSkip }: { disabled: boolean; onSkip: () => void }) {
+  const [armed, setArmed] = useState(false);
+  useEffect(() => {
+    if (!armed) return;
+    const disarm = setTimeout(() => setArmed(false), SKIP_CONFIRM_MS);
+    return () => clearTimeout(disarm);
+  }, [armed]);
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={() => (armed ? onSkip() : setArmed(true))}
+      className={`pixel-button self-end px-3 py-2 text-[10px] transition-colors ${
+        armed ? "border-claret text-claret" : "text-chalk-dim"
+      }`}
+    >
+      {armed ? "TAP AGAIN TO SKIP" : "SKIP"}
+    </button>
   );
 }
 
