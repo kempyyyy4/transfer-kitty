@@ -185,7 +185,9 @@ A feature's `service.ts` is server-only. Its client components import from their
 - The privacy policy and terms are in `src/features/legal`, built from `src/config/legal.ts` and the price config, so prices on them never drift. They are drafts until checked; `LEGAL.isDraft` shows a notice. Change the wording only with Tom's approval.
 - Display names pass `checkDisplayName`: the obscenity library (with spacing squashed out) and `RESERVED_NAME_PARTS` in `src/config/account.ts`.
 - Players delete their own account from the Account page. `prepare_account_deletion` first hands their leagues to another member; every other table cascades from `auth.users`. A new table holding a user's data must reference `auth.users` with `on delete cascade`.
-- Buy buttons say that access starts at once and the 14-day right to cancel is given up. Keep that line next to every buy button.
+- Every buy button stays disabled until the player ticks that it starts at once and they give up the 14-day right to cancel (UK law needs that express agreement), and Stripe's page repeats it. Keep both on every buy button.
+- Request counters in `rate_limits` can hold an IP address, so the nightly job deletes them after a day.
+- `LEGAL_CHECK.md` lists the legal risks still open and the business admin needed before launch.
 - `README.md` covers setup and launch. Keep it current.
 
 ## Question rules
