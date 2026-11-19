@@ -17,3 +17,17 @@ export async function consumeRateLimit(
 
   return z.boolean().parse(data);
 }
+
+/**
+ * Deletes request counters older than a day. Some keys hold an IP address (sign-in limits),
+ * and the privacy policy says those are kept only briefly. Returns how many were removed.
+ */
+export async function deleteOldRateLimits(now: Date): Promise<number> {
+  const cutoff = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+  const { count, error } = await getServiceClient()
+    .from("rate_limits")
+    .delete({ count: "exact" })
+    .lt("window_start", cutoff);
+  if (error) throw new Error(`Clearing old rate limits failed: ${error.message}`);
+  return count ?? 0;
+}
