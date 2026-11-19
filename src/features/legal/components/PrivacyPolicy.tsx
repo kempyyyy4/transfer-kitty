@@ -57,7 +57,7 @@ export function PrivacyPolicy() {
           without cookies.
         </li>
         <li>To keep payment records, as the law requires.</li>
-        <li>To show personalised ads to free players, only if you agree.</li>
+        <li>To show ads to free players. They are never personalised to you.</li>
       </ul>
 
       <h2>WHAT OTHERS SEE</h2>
@@ -92,8 +92,9 @@ export function PrivacyPolicy() {
         </li>
         <li>
           <strong>Ads:</strong> free players may see Google ads on the Results and Top Kitties
-          screens. Google asks for your agreement first and you can change your mind at any time.
-          Players with the lifetime unlock never see ads.
+          screens. They are never personalised to you. Where the law needs it, Google asks for your
+          agreement to its ad cookies first, and you can change your mind at any time. Players with
+          the lifetime unlock never see ads.
         </li>
       </ul>
 

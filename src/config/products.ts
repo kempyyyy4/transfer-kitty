@@ -11,3 +11,9 @@ export const LIFETIME_UNLOCK = {
 
 /** Every themed pack costs the same. */
 export const PACK_PRICE_PENCE = 199;
+
+/**
+ * Stripe's product tax code for everything sold: "General - Electronically Supplied
+ * Services", which is how EU VAT treats digital content (docs.stripe.com/tax/tax-codes).
+ */
+export const STRIPE_TAX_CODE = "txcd_10000000";

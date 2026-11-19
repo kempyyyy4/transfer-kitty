@@ -12,6 +12,11 @@ export function getStripe(): Stripe | null {
   return client;
 }
 
+/** Whether Checkout should work out EU VAT with Stripe Tax (STRIPE_AUTOMATIC_TAX=on). */
+export function isAutomaticTaxOn(): boolean {
+  return getServerEnv().STRIPE_AUTOMATIC_TAX === "on";
+}
+
 export function getWebhookSecret(): string | null {
   return getServerEnv().STRIPE_WEBHOOK_SECRET ?? null;
 }

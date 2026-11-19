@@ -172,12 +172,13 @@ A feature's `service.ts` is server-only. Its client components import from their
 
 - Everything sold is priced in `src/config/products.ts` and `src/config/coins.ts`. The browser only names a product (`lifetime`, `coins-500`, `pack:<id>`); the server sets the price on the Stripe Checkout it creates.
 - Buying needs a signed-in account, so purchases restore on any device. A `purchases` row is written before Checkout opens.
+- Prices include any VAT (`tax_behavior: "inclusive"`), so what the buyer pays always equals the price in config. With `STRIPE_AUTOMATIC_TAX=on`, Stripe Tax takes EU VAT out of it (Tom chose non-Union OSS registration for EU VAT).
 - Only the webhook (`/api/stripe/webhook`) grants anything. It checks Stripe's signature, then `fulfil_purchase` grants once: the event ID is stored in `stripe_events`, the purchase must still be pending, and the amount paid must match. What is granted comes from the stored purchase, never the event's metadata.
 - Entitlements are `lifetime` and `pack:<id>`, in `entitlements`. Check them with `getAccess` from `src/features/payments/server.ts`.
 - Archive, Unlimited and pack rounds never count on Top Kitties, never earn coins, and never change the crowd figures that set tiers (only daily plays do, in `submit_answer`).
 - No paid round may show a question from today's or a coming daily puzzle. `pick_practice_questions` leaves those out; Unlimited also leaves out pack questions and famous questions still waiting for a daily; the daily never picks a pack question.
 - Nine Lives (lifetime) bridges one missed day per UK calendar month, automatically, in `computeStats`.
-- Ads load only with `NEXT_PUBLIC_ADSENSE_CLIENT` set and no lifetime unlock, on Results and Top Kitties only. Consent is asked by Google's certified message, set up in AdSense (Privacy & messaging). Every cookie of our own is strictly necessary, so the site has no banner of its own. Adding any non-essential cookie or tracker means adding a consent step first.
+- Ads load only with `NEXT_PUBLIC_ADSENSE_CLIENT` set and no lifetime unlock, on Results and Top Kitties only. Ads are never personalised (`requestNonPersonalizedAds`), for anyone, because of the Children's Code. Consent is asked by Google's certified message, set up in AdSense (Privacy & messaging). Every cookie of our own is strictly necessary, so the site has no banner of its own. Adding any non-essential cookie or tracker means adding a consent step first.
 - To test payments locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`, and Stripe's test card 4242 4242 4242 4242.
 
 ## Launch extras

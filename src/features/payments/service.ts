@@ -10,7 +10,8 @@ import {
   insertPurchase,
   type FulfilOutcome,
 } from "@/lib/db";
-import { getStripe, getWebhookSecret } from "@/lib/stripe";
+import { STRIPE_TAX_CODE } from "@/config/products";
+import { getStripe, getWebhookSecret, isAutomaticTaxOn } from "@/lib/stripe";
 import { getAccess } from "./access";
 import { grantFor, packIdOf, productFor, type Product } from "./products";
 import type { PurchaseStatus } from "./types";
@@ -52,10 +53,18 @@ export async function startCheckout(productKey: string, origin: string): Promise
         price_data: {
           currency: "gbp",
           unit_amount: product.pricePence,
-          product_data: { name: product.name, description: product.description },
+          // Prices include any VAT, so the buyer pays the price shown and the webhook's
+          // amount check still matches. VAT for EU buyers comes out of it.
+          tax_behavior: "inclusive",
+          product_data: {
+            name: product.name,
+            description: product.description,
+            tax_code: STRIPE_TAX_CODE,
+          },
         },
       },
     ],
+    automatic_tax: { enabled: isAutomaticTaxOn() },
     client_reference_id: purchaseId,
     metadata: { purchase_id: purchaseId },
     customer_email: visitor.email ?? undefined,

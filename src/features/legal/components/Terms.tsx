@@ -65,8 +65,8 @@ export function Terms() {
         </li>
       </ul>
       <p>
-        Purchases need a signed-in account, so they come back whenever you sign in. Payments are
-        taken by Stripe.
+        Prices include any VAT. Purchases need a signed-in account, so they come back whenever you
+        sign in. Payments are taken by Stripe.
       </p>
 
       <h2>YOUR RIGHT TO CANCEL</h2>
