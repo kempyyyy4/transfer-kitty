@@ -59,6 +59,14 @@ export async function startCheckout(productKey: string, origin: string): Promise
     client_reference_id: purchaseId,
     metadata: { purchase_id: purchaseId },
     customer_email: visitor.email ?? undefined,
+    // Repeated on Stripe's page next to Pay: the player asked for it to
+    // start straight away and so lose the 14-day right to cancel (agreed on our buy button).
+    custom_text: {
+      submit: {
+        message:
+          "This starts as soon as you pay. You asked for that and agreed you then lose the 14-day right to cancel.",
+      },
+    },
     success_url: `${origin}/purchase?id=${purchaseId}`,
     cancel_url: `${origin}/shop?cancelled=1`,
   });

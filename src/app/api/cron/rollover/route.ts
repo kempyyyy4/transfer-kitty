@@ -3,6 +3,7 @@ import { clearOldAnalytics } from "@/features/analytics/server";
 import { scheduleDailyPuzzles } from "@/features/questions";
 // Server-only, so it is not in the scoring feature's index, which client screens import.
 import { recalculateDueTiers } from "@/features/scoring/recalculation-job";
+import { deleteOldRateLimits } from "@/lib/db";
 import { getServerEnv } from "@/lib/env";
 import { jsonError } from "@/lib/http";
 import { ukDayOf } from "@/lib/time/uk-day";
@@ -12,7 +13,7 @@ import { ukDayOf } from "@/lib/time/uk-day";
  * The puzzle itself changes at UK midnight without this: each request works out the UK
  * day for itself. This job keeps puzzles scheduled ahead and recalculates tiers from real
  * answers, skipping today's questions so fees never change mid-day, and deletes analytics
- * events past their keeping period. Running it twice, or
+ * events past their keeping period and request counters (some hold an IP) after a day. Running it twice, or
  * missing a day, does no harm.
  */
 export async function GET(request: Request) {
@@ -24,10 +25,12 @@ export async function GET(request: Request) {
   const created = await scheduleDailyPuzzles(today);
   const recalculated = await recalculateDueTiers(today);
   const analyticsDeleted = await clearOldAnalytics(today);
+  const rateLimitsDeleted = await deleteOldRateLimits(new Date());
   return Response.json({
     puzzlesCreated: created,
     questionsRecalculated: recalculated,
     analyticsDeleted,
+    rateLimitsDeleted,
   });
 }
 

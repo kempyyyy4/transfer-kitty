@@ -35,8 +35,8 @@ export function PrivacyPolicy() {
           you picked.
         </li>
         <li>
-          <strong>To keep the game fair and safe:</strong> your IP address, briefly, to stop anyone
-          flooding the game with requests.
+          <strong>To keep the game fair and safe:</strong> your IP address, to stop anyone flooding
+          the game or the sign-in emails with requests. It is deleted within a day.
         </li>
         <li>
           <strong>To count visits, without cookies:</strong> which pages are viewed and for how
@@ -73,6 +73,11 @@ export function PrivacyPolicy() {
         <li>Stripe takes payments and keeps its own payment records.</li>
         <li>Google, if you sign in with Google, and for ads shown to free players.</li>
       </ul>
+      <p>
+        Vercel, Stripe and Google may handle data in the United States. Where they do, they use the
+        safeguards UK law requires, such as the UK International Data Transfer Addendum or the UK
+        Extension to the EU-US Data Privacy Framework.
+      </p>
 
       <h2>COOKIES</h2>
       <ul>

@@ -57,7 +57,7 @@ export {
   retireGeneratedQuestionsExcept,
   type QuestionImport,
 } from "./questions";
-export { consumeRateLimit } from "./rate-limits";
+export { consumeRateLimit, deleteOldRateLimits } from "./rate-limits";
 export {
   getAnswerPlayCounts,
   getQuestionsDueForRecalculation,
