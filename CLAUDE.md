@@ -177,7 +177,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Archive, Unlimited and pack rounds never count on Top Kitties, never earn coins, and never change the crowd figures that set tiers (only daily plays do, in `submit_answer`).
 - No paid round may show a question from today's or a coming daily puzzle. `pick_practice_questions` leaves those out; Unlimited also leaves out pack questions and famous questions still waiting for a daily; the daily never picks a pack question.
 - Nine Lives (lifetime) bridges one missed day per UK calendar month, automatically, in `computeStats`.
-- Ads load only with `NEXT_PUBLIC_ADSENSE_CLIENT` set and no lifetime unlock, on Results and Top Kitties only. Consent is asked by Google's certified message, set up in AdSense (Privacy & messaging). Every cookie of our own is strictly necessary, so the site has no banner of its own. Adding any non-essential cookie or tracker means adding a consent step first.
+- Ads load only with `NEXT_PUBLIC_ADSENSE_CLIENT` set and no lifetime unlock, on Results and Top Kitties only. Ads are never personalised (`requestNonPersonalizedAds`), for anyone, because of the Children's Code. Consent is asked by Google's certified message, set up in AdSense (Privacy & messaging). Every cookie of our own is strictly necessary, so the site has no banner of its own. Adding any non-essential cookie or tracker means adding a consent step first.
 - To test payments locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`, and Stripe's test card 4242 4242 4242 4242.
 
 ## Launch extras

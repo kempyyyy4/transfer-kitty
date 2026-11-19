@@ -18,6 +18,15 @@ UK law throughout (England and Wales).
 | Trade mark and data credits                 | Club and competition names belong to their owners; the kitties are cartoon cats; the data sources are named.                                                                                                                                      |
 | Data sent to the US                         | The privacy policy now says Vercel, Stripe and Google may handle data in the US, under the safeguards UK law requires.                                                                                                                            |
 
+## Tom's decisions (19 November 2026)
+
+- **No solicitor review** for now, and no request to Transfermarkt. Tom accepts the risks in 1
+  and 2 below, knowing the likeliest outcome is a request to stop, and that switching to
+  Wikidata only would take several days.
+- **The team photo stays** as close likenesses (risk 2).
+- **Ads are never personalised**, for anyone, which covers the Children's Code point (risk 4).
+  Done in `src/features/ads/AdSlot.tsx` and the privacy policy.
+
 ## The real risks, biggest first
 
 ### 1. The Transfermarkt data (biggest risk)
@@ -86,23 +95,27 @@ before spending on the brand. Registering your own costs about £170 for one cla
       and fines can follow.
 - [ ] **Register as self-employed with HMRC** (or set up a company) once money comes in.
 - [ ] **EU VAT.** VAT on digital sales to EU customers is due **from the first sale**. The UK's
-      £90,000 threshold doesn't apply to EU sales. Choose one:
-  - [ ] register for the EU's non-Union OSS scheme, with Stripe Tax working out the VAT,
-  - [ ] use a "merchant of record" such as Paddle or Lemon Squeezy, who handle all tax for a
-        fee, or
-  - [ ] sell only to UK buyers.
+      £90,000 threshold doesn't apply to EU sales. See "EU VAT options" below, and pick one.
 - [ ] Fill in `src/config/legal.ts`: your name (or company), a postal address (a virtual
       office service can stand in for your home address) and a contact email. Then set
       `isDraft` to false.
 - [ ] In Stripe: turn on **email receipts** (the law needs a written confirmation after each
       purchase) and add the terms page link in your account's public details.
 
-## What a lawyer needs to look at (one short review)
+## EU VAT options
 
-1. The Transfermarkt data (risk 1).
-2. The team photo likenesses (risk 2).
-3. The privacy policy and terms, now updated.
-4. Whether the Online Safety Act applies (risk 5).
+Prices are small (coins from £0.99, lifetime £3.99), so fixed fees per sale matter most.
 
-Many solicitors offer a fixed-fee website terms review. A sports or IP solicitor is best for
-points 1 and 2.
+| Option                                         | Cost                                                                                                                  | Work for you                                                                                                                                                 |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Sell only outside the EU at first**          | Nothing extra. You lose EU sales.                                                                                     | None. I make checkout refuse EU visitors (by the country the host reports) with a friendly message. Switch on EU sales later if there is demand.             |
+| **Non-Union OSS + Stripe Tax**                 | Stripe Tax: 0.5% of each sale where you are registered. VAT itself (around 17 to 27%) comes out of the price.         | Register for OSS in one EU country (Ireland is common), then file a return every quarter, even with no sales. Stripe works out the VAT but does not file it. |
+| **Merchant of record (Paddle, Lemon Squeezy)** | 5% + 50 cents a sale, which takes about 40% of a £0.99 coin pack. Paddle quotes its own rates for products under $10. | Almost none: they are the seller and handle all tax. But it means switching away from Stripe, about two days of work.                                        |
+
+**Recommendation:** sell only outside the EU at launch. It costs nothing, needs no
+registration, and the UK is the main audience. Revisit once the analytics show EU visitors
+trying to buy.
+
+Sources: Google AdSense help (non-personalised ads, answer 9042142); Paddle pricing page;
+Stripe support, "Understanding Stripe Tax pricing"; VAT guides from hellotax and simplyvat on
+non-Union OSS. Check HMRC's and the European Commission's OSS pages before registering.

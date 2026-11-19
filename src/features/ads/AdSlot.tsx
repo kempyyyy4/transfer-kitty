@@ -8,7 +8,7 @@ const SCRIPT_ID = "adsbygoogle-script";
 
 declare global {
   interface Window {
-    adsbygoogle?: unknown[];
+    adsbygoogle?: unknown[] & { requestNonPersonalizedAds?: 0 | 1 };
   }
 }
 
@@ -17,6 +17,10 @@ declare global {
  * mid-game. Nothing loads unless AdSense is set up and the player has no lifetime unlock.
  * Consent is asked by Google's own certified message (AdSense, Privacy & messaging), which
  * the AdSense script shows to UK and EU visitors before any personalised ad.
+ *
+ * Ads are never personalised, for anyone (Tom's choice, 19 November 2026): football trivia
+ * draws under-18s, and the ICO's Children's Code expects no personalised ads for them.
+ * Google still asks consent for its ad cookies where the law needs it.
  */
 export function AdSlot() {
   const access = useAccess();
@@ -36,7 +40,10 @@ export function AdSlot() {
       script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
       document.head.appendChild(script);
     }
-    (window.adsbygoogle = window.adsbygoogle ?? []).push({});
+    const queue = (window.adsbygoogle = window.adsbygoogle ?? []);
+    // Must be set before the first push (Google AdSense help, answer 9042142).
+    queue.requestNonPersonalizedAds = 1;
+    queue.push({});
   }, [show, client]);
 
   if (!show || !client) return null;
