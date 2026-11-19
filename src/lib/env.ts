@@ -18,6 +18,11 @@ const serverEnvSchema = z.object({
   STRIPE_SECRET_KEY: optional(z.string().regex(/^(sk|rk)_(test|live)_/)),
   /** Proves a webhook request came from Stripe (whsec_...). */
   STRIPE_WEBHOOK_SECRET: optional(z.string().startsWith("whsec_")),
+  /**
+   * "on" once Stripe Tax is activated on the account (Settings > Tax), so Checkout works out
+   * EU VAT. Left off, Checkout works without it; turned on before activation, Checkout fails.
+   */
+  STRIPE_AUTOMATIC_TAX: optional(z.enum(["on", "off"])),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;

@@ -94,8 +94,16 @@ before spending on the brand. Registering your own costs about £170 for one cla
       unless exempt. Tier 1 costs about £50 a year, online at ico.org.uk. It is easy to miss,
       and fines can follow.
 - [ ] **Register as self-employed with HMRC** (or set up a company) once money comes in.
-- [ ] **EU VAT.** VAT on digital sales to EU customers is due **from the first sale**. The UK's
-      £90,000 threshold doesn't apply to EU sales. See "EU VAT options" below, and pick one.
+- [ ] **EU VAT: Tom chose non-Union OSS with Stripe Tax** (19 November 2026). Prices stay
+      the same and include VAT; for EU buyers the VAT comes out of them. Checkout is ready.
+      Before the first live sale:
+  - [ ] register for non-Union OSS in one EU country (Ireland's Revenue is common, and in
+        English);
+  - [ ] in Stripe, activate Tax (Settings > Tax), set your address, and add the OSS
+        registration;
+  - [ ] in Vercel, set `STRIPE_AUTOMATIC_TAX` to `on`;
+  - [ ] every quarter, file the OSS return (even with no sales) from Stripe's tax report,
+        and pay the VAT.
 - [ ] Fill in `src/config/legal.ts`: your name (or company), a postal address (a virtual
       office service can stand in for your home address) and a contact email. Then set
       `isDraft` to false.
