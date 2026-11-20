@@ -189,6 +189,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Every buy button stays disabled until the player ticks that it starts at once and they give up the 14-day right to cancel (UK law needs that express agreement), and Stripe's page repeats it. Keep both on every buy button.
 - Request counters in `rate_limits` can hold an IP address, so the nightly job deletes them after a day.
 - `LEGAL_CHECK.md` lists the legal risks still open and the business admin needed before launch.
+- `LAUNCH_GUIDE.md` is Tom's step-by-step guide to going live, with costs.
 - `README.md` covers setup and launch. Keep it current.
 
 ## Question rules
