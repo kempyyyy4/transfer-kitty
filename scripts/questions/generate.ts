@@ -7,7 +7,8 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { CLUB_SHORT_NAMES } from "@/config/competitions";
 import { CLUB_ASSOCIATION } from "@/config/fame";
-import { DAILY_CLUBS, DAILY_PUZZLE, GAME_RULES } from "@/config/game";
+import { sqlList } from "./build";
+import { DAILY_CLUBS, DAILY_PUZZLE, GAME_RULES, UNLIMITED_ONLY_COMPETITIONS } from "@/config/game";
 import { assignTiers } from "@/features/scoring";
 import { openWarehouse } from "../data/warehouse";
 import { QUESTIONS_PATH, REPORT_PATH } from "./paths";
@@ -78,6 +79,15 @@ const otherClubRank = new Map(
     .map((row, index) => [row.club_id, index + 1]),
 );
 
+/** Clubs kept out of the daily but left in Unlimited (DAILY_CLUBS.unlimitedOnly). */
+const unlimitedOnlyClubs = new Set(
+  warehouse
+    .query<{ club_id: number }>(
+      `select club_id from tm_clubs where name in (${sqlList(DAILY_CLUBS.unlimitedOnly)})`,
+    )
+    .map((row) => row.club_id),
+);
+
 /**
  * Whether a question is fair for the daily: every club it names is well known, and a
  * question about one final's line-ups is about a final most fans watch.
@@ -138,6 +148,27 @@ function withShortClubNames(prompt: string): string {
   );
 }
 
+/** A pre-2000 squad of a club outside the Premier League is too hard for a UK daily. */
+function isOldOverseasDecade(draft: DraftQuestion): boolean {
+  return (
+    draft.templateKey === "club-decade" &&
+    String(draft.params.decade).startsWith("19") &&
+    !premierLeagueClubs.has(Number(draft.params.clubId))
+  );
+}
+
+/** Held just under the daily's bar for a niche club or league, so it stays in Unlimited. */
+function dailyProminence(draft: DraftQuestion, prominence: number): number {
+  const { competitionId, firstCompetitionId, secondCompetitionId } = draft.params;
+  const niche =
+    clubIdsOf(draft).some((id) => unlimitedOnlyClubs.has(id)) ||
+    [competitionId, firstCompetitionId, secondCompetitionId].some((id) =>
+      UNLIMITED_ONLY_COMPETITIONS.includes(String(id)),
+    ) ||
+    isOldOverseasDecade(draft);
+  return niche ? Math.min(prominence, DAILY_PUZZLE.minProminence - 1) : prominence;
+}
+
 function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion {
   const clubIds = clubIdsOf(draft);
   const tiered = assignTiers(
@@ -154,9 +185,10 @@ function finish(draft: DraftQuestion, dataSource: DataSource): FinishedQuestion 
     prompt: withShortClubNames(draft.prompt),
     dataSource,
     // An unfair question gets prominence 0: never in the daily, and never in Unlimited.
-    prominence: fairForDaily(draft)
-      ? (tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0)
-      : 0,
+    prominence: dailyProminence(
+      draft,
+      fairForDaily(draft) ? (tiered[DAILY_PUZZLE.prominenceAnswerRank]?.popularity ?? 0) : 0,
+    ),
     answers: tiered.map(({ entityId, popularity, tier }) => ({
       playerId: entityId,
       popularity,

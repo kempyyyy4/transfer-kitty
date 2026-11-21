@@ -193,6 +193,10 @@ Git, GitHub CLI and Node.js were installed on 10 November 2026 with Tom's go-ahe
 - **The button always reads KICK OFF**; the menu is big tiles with Unlimited featured; the round starts the moment KICK OFF is pressed; loading messages only show when loading is slow; tiers have colours and answer lists are grouped by tier.
 - **Still to build**: manager, team and stadium questions (new kinds of answer), the Unlimited round builder, and the bell curve of the day's scores.
 
+### Domain (21 November 2026, agreed)
+
+The site's domain is **transferkitty.io**, by Tom's choice, in place of the brief's transferkitty.gg: `.com` is taken and `.io` costs about half as much as `.gg`.
+
 ## 3. Costs and outside checks
 
 Prices read from each company's pricing page on 10 November 2026. They can change.
@@ -230,7 +234,7 @@ I cannot create accounts, sign in, or handle passwords and secret keys for you. 
 | Now      | Sign in to GitHub once with `gh auth login`. Decide whether to make the repo private (2.2).                                         |
 | Stage 2  | Create two Supabase projects (development and live) and paste their keys into `.env.local`. I will give exact click-by-click steps. |
 | Stage 7  | Create a Google sign-in client and paste its ID and secret into Supabase.                                                           |
-| Stage 12 | Create Stripe and AdSense accounts and paste the keys into Vercel. Upgrade Vercel to Pro. Connect transferkitty.gg in Vercel.       |
+| Stage 12 | Create Stripe and AdSense accounts and paste the keys into Vercel. Upgrade Vercel to Pro. Connect transferkitty.io in Vercel.       |
 
 ---
 

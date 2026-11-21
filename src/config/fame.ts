@@ -46,6 +46,8 @@ export const FULL_INVOLVEMENT = {
   matchMinutes: 90,
   goals: 10,
   seasonGoals: 25,
+  seasonAssists: 15,
+  fixtureGoals: 3,
   hatTricks: 3,
   finals: 2,
   transferFeeMillionEur: 50,

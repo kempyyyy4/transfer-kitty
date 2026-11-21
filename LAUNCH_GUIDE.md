@@ -11,10 +11,11 @@ that needs it (Vercel, Supabase, Stripe). Never paste one into the chat.
 
 ## Part 1: Business basics (about 1 hour)
 
-### Step 1. Domain name (skip if you already own transferkitty.gg)
+### Step 1. Domain name (skip if you already own transferkitty.io)
 
-- **You:** buy `transferkitty.gg` from a registrar such as Porkbun (about £40 a year). Turn on
-  the registrar's free email forwarding so `hello@transferkitty.gg` reaches your own inbox.
+- **You:** buy `transferkitty.io` on Namecheap (about £12 for the first year; check the renewal
+  price, which may be higher). Turn on domain privacy, auto-renew and Namecheap's free email
+  forwarding so `support@transferkitty.io` reaches your own inbox.
   That's the contact email for the terms, and keeps your personal address private.
 
 ### Step 2. A postal address for the terms
@@ -64,10 +65,10 @@ Supabase's built-in email sends only a few emails an hour, which isn't enough fo
 - **You:** in Resend, create an SMTP password. In Supabase (live project), go to
   Authentication > Emails > SMTP settings, turn on custom SMTP and enter:
   - host `smtp.resend.com`, port `465`, user `resend`, and the password;
-  - sender `hello@transferkitty.gg`, sender name `Transfer Kitty`.
+  - sender `support@transferkitty.io`, sender name `Transfer Kitty`.
 - **You:** in Supabase, go to Authentication > URL configuration:
-  - Site URL: `https://transferkitty.gg`;
-  - Redirect URLs: add `https://transferkitty.gg/auth/callback`.
+  - Site URL: `https://transferkitty.io`;
+  - Redirect URLs: add `https://transferkitty.io/auth/callback`.
 - Free covers 100 emails a day. If more than 100 people sign in on one day, upgrade to Resend
   Pro (about £16 a month).
 
@@ -103,7 +104,7 @@ The free Hobby plan doesn't allow commercial use, so the site needs Pro.
 | `STRIPE_AUTOMATIC_TAX`                 | Step 11 (`on`)                                                            |
 | `NEXT_PUBLIC_ADSENSE_CLIENT`           | Leave blank until AdSense approves you (step 16)                          |
 
-- **You:** under Settings > Domains, add `transferkitty.gg` and add the DNS records Vercel shows
+- **You:** under Settings > Domains, add `transferkitty.io` and add the DNS records Vercel shows
   at your registrar.
 - **Claude:** checks the live site, the nightly job and the speed.
 
@@ -122,10 +123,10 @@ The free Hobby plan doesn't allow commercial use, so the site needs Pro.
   account for payouts. Approval can take a day or two.
 - **You:** in Settings, then:
   - turn on **email receipts** for successful payments (UK law needs a written confirmation);
-  - add `https://transferkitty.gg/terms` and your support email to the public business
+  - add `https://transferkitty.io/terms` and your support email to the public business
     details.
 - **You:** in Developers > Webhooks (live mode), add an endpoint:
-  - address `https://transferkitty.gg/api/stripe/webhook`;
+  - address `https://transferkitty.io/api/stripe/webhook`;
   - events `checkout.session.completed` and `checkout.session.async_payment_succeeded`.
 
   Copy its signing secret (`whsec_...`) into Vercel as `STRIPE_WEBHOOK_SECRET`.
@@ -184,13 +185,13 @@ The free Hobby plan doesn't allow commercial use, so the site needs Pro.
 
 | What                                  | Cost                   |
 | ------------------------------------- | ---------------------- |
-| Domain, first year (if not owned)     | about £40              |
+| Domain, first year                    | about £12              |
 | ICO fee, first year (direct debit)    | £47                    |
 | Supabase Pro, first month             | about £20              |
 | Vercel Pro, first month               | about £16              |
 | Virtual office, first month (if used) | about £10 to £20       |
 | Resend, Stripe, Stripe Tax setup, OSS | £0                     |
-| **Total to launch**                   | **about £135 to £145** |
+| **Total to launch**                   | **about £105 to £115** |
 
 ### Every month after
 
@@ -207,8 +208,8 @@ The free Hobby plan doesn't allow commercial use, so the site needs Pro.
 | What                                      | Cost                   |
 | ----------------------------------------- | ---------------------- |
 | 12 months of running costs                | about £550 to £860     |
-| Domain and ICO fee for the year           | about £87              |
-| **First year in total** (including today) | **about £640 to £950** |
+| Domain and ICO fee for the year           | about £59              |
+| **First year in total** (including today) | **about £610 to £925** |
 
 The low end has no Resend Pro and the cheaper virtual office; the high end has both.
 
@@ -231,5 +232,5 @@ about 14 lifetime sales a month**, or a mix of packs, before ads.
 
 Sources (checked 20 November 2026): vercel.com/pricing and Vercel's Hobby plan docs;
 supabase.com/pricing; resend.com/docs (free plan limits); ICO data protection fee
-self-assessment; stripe.com/gb/pricing; Porkbun's .gg price via costgoat.com. Prices change, so
+self-assessment; stripe.com/gb/pricing; Namecheap's .io price as Tom saw it. Prices change, so
 check each site's own page before paying.
