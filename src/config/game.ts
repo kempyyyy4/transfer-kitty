@@ -30,7 +30,7 @@ export const PRACTICE_TIME_LIMIT_MS = 60 * 60 * 1000;
 /** How each day's puzzle is put together. */
 export const DAILY_PUZZLE = {
   /** The UK day of puzzle #1. Set this to the launch date before going live. */
-  firstPuzzleDate: "2026-11-12",
+  firstPuzzleDate: "2026-11-22",
   /** Puzzles are created this far ahead, so a missed scheduled job never leaves a day empty. */
   daysScheduledAhead: 30,
   /**
