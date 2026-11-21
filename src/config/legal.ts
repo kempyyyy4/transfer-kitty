@@ -5,7 +5,7 @@
  */
 export const LEGAL = {
   /** The person or company running the site, e.g. "A. Person, trading as Transfer Kitty". */
-  operatorName: null as string | null,
+  operatorName: "Tom Kempshall" as string | null,
   /**
    * A postal address players can write to. UK law requires a geographic address for anyone
    * selling online (Consumer Contracts Regulations 2013, E-Commerce Regulations 2002).
@@ -13,7 +13,7 @@ export const LEGAL = {
    */
   postalAddress: null as string | null,
   /** Where players write about their data or a purchase. */
-  contactEmail: null as string | null,
+  contactEmail: "tomkempshall@gmail.com" as string | null,
   /** Set to false once the texts have been checked. */
   isDraft: true,
   lastUpdated: "18 November 2026",
