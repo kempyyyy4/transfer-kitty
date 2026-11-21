@@ -13,7 +13,7 @@ export const LEGAL = {
    */
   postalAddress: null as string | null,
   /** Where players write about their data or a purchase. */
-  contactEmail: "tomkempshall@gmail.com" as string | null,
+  contactEmail: "support@transferkitty.io" as string | null,
   /** Set to false once the texts have been checked. */
   isDraft: true,
   lastUpdated: "18 November 2026",

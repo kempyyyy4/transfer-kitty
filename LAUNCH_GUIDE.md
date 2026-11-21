@@ -15,7 +15,7 @@ that needs it (Vercel, Supabase, Stripe). Never paste one into the chat.
 
 - **You:** buy `transferkitty.io` on Namecheap (about £12 for the first year; check the renewal
   price, which may be higher). Turn on domain privacy, auto-renew and Namecheap's free email
-  forwarding so `hello@transferkitty.io` reaches your own inbox.
+  forwarding so `support@transferkitty.io` reaches your own inbox.
   That's the contact email for the terms, and keeps your personal address private.
 
 ### Step 2. A postal address for the terms
@@ -65,7 +65,7 @@ Supabase's built-in email sends only a few emails an hour, which isn't enough fo
 - **You:** in Resend, create an SMTP password. In Supabase (live project), go to
   Authentication > Emails > SMTP settings, turn on custom SMTP and enter:
   - host `smtp.resend.com`, port `465`, user `resend`, and the password;
-  - sender `hello@transferkitty.io`, sender name `Transfer Kitty`.
+  - sender `support@transferkitty.io`, sender name `Transfer Kitty`.
 - **You:** in Supabase, go to Authentication > URL configuration:
   - Site URL: `https://transferkitty.io`;
   - Redirect URLs: add `https://transferkitty.io/auth/callback`.
