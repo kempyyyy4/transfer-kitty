@@ -15,7 +15,7 @@ interface Row extends AnswerRow {
 
 /**
  * "Name a player who joined Chelsea FC for €30m or more since the summer of 2012
- * (Transfermarkt fee)." Fees are in euros because that is what the data holds.
+ * (reported fee)." Fees are in euros because that is what the data holds.
  * Each club gets one question, at the highest fee that still has enough answers.
  */
 export const transferFee: Template = {
@@ -47,7 +47,7 @@ function questionForClub(clubRows: Row[], templateKey: string): DraftQuestion[] 
     return groupIntoQuestions(qualifying, FULL_INVOLVEMENT.transferFeeMillionEur, (row) => ({
       dedupeKey: `transfer-fee:${row.club_id}`,
       templateKey,
-      prompt: `Name a player who joined ${row.club_name} for €${target}m or more since the summer of ${FIRST_SEASON} (Transfermarkt fee).`,
+      prompt: `Name a player who joined ${row.club_name} for a reported €${target}m or more since the summer of ${FIRST_SEASON}.`,
       params: { clubId: row.club_id, feeMillionEur: target },
       tags: [{ type: "club", value: slugify(row.club_name) }],
     }));

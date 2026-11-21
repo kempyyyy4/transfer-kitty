@@ -57,10 +57,10 @@ export const DAILY_PUZZLE = {
   /** At most this many of a day's questions may come from the same template. Tom chose 1. */
   maxQuestionsPerTemplate: 1,
   /**
-   * Templates that read alike ("Name a player who played for <club>...") form a family, and
-   * a day has at most this many from one family.
+   * Templates that read alike form a family, and a day has at most this many from one, so
+   * the rest are scoring, assist, appearance and transfer questions (Tom, 21 November 2026).
    */
-  familyLimits: { club: 3 } as Record<string, number>,
+  familyLimits: { club: 2, playedIn: 2 } as Record<string, number>,
   /** How many random candidates are drawn to choose a day's questions from. */
   candidateSampleSize: 300,
 } as const;
@@ -74,6 +74,14 @@ export const TEMPLATE_FAMILIES: Readonly<Record<string, string>> = {
   "club-cup": "club",
   "club-scorer": "club",
   "nationality-club": "club",
+  "club-trophy": "club",
+  "two-clubs": "club",
+  "nationality-league": "playedIn",
+  "two-leagues": "playedIn",
+  "cup-final": "playedIn",
+  "cup-finalist": "playedIn",
+  goalkeeper: "playedIn",
+  "world-cup-2026-group-stage": "playedIn",
 };
 
 /**
@@ -86,4 +94,61 @@ export const DAILY_CLUBS = {
   topOtherClubs: 25,
   /** Questions about one final's line-ups are only fair for the finals most fans watch. */
   finalCompetitions: ["CL", "EL", "FAC"],
+  /**
+   * Known, but too niche for a UK audience's daily (Tom, 21 November 2026). Their questions
+   * stay in Unlimited. Names as the dataset spells them.
+   */
+  unlimitedOnly: [
+    "Galatasaray",
+    "Fenerbahce",
+    "PSV Eindhoven",
+    "SL Benfica",
+    "FC Porto",
+    "Parma Calcio 1913",
+  ],
 } as const;
+
+/** Competitions too niche for the daily; their questions stay in Unlimited. */
+export const UNLIMITED_ONLY_COMPETITIONS: readonly string[] = [
+  "NL1",
+  "PO1",
+  "TR1",
+  "BE1",
+  "NLP",
+  "UCOL",
+];
+
+/** Big league fixtures for "scored in a match between X and Y", by competition. */
+export const FIXTURE_CLUBS: Readonly<Record<string, readonly string[]>> = {
+  GB1: [
+    "Arsenal FC",
+    "Chelsea FC",
+    "Liverpool FC",
+    "Manchester City",
+    "Manchester United",
+    "Newcastle United",
+    "Tottenham Hotspur",
+  ],
+  ES1: ["Atlético de Madrid", "FC Barcelona", "Real Madrid"],
+  IT1: ["AC Milan", "Associazione Sportiva Roma", "Inter Milan", "Juventus FC", "SSC Napoli"],
+  L1: ["Bayern Munich", "Borussia Dortmund"],
+};
+
+/** The clubs asked about in "scored against X in the Champions League". */
+export const SCORED_AGAINST_CLUBS: readonly string[] = [
+  "AC Milan",
+  "Arsenal FC",
+  "Atlético de Madrid",
+  "Bayern Munich",
+  "Borussia Dortmund",
+  "Chelsea FC",
+  "FC Barcelona",
+  "Inter Milan",
+  "Juventus FC",
+  "Liverpool FC",
+  "Manchester City",
+  "Manchester United",
+  "Paris Saint-Germain",
+  "Real Madrid",
+  "Tottenham Hotspur",
+];

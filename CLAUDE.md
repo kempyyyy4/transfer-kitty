@@ -197,6 +197,7 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Fame is the hype score: for players born from 1990, mostly Wikipedia renown (`WIKIPEDIA_FAME.renownShare`) and the rest career volume, so famous young stars count as the obvious answers they are. In questions that name a club, a player there now is fully involved, and a short spell in a long career counts for less (`CLUB_ASSOCIATION`). Rebuild with `tsx scripts/data/derive.ts` then regenerate.
 - "Played for X and won Y" questions name the seasons the data fully covers, worked out from the data, so a final missing from a download never marks winners wrong.
 
+- A day has at most 2 "played for" and 2 "played in" questions (`familyLimits`), so the rest are scoring, assist, appearance and transfer questions. Niche clubs and leagues (`DAILY_CLUBS.unlimitedOnly`, `UNLIMITED_ONLY_COMPETITIONS`) and pre-2000 overseas squads stay in Unlimited.
 - Never write football facts from memory. Every generated question and every valid answer comes from a data source approved in `PLAN.md`.
 - Do not add a data source without a licence that allows commercial use, and not without Tom's approval.
 - Any fact that is not from an approved data source must be listed in `QUESTIONS_TO_CHECK.md` for Tom to verify, and kept in one file in `src/config`.
