@@ -1,3 +1,4 @@
+import { SITE } from "@/config/site";
 import type { Metadata, Viewport } from "next";
 import { Press_Start_2P, VT323 } from "next/font/google";
 import { StadiumScene } from "@/components/scene/StadiumScene";
@@ -20,11 +21,18 @@ const bodyFont = VT323({
 });
 
 export const metadata: Metadata = {
-  title: "Transfer Kitty",
-  description: "The daily football trivia game where rare answers earn big transfer fees.",
+  metadataBase: new URL(SITE.url),
+  title: SITE.title,
+  description: SITE.description,
   applicationName: "Transfer Kitty",
   appleWebApp: { capable: true, title: "Transfer Kitty", statusBarStyle: "black-translucent" },
-  openGraph: { type: "website", siteName: "Transfer Kitty" },
+  openGraph: {
+    type: "website",
+    siteName: SITE.name,
+    title: SITE.title,
+    description: SITE.description,
+    url: SITE.url,
+  },
   twitter: { card: "summary_large_image" },
 };
 

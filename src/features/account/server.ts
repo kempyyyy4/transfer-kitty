@@ -3,6 +3,7 @@ export {
   callbackQuerySchema,
   deleteAccountSchema,
   displayNameSchema,
+  emailCodeSchema,
   emailSignInSchema,
   type CallbackQuery,
 } from "./schemas";

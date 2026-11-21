@@ -2,7 +2,7 @@ export { getOrCreateUserId, getUserId, getVisitor, type Visitor } from "./sessio
 export {
   completeSignIn,
   googleSignInUrl,
-  sendMagicLink,
+  sendEmailCode,
   SignInError,
   signOut,
   type SignInProof,

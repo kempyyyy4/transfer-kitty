@@ -73,7 +73,7 @@ export function AccountScreen() {
 /** What the sign-in return page reported, as a sentence for the player. */
 function noticeFromAddress(params: URLSearchParams): string | null {
   if (params.get("signin") === "failed") {
-    return "That sign-in link did not work. It may have expired or been used already, or been opened in a different browser. Ask for a new one below.";
+    return "That sign-in did not work. Please try again below.";
   }
   if (params.get("signin") !== "ok") return null;
 

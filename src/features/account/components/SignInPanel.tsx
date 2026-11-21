@@ -4,33 +4,40 @@ import { track } from "@/features/analytics";
 import { useState, type FormEvent } from "react";
 import { accountApi, AccountApiError } from "../api-client";
 
-/** Email link or Google. A guest's games and leagues come with them. */
+const messageOf = (failure: unknown, fallback: string) =>
+  failure instanceof AccountApiError ? failure.message : fallback;
+
+/** Emailed code or Google. A guest's games and leagues come with them. */
 export function SignInPanel({ isGuest }: { isGuest: boolean }) {
   const [email, setEmail] = useState("");
   const [sentTo, setSentTo] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   async function send(event: FormEvent) {
     event.preventDefault();
     track("sign_in_started", { method: "email" });
     setError(null);
+    setBusy(true);
     try {
-      await accountApi.emailLink(email);
+      await accountApi.emailCode(email);
       setSentTo(email);
     } catch (failure) {
-      setError(failure instanceof AccountApiError ? failure.message : "Could not send the email.");
+      setError(messageOf(failure, "Could not send the email."));
+    } finally {
+      setBusy(false);
     }
   }
 
   if (sentTo) {
     return (
-      <div className="pixel-panel flex flex-col gap-2 border-floodlight p-4" role="status">
-        <p className="font-bold">Check your email</p>
-        <p>
-          We sent a sign-in link to {sentTo}. Open it on this device, in this browser, within the
-          hour.
-        </p>
-      </div>
+      <CodeForm
+        email={sentTo}
+        onChangeEmail={() => {
+          setSentTo(null);
+          setError(null);
+        }}
+      />
     );
   }
 
@@ -54,9 +61,10 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
         />
         <button
           type="submit"
+          disabled={busy}
           className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight"
         >
-          EMAIL ME A SIGN-IN LINK
+          {busy ? "SENDING..." : "EMAIL ME A CODE"}
         </button>
       </form>
 
@@ -71,5 +79,55 @@ export function SignInPanel({ isGuest }: { isGuest: boolean }) {
 
       {error ? <p role="alert">{error}</p> : null}
     </section>
+  );
+}
+
+/** The code from the email is typed here, so it works whichever app the email is read in. */
+function CodeForm({ email, onChangeEmail }: { email: string; onChangeEmail: () => void }) {
+  const [code, setCode] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function verify(event: FormEvent) {
+    event.preventDefault();
+    setError(null);
+    setBusy(true);
+    try {
+      const { next } = await accountApi.verifyCode(email, code);
+      window.location.assign(next);
+    } catch (failure) {
+      setError(messageOf(failure, "That did not work. Try again."));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <form onSubmit={verify} className="pixel-panel flex flex-col gap-3 border-floodlight p-4">
+      <p className="font-bold">Check your email</p>
+      <p>We sent a sign-in code to {email}. It lasts an hour.</p>
+      <label htmlFor="code">Your code</label>
+      <input
+        id="code"
+        required
+        autoFocus
+        value={code}
+        onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+        inputMode="numeric"
+        autoComplete="one-time-code"
+        maxLength={10}
+        className="pixel-input p-3 text-center text-2xl tracking-widest"
+      />
+      <button
+        type="submit"
+        disabled={busy || code.length < 6}
+        className="pixel-button border-floodlight px-4 py-3 text-xs text-floodlight disabled:opacity-50"
+      >
+        {busy ? "CHECKING..." : "SIGN IN"}
+      </button>
+      {error ? <p role="alert">{error}</p> : null}
+      <button type="button" onClick={onChangeEmail} className="text-center underline">
+        Use a different email or send a new code
+      </button>
+    </form>
   );
 }

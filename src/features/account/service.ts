@@ -61,9 +61,10 @@ export interface SignInResult {
 export async function finishSignIn(proof: SignInProof): Promise<SignInResult> {
   const cookieStore = await cookies();
   const token = cookieStore.get(MERGE_COOKIE)?.value;
-  cookieStore.delete(MERGE_COOKIE);
 
+  // Only after this succeeds: a mistyped code must not lose the link to the guest's games.
   const accountId = await completeSignIn(proof);
+  cookieStore.delete(MERGE_COOKIE);
   const guestId = token ? await takePendingMerge(token, ACCOUNT.signInWindowSeconds) : null;
 
   let gamesMoved = 0;
