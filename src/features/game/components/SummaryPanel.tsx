@@ -101,7 +101,10 @@ export function SummaryPanel({ sessionId, summary, onPlayAgain }: Props) {
                 ) : null}
                 <div className="min-w-0 flex-1">
                   <p className="text-xl leading-tight">
-                    {outcomeLine(answer.outcome, answer.answer)}
+                    {/* Skips and timeouts are stored alike, so this covers both. */}
+                    {answer.outcome === "timeout"
+                      ? "No answer"
+                      : outcomeLine(answer.outcome, answer.answer)}
                   </p>
                   <p className="font-pixel text-[10px]" style={{ color: tierColour(answer.tier) }}>
                     {tierName(answer.tier).toUpperCase()}
