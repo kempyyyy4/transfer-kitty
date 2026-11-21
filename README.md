@@ -112,7 +112,7 @@ Ads appear only on the Results and Top Kitties screens, never mid-game, and neve
 1. Import the GitHub repository in Vercel. The framework is detected as Next.js.
 2. Add every environment variable from `.env.example`, with live values, under Settings, Environment Variables.
 3. `vercel.json` schedules `/api/cron/rollover` twice a night (it covers the clock change between GMT and BST). `PLAN.md` recommends Vercel's Pro plan so the jobs run on time. Set `CRON_SECRET` so nobody else can trigger them.
-4. Under Settings, Domains, add `transferkitty.gg` and `www.transferkitty.gg`, then create the DNS records Vercel shows at the domain's registrar. Vercel adds HTTPS by itself.
+4. Under Settings, Domains, add `transferkitty.io` and `www.transferkitty.io`, then create the DNS records Vercel shows at the domain's registrar. Vercel adds HTTPS by itself.
 5. Update the Supabase Site URL and redirect URLs, Google sign-in and the Stripe webhook to the new domain.
 
 ## Before launch
