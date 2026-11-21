@@ -2,6 +2,12 @@ import { z } from "zod";
 
 export const emailSignInSchema = z.object({ email: z.email().max(254) });
 
+/** Supabase codes are 6 to 10 digits, depending on the project's setting. */
+export const emailCodeSchema = z.object({
+  email: z.email().max(254),
+  code: z.string().regex(/^\d{6,10}$/),
+});
+
 /** The player types DELETE to confirm, so a stray click can never delete an account. */
 export const deleteAccountSchema = z.object({ confirm: z.literal("DELETE") });
 

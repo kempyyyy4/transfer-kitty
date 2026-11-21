@@ -18,6 +18,8 @@ export const RATE_LIMITS = {
   profile: { name: "profile", limit: 60, windowSeconds: 60 },
   /** Each try sends an email, so this stays low. Counted per IP address. */
   signIn: { name: "sign-in", limit: 5, windowSeconds: 600 },
+  /** Tries at a sign-in code, per IP and per address, so a code cannot be guessed. */
+  signInCode: { name: "sign-in-code", limit: 8, windowSeconds: 600 },
   accountChange: { name: "account-change", limit: 20, windowSeconds: 600 },
   /** Creating, joining and leaving leagues. Low, because a script could spam invite codes. */
   leagueChange: { name: "league-change", limit: 10, windowSeconds: 600 },

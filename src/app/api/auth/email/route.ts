@@ -1,10 +1,10 @@
 import { RATE_LIMITS } from "@/config/rate-limits";
 import { emailSignInSchema, rememberGuestForSignIn } from "@/features/account/server";
-import { getVisitor, sendMagicLink, SignInError } from "@/lib/auth";
+import { getVisitor, sendEmailCode, SignInError } from "@/lib/auth";
 import { clientAddress, jsonError, readJsonBody, tooManyRequests } from "@/lib/http";
 import { isWithinRateLimit } from "@/lib/rate-limit";
 
-/** Emails a sign-in link. A guest's play follows them into the account. */
+/** Emails a sign-in code. A guest's play follows them into the account. */
 export async function POST(request: Request) {
   if (!(await isWithinRateLimit(RATE_LIMITS.signIn, `ip:${clientAddress(request)}`))) {
     return tooManyRequests();
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
   await rememberGuestForSignIn(await getVisitor());
   try {
-    await sendMagicLink(body.data.email, new URL("/auth/callback", request.url).toString());
+    await sendEmailCode(body.data.email);
   } catch (error) {
     if (!(error instanceof SignInError)) throw error;
     if (error.status === 429) {

@@ -135,7 +135,7 @@ Sign-in goes through `src/lib/auth` only, the same way database access goes thro
 
 ## Accounts
 
-- Every visitor who plays is a Supabase user: a guest (anonymous) until they sign in by emailed link or Google.
+- Every visitor who plays is a Supabase user: a guest (anonymous) until they sign in with an emailed code or Google. A code, because phones often open email links in a different browser. Supabase's Magic Link email template must show `{{ .Token }}`.
 - Signing in always signs in to an account, new or existing, then merges the guest into it (`merge_guest_into_account`). There is no separate "convert guest" path. The guest is found through a random token in an httpOnly cookie, matched on the server in `pending_merges`, never from an ID the browser sends.
 - The sign-in return page, `/auth/callback`, only ever redirects to fixed pages on this site.
 - Redirect with `NextResponse.redirect`, not `Response.redirect`, from any route that sets cookies.
@@ -229,6 +229,10 @@ A feature's `service.ts` is server-only. Its client components import from their
 - Kit the mascot and every sprite must be original artwork drawn as code.
 - The home team photo (`LINEUP` in `src/features/avatar/cast.ts`) shows close likenesses of famous players, by Tom's choice (PLAN.md 2.7). It must pass the legal check before launch. Never name them anywhere, and never add a likeness elsewhere without asking.
 - No random packs, loot boxes or mystery items. Direct purchase only.
+
+## Search engines
+
+- `src/config/site.ts` holds the live address, title and description, and which pages are public. `src/app/robots.ts` and `sitemap.ts` read it.
 
 ## Keeping this file current
 

@@ -26,7 +26,9 @@ function post<T>(path: string, body: object = {}): Promise<T> {
 
 export const accountApi = {
   status: () => call<AccountStatus>("/api/account"),
-  emailLink: (email: string) => post<{ sent: true }>("/api/auth/email", { email }),
+  emailCode: (email: string) => post<{ sent: true }>("/api/auth/email", { email }),
+  verifyCode: (email: string, code: string) =>
+    post<{ next: string }>("/api/auth/email/verify", { email, code }),
   setName: (name: string) => post<{ displayName: string }>("/api/account/name", { name }),
   signOut: () => post<{ signedOut: true }>("/api/auth/sign-out"),
   deleteAccount: () => post<{ deleted: true }>("/api/account/delete", { confirm: "DELETE" }),
